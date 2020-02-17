@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+install:
+  - pip install -r requirements.txt
+  - pip install codecov
+script:
+  - pytest --cov=./pycamunda 
+after_success:
+  - codecov
