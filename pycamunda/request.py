@@ -70,13 +70,14 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
     @property
     def url(self):
         params = {}
+        missing_params = {}
         for name, attribute in vars(type(self)).items():
             if isinstance(attribute, PathParameter):
                 try:
                     params[attribute.key] = getattr(self, attribute.name)
                 except KeyError:
-                    pass
-        return self._url.format(**params)
+                    missing_params[attribute.key] = ''
+        return self._url.format(**{**params, **missing_params}).rstrip('/')
 
     @abc.abstractmethod
     def send(self):
