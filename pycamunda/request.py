@@ -1,21 +1,27 @@
 # -*- coding: utf-8 -*-
 
 import abc
+from typing import Mapping, Callable
 
 
 class RequestParameter:
 
-    def __init__(self, key):
+    def __init__(self, key, mapping: Mapping=None, provide: Callable=None):
         """Parameter that is send with a CamundaRequest when it is attached to the class and its value is set. This
         class implements the descriptor protocol.
 
         :param key: Camunda key of the request parameter.
         """
         self.key = key
+        self.mapping = mapping
+        self.provide = provide
         self.name = None
 
     def __get__(self, obj, obj_type=None):
-        return obj.__dict__[self.name]
+        if self.provide is None or self.provide(self):
+            if self.mapping is None:
+                return obj.__dict__[self.name]
+            return self.mapping[obj.__dict__[self.name]]
 
     def __set__(self, obj, value):
         obj.__dict__[self.name] = value
@@ -78,6 +84,9 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                 except KeyError:
                     missing_params[attribute.key] = ''
         return self._url.format(**{**params, **missing_params}).rstrip('/')
+
+    def __call__(self, *args, **kwargs):
+        return self.send()
 
     @abc.abstractmethod
     def send(self):
