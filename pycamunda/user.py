@@ -3,12 +3,30 @@
 """This module provides access to the user REST api of Camunda."""
 
 import requests
+import dataclasses
 
 import pycamunda
 import pycamunda.request
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/user'
+
+
+@dataclasses.dataclass
+class User:
+    id_: str
+    first_name: str
+    last_name: str
+    email: str
+
+    @classmethod
+    def from_json(cls, json):
+        return User(
+            id_=json['id'],
+            first_name=json['firstName'],
+            last_name=json['lastName'],
+            email=json['email']
+        )
 
 
 class Delete(pycamunda.request.CamundaRequest):
@@ -132,7 +150,7 @@ class Get(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return response.json()
+        return tuple(User.from_json(user_json) for user_json in response.json())
 
 
 class GetProfile(pycamunda.request.CamundaRequest):
@@ -157,7 +175,7 @@ class GetProfile(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return response.json()
+        return User.from_json(response.json())
 
 
 class Options(pycamunda.request.CamundaRequest):
