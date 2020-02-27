@@ -4,6 +4,7 @@
 
 import requests
 import dataclasses
+import typing
 
 import pycamunda
 import pycamunda.request
@@ -20,12 +21,38 @@ class User:
     email: str
 
     @classmethod
-    def from_json(cls, json):
+    def load(cls, data):
         return User(
-            id_=json['id'],
-            first_name=json['firstName'],
-            last_name=json['lastName'],
-            email=json['email']
+            id_=data['id'],
+            first_name=data['firstName'],
+            last_name=data['lastName'],
+            email=data['email']
+        )
+
+
+@dataclasses.dataclass
+class Link:
+    method: str
+    href: str
+    rel: str
+
+    @classmethod
+    def load(cls, data):
+        return Link(
+            method=data['method'],
+            href=data['href'],
+            rel=data['rel'],
+        )
+
+
+@dataclasses.dataclass
+class ResourceOptions:
+    links: typing.Tuple[Link]
+
+    @classmethod
+    def load(cls, data):
+        return ResourceOptions(
+            links=tuple(Link(**link) for link in data['links'])
         )
 
 
@@ -150,7 +177,7 @@ class Get(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return tuple(User.from_json(user_json) for user_json in response.json())
+        return tuple(User.load(user_json) for user_json in response.json())
 
 
 class GetProfile(pycamunda.request.CamundaRequest):
@@ -175,7 +202,7 @@ class GetProfile(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return User.from_json(response.json())
+        return User.load(response.json())
 
 
 class Options(pycamunda.request.CamundaRequest):
@@ -201,7 +228,7 @@ class Options(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return response.json()
+        return ResourceOptions.load(response.json())
 
 
 class Create(pycamunda.request.CamundaRequest):
