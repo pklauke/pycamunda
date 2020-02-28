@@ -112,6 +112,9 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                     value = getattr(self, val.name)
                 except KeyError:
                     pass
+                except AttributeError:
+                    if isinstance(val, str):
+                        query[key] = val
                 else:
                     if value is not None:
                         query[key] = value
