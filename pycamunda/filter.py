@@ -58,7 +58,7 @@ class Filter:
         )
 
 
-class Get(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.request.CamundaRequest):
 
     id_ = QueryParameter('filterId')
     resource_type = QueryParameter('resourceType')
@@ -84,7 +84,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param name: Filter by the name of the filter.
         :param name_like: Filter by a substring of the name of the filter.
         :param owner: Filter by the user id of the owner of the filter.
-        :param item_count: Return the number of items matched by the respective filter.
+        :param item_count: Return the number of items matched by the respective filters.
         :param sort_by: Sort the results by `id_`, `first_name`, `last_name` or `email` of the user.
         :param ascending: Sort order.
         :param first_result: Pagination of results. Index of the first result to return.
@@ -113,6 +113,74 @@ class Get(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(Filter.load(filter_json) for filter_json in response.json())
+
+
+class Count(pycamunda.request.CamundaRequest):
+
+    id_ = QueryParameter('filterId')
+    resource_type = QueryParameter('resourceType')
+    name = QueryParameter('name')
+    name_like = QueryParameter('nameLike')
+    owner = QueryParameter('owner')
+
+    def __init__(self, url, id_=None, resource_type=None, name=None, name_like=None, owner=None):
+        """Count filters.1
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the filter.
+        :param resource_type: Filter by the resource type of the filter.
+        :param name: Filter by the name of the filter.
+        :param name_like: Filter by a substring of the name of the filter.
+        :param owner: Filter by the user id of the owner of the filter.
+        """
+        super().__init__(url + URL_SUFFIX + '/count')
+        self.id_ = id_
+        self.resource_type = resource_type
+        self.name = name
+        self.name_like = name_like
+        self.owner = owner
+
+    def send(self):
+        """Send the request"""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        print(response.json())
+        return response.json()['count']
+
+
+class Get(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('filterId')
+    item_count = QueryParameter('itemCount')
+
+    def __init__(self, url, id_, item_count=False):
+        """Query for a filter.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the filter.
+        :param item_count: Return the number of items matched by the respective filter.
+        """
+        super().__init__(url + URL_SUFFIX + '/{filterId}')
+        self.id_ = id_
+        self.item_count = item_count
+
+    def send(self):
+        """Send the request"""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return Filter.load(response.json())
 
 
 class Create(pycamunda.request.CamundaRequest):
@@ -151,5 +219,73 @@ class Create(pycamunda.request.CamundaRequest):
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException as exc:
             raise pycamunda.PyCamundaException(exc)
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return Filter.load(response.json())
+
+
+class Update(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    resource_type = BodyParameter('resourceType')
+    name = BodyParameter('name')
+    owner = BodyParameter('owner')
+    query = BodyParameterContainer('query')
+    properties = BodyParameterContainer('properties')
+
+    def __init__(self, url, id_, resource_type=None, name=None, owner=None):
+        """Update a filter.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the filter.
+        :param resource_type: Resource type of the filter.
+        :param name: Name of the filter.
+        :param owner: User id of the owner of the filter.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.resource_type = resource_type
+        self.name = name
+        self.owner = owner
+
+    def add_query(self, **kwargs):
+        for key, value in kwargs.items():
+            self.query.parameters[key] = value
+
+    def add_properties(self, **kwargs):
+        for key, value in kwargs.items():
+            self.properties.parameters[key] = value
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException as exc:
+            raise pycamunda.PyCamundaException(exc)
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Delete(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url, id_):
+        """Delete a filter.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the filter.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def send(self):
+        """Send the request."""
+        try:
+            response = requests.delete(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)

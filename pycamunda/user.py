@@ -113,7 +113,7 @@ class Count(pycamunda.request.CamundaRequest):
         return response.json()['count']
 
 
-class Get(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.request.CamundaRequest):
 
     id_ = QueryParameter('id')
     first_name = QueryParameter('firstName')
@@ -147,7 +147,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param email_like: Filter by a substring of the email.
         :param member_of_group: Filter for users which are a member of a group.
         :param member_of_tenant: Filter for users which are a member of a tenant.
-        :param sort_by: Sort the results by `id`, `first_name`, `last_name` or `email` of the user.
+        :param sort_by: Sort the results by `id_`, `first_name`, `last_name` or `email` of the user.
         :param ascending: Sort order.
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
