@@ -4,11 +4,11 @@
 
 import requests
 import dataclasses
-import typing
 
 import pycamunda
 import pycamunda.request
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
+import pycamunda.task
 
 URL_SUFFIX = '/filter'
 
@@ -124,7 +124,7 @@ class Count(pycamunda.request.CamundaRequest):
     owner = QueryParameter('owner')
 
     def __init__(self, url, id_=None, resource_type=None, name=None, name_like=None, owner=None):
-        """Count filters.1
+        """Count filters.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
@@ -150,7 +150,6 @@ class Count(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        print(response.json())
         return response.json()['count']
 
 
@@ -208,9 +207,13 @@ class Create(pycamunda.request.CamundaRequest):
         for key, value in kwargs.items():
             self.query.parameters[key] = value
 
+        return self
+
     def add_properties(self, **kwargs):
         for key, value in kwargs.items():
             self.properties.parameters[key] = value
+
+        return self
 
     def send(self):
         """Send the request"""
@@ -253,9 +256,13 @@ class Update(pycamunda.request.CamundaRequest):
         for key, value in kwargs.items():
             self.query.parameters[key] = value
 
+        return self
+
     def add_properties(self, **kwargs):
         for key, value in kwargs.items():
             self.properties.parameters[key] = value
+
+        return self
 
     def send(self):
         """Send the request"""
@@ -289,3 +296,57 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Execute(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    query = BodyParameterContainer('query')
+
+    def __init__(self, url, id_, single_result=False):
+        """Execute a filter.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the filter.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.single_result = single_result
+
+    def send(self):
+        """Send the request."""
+        try:
+            response = requests.get(self.url + ('/singleResult' if self.single_result else '/list'))
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        if self.single_result:
+            return pycamunda.task.Task.load(response.json())
+        return tuple(pycamunda.task.Task.load(task_json) for task_json in response.json())
+
+
+class ExecuteCount(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url, id_):
+        """Get the number of results returned by executing a filter.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the filter.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/count')
+        self.id_ = id_
+
+    def send(self):
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return response.json()['count']
