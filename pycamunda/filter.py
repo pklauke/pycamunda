@@ -72,7 +72,7 @@ class GetList(pycamunda.request.CamundaRequest):
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
-    def __init__(self, url, id_=None, resource_type=None, name=None, name_like=None, owner=None,
+    def __init__(self, url, id_=None, name=None, name_like=None, owner=None,
                  item_count=False, sort_by=None, ascending=True, first_result=None,
                  max_results=None):
         """Query for a list of filters using a list of parameters. The size of the result set can be
@@ -80,7 +80,6 @@ class GetList(pycamunda.request.CamundaRequest):
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
-        :param resource_type: Filter by the resource type of the filter.
         :param name: Filter by the name of the filter.
         :param name_like: Filter by a substring of the name of the filter.
         :param owner: Filter by the user id of the owner of the filter.
@@ -92,7 +91,7 @@ class GetList(pycamunda.request.CamundaRequest):
         """
         super().__init__(url + URL_SUFFIX)
         self.id_ = id_
-        self.resource_type = resource_type
+        self.resource_type = 'Task'
         self.name = name
         self.name_like = name_like
         self.owner = owner
@@ -123,19 +122,18 @@ class Count(pycamunda.request.CamundaRequest):
     name_like = QueryParameter('nameLike')
     owner = QueryParameter('owner')
 
-    def __init__(self, url, id_=None, resource_type=None, name=None, name_like=None, owner=None):
+    def __init__(self, url, id_=None, name=None, name_like=None, owner=None):
         """Count filters.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
-        :param resource_type: Filter by the resource type of the filter.
         :param name: Filter by the name of the filter.
         :param name_like: Filter by a substring of the name of the filter.
         :param owner: Filter by the user id of the owner of the filter.
         """
         super().__init__(url + URL_SUFFIX + '/count')
         self.id_ = id_
-        self.resource_type = resource_type
+        self.resource_type = 'Task'
         self.name = name
         self.name_like = name_like
         self.owner = owner
@@ -190,16 +188,15 @@ class Create(pycamunda.request.CamundaRequest):
     query = BodyParameterContainer('query')
     properties = BodyParameterContainer('properties')
 
-    def __init__(self, url, resource_type=None, name=None, owner=None):
+    def __init__(self, url, name=None, owner=None):
         """Create a new filter.
 
         :param url: Camunda Rest engine URL.
-        :param resource_type: Resource type of the filter.
         :param name: Name of the filter.
         :param owner: User id of the owner of the filter.
         """
         super().__init__(url=url + URL_SUFFIX + '/create')
-        self.resource_type = resource_type
+        self.resource_type = 'Task'
         self.name = name
         self.owner = owner
 
@@ -237,18 +234,17 @@ class Update(pycamunda.request.CamundaRequest):
     query = BodyParameterContainer('query')
     properties = BodyParameterContainer('properties')
 
-    def __init__(self, url, id_, resource_type=None, name=None, owner=None):
+    def __init__(self, url, id_, name=None, owner=None):
         """Update a filter.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
-        :param resource_type: Resource type of the filter.
         :param name: Name of the filter.
         :param owner: User id of the owner of the filter.
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
-        self.resource_type = resource_type
+        self.resource_type = 'Task'
         self.name = name
         self.owner = owner
 
