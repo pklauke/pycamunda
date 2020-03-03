@@ -206,7 +206,6 @@ class CriteriaMixin:
         :param key_in: Filter by a substring of the key of the process definition.
         :param name: Filter by the name of the process definition.
         :param name_like: Filter by a substring of the name of the process definition.
-        :return:
         """
         self.query.parameters['processDefinitionId'] = id_
         self.query.parameters['processDefinitionKey'] = key
@@ -215,6 +214,17 @@ class CriteriaMixin:
         self.query.parameters['processDefinitionNameLike'] = name_like
 
         return self
+
+    def add_case_definition_criteria(self, id_=None, business_key=None, business_key_like=None):
+        """Add criteria that filter by the case instance.
+
+        :param id_: Filter by the id of the case instance.
+        :param business_key: Filter by the business key of the case instance.
+        :param business_key_like: Filter by a substring of the business key of the case instance.
+        """
+        self.query.parameters['caseInstanceId'] = id_
+        self.query.parameters['caseInstanceBusinessKey'] = business_key
+        self.query.parameters['caseInstanceBusinessKeyLike'] = business_key_like
 
 
 class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
@@ -252,7 +262,6 @@ class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
     def send(self):
         """Send the request"""
         params = self.body_parameters()
-        print('PARAMS', params)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException as exc:
