@@ -180,7 +180,44 @@ class Get(pycamunda.request.CamundaRequest):
         return Filter.load(response.json())
 
 
-class Create(pycamunda.request.CamundaRequest):
+class CriteriaMixin:
+
+    query = BodyParameterContainer('query')
+
+    def add_process_instance_criteria(self, id_=None, business_key=None, business_key_like=None):
+        """Add criteria that filter by process instance.
+
+        :param id_: Filter by the id of the process instance.
+        :param business_key: Filter by the business key of the process instance.
+        :param business_key_like: Filter by a substring of the business key of the filter.
+        """
+        self.query.parameters['processInstanceId'] = id_
+        self.query.parameters['processInstanceBusinessKey'] = business_key
+        self.query.parameters['processInstanceBusinessKeyLike'] = business_key_like
+
+        return self
+
+    def add_process_definition_criteria(self, id_=None, key=None, key_in=None, name=None,
+                                        name_like=None):
+        """Add criteria that filter by the process definition.
+
+        :param id_: Filter by the id of the process definition.
+        :param key: Filter by the key of the process definition.
+        :param key_in: Filter by a substring of the key of the process definition.
+        :param name: Filter by the name of the process definition.
+        :param name_like: Filter by a substring of the name of the process definition.
+        :return:
+        """
+        self.query.parameters['processDefinitionId'] = id_
+        self.query.parameters['processDefinitionKey'] = key
+        self.query.parameters['processDefinitionKeyIn'] = key_in
+        self.query.parameters['processDefinitionName'] = name
+        self.query.parameters['processDefinitionNameLike'] = name_like
+
+        return self
+
+
+class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
 
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
@@ -188,7 +225,7 @@ class Create(pycamunda.request.CamundaRequest):
     query = BodyParameterContainer('query')
     properties = BodyParameterContainer('properties')
 
-    def __init__(self, url, name=None, owner=None):
+    def __init__(self, url, name, owner=None):
         """Create a new filter.
 
         :param url: Camunda Rest engine URL.
@@ -215,6 +252,7 @@ class Create(pycamunda.request.CamundaRequest):
     def send(self):
         """Send the request"""
         params = self.body_parameters()
+        print('PARAMS', params)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException as exc:

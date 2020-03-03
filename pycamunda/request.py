@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import abc
+import collections
 from typing import Mapping, Callable
 
 
@@ -53,6 +54,10 @@ class BodyParameterContainer:
         self.parameters = {}
         for arg in args:
             self.parameters[arg.key] = arg
+
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}(key={self.key}, ' \
+               f'{", ".join(k+"="+str(v) for k, v in self.parameters.items())})'
 
 
 class CamundaRequestMeta(abc.ABCMeta):
@@ -113,7 +118,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                 except KeyError:
                     pass
                 except AttributeError:
-                    if isinstance(val, str):
+                    if isinstance(val, collections.Iterable):
                         query[key] = val
                 else:
                     if value is not None:
