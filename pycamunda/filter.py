@@ -215,7 +215,7 @@ class CriteriaMixin:
 
         return self
 
-    def add_case_definition_criteria(self, id_=None, business_key=None, business_key_like=None):
+    def add_case_instance_criteria(self, id_=None, business_key=None, business_key_like=None):
         """Add criteria that filter by the case instance.
 
         :param id_: Filter by the id of the case instance.
@@ -225,6 +225,32 @@ class CriteriaMixin:
         self.query.parameters['caseInstanceId'] = id_
         self.query.parameters['caseInstanceBusinessKey'] = business_key
         self.query.parameters['caseInstanceBusinessKeyLike'] = business_key_like
+
+        return self
+
+    def add_case_definition_criteria(self, id_=None, key=None, name=None, name_like=None):
+        """Add criteria that filter by the case definition.
+
+        :param id_: Filter by the id of the case definition.
+        :param key: Filter by the key of the case definition.
+        :param name: Filter by the name of the case definition.
+        :param name_like: Filter by a substring of the name of the case definition.
+        """
+        self.query.parameters['caseDefinitionId'] = id_
+        self.query.parameters['caseDefinitionKey'] = key
+        self.query.parameters['caseDefinitionName'] = name
+        self.query.parameters['caseDefinitionNameLike'] = name_like
+
+    def add_other_criteria(self, active=False, activity_instance_id_in=None, execution_id=None):
+        """Add criteria that filter by active status, activity instance or execution id.
+
+        :param active: Filter only active tasks.
+        :param activity_instance_id_in: Filter by activity instance ids.
+        :param execution_id: Filter by the execution id.
+        """
+        self.query.parameters['active'] = active or None
+        self.query.parameters['activityInstanceIdIn'] = activity_instance_id_in
+        self.query.parameters['executionId'] = execution_id
 
 
 class Create(pycamunda.request.CamundaRequest, CriteriaMixin):

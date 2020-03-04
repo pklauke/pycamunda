@@ -118,7 +118,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                 except KeyError:
                     pass
                 except AttributeError:
-                    if isinstance(val, collections.Iterable):
+                    if val is not None:
                         query[key] = val
                 else:
                     if value is not None:
