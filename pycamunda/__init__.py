@@ -6,7 +6,10 @@ class PyCamundaException(Exception):
 
 
 class PyCamundaNoSuccess(PyCamundaException):
-    """Exception that is raised when a response is not successful."""
+    """Exception that is raised when a request is not successful."""
+
+class PyCamundaInvalidInput(PyCamundaNoSuccess):
+    """Exception that is raised when invalid input is given to a request."""
 
 
 class PyCamundaUserAlreadyExists(PyCamundaNoSuccess):

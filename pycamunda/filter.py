@@ -252,6 +252,45 @@ class CriteriaMixin:
         self.query.parameters['activityInstanceIdIn'] = activity_instance_id_in
         self.query.parameters['executionId'] = execution_id
 
+    def add_user_criteria(self, assignee=None, assignee_in=None, assignee_like=None, owner=None,
+                          candidate_group=None, candidate_groups=None, candidate_user=None,
+                          involved_user=None, unassigned=None, delegation_resolved=None):
+        """Add criteria that filter by user.
+
+        :param assignee: Filter by the assignee of the task.
+        :param assignee_in: Filter whether assignee of the task is one multiple ones.
+        :param assignee_like: Filter by a substring of the assignee of the task.
+        :param owner: Filter by the owner of the task.
+        :param candidate_group: Filter by the candidate group of the task.
+        :param candidate_groups: Filter whether the candidate group of the task is one of multiple
+                                 ones.
+        :param candidate_user: Filter by the candidate user of the task.
+        :param involved_user: TODO
+        :param unassigned: Filter only unassigned tasks.
+        :param delegation_resolved: Filter by delegation state.
+        """
+        if candidate_user is not None and (
+                candidate_group is not None or candidate_groups is not None):
+            raise pycamunda.PyCamundaInvalidInput('candidate user and candidate groups must not be '
+                                                  'both provided.')
+
+        self.query.parameters['assignee'] = assignee
+        self.query.parameters['assigneeIn'] = assignee_in
+        self.query.parameters['assigneeLike'] = assignee_like
+        self.query.parameters['owner'] = owner
+        self.query.parameters['candidateGroup'] = candidate_group
+        self.query.parameters['candidateGroups'] = candidate_groups
+        self.query.parameters['candidateUser'] = candidate_user
+        self.query.parameters['involvedUser'] = involved_user
+        self.query.parameters['unassigned'] = unassigned
+        if delegation_resolved is not None:
+            self.query.parameters['delegationState'] = \
+                'RESOLVED' if delegation_resolved else 'PENDING'
+        else:
+            self.query.parameters['delegationState'] = None
+
+        return self
+
 
 class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
 
