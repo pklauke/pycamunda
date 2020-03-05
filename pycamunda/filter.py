@@ -184,21 +184,24 @@ class CriteriaMixin:
 
     query = BodyParameterContainer('query')
 
-    def add_process_instance_criteria(self, id_=None, business_key=None, business_key_like=None):
+    def add_process_instance_criteria(self, id_=..., business_key=..., business_key_like=...):
         """Add criteria that filter by process instance.
 
         :param id_: Filter by the id of the process instance.
         :param business_key: Filter by the business key of the process instance.
         :param business_key_like: Filter by a substring of the business key of the filter.
         """
-        self.query.parameters['processInstanceId'] = id_
-        self.query.parameters['processInstanceBusinessKey'] = business_key
-        self.query.parameters['processInstanceBusinessKeyLike'] = business_key_like
+        if id_ is not Ellipsis:
+            self.query.parameters['processInstanceId'] = id_
+        if business_key is not Ellipsis:
+            self.query.parameters['processInstanceBusinessKey'] = business_key
+        if business_key_like is not Ellipsis:
+            self.query.parameters['processInstanceBusinessKeyLike'] = business_key_like
 
         return self
 
-    def add_process_definition_criteria(self, id_=None, key=None, key_in=None, name=None,
-                                        name_like=None):
+    def add_process_definition_criteria(self, id_=..., key=..., key_in=..., name=...,
+                                        name_like=...):
         """Add criteria that filter by the process definition.
 
         :param id_: Filter by the id of the process definition.
@@ -207,28 +210,36 @@ class CriteriaMixin:
         :param name: Filter by the name of the process definition.
         :param name_like: Filter by a substring of the name of the process definition.
         """
-        self.query.parameters['processDefinitionId'] = id_
-        self.query.parameters['processDefinitionKey'] = key
-        self.query.parameters['processDefinitionKeyIn'] = key_in
-        self.query.parameters['processDefinitionName'] = name
-        self.query.parameters['processDefinitionNameLike'] = name_like
+        if id_ is not Ellipsis:
+            self.query.parameters['processDefinitionId'] = id_
+        if key is not Ellipsis:
+            self.query.parameters['processDefinitionKey'] = key
+        if key_in is not Ellipsis:
+            self.query.parameters['processDefinitionKeyIn'] = key_in
+        if name is not Ellipsis:
+            self.query.parameters['processDefinitionName'] = name
+        if name_like is not Ellipsis:
+            self.query.parameters['processDefinitionNameLike'] = name_like
 
         return self
 
-    def add_case_instance_criteria(self, id_=None, business_key=None, business_key_like=None):
+    def add_case_instance_criteria(self, id_=..., business_key=..., business_key_like=...):
         """Add criteria that filter by the case instance.
 
         :param id_: Filter by the id of the case instance.
         :param business_key: Filter by the business key of the case instance.
         :param business_key_like: Filter by a substring of the business key of the case instance.
         """
-        self.query.parameters['caseInstanceId'] = id_
-        self.query.parameters['caseInstanceBusinessKey'] = business_key
-        self.query.parameters['caseInstanceBusinessKeyLike'] = business_key_like
+        if id_ is not Ellipsis:
+            self.query.parameters['caseInstanceId'] = id_
+        if business_key is not Ellipsis:
+            self.query.parameters['caseInstanceBusinessKey'] = business_key
+        if business_key_like is not Ellipsis:
+            self.query.parameters['caseInstanceBusinessKeyLike'] = business_key_like
 
         return self
 
-    def add_case_definition_criteria(self, id_=None, key=None, name=None, name_like=None):
+    def add_case_definition_criteria(self, id_=..., key=..., name=..., name_like=...):
         """Add criteria that filter by the case definition.
 
         :param id_: Filter by the id of the case definition.
@@ -236,25 +247,32 @@ class CriteriaMixin:
         :param name: Filter by the name of the case definition.
         :param name_like: Filter by a substring of the name of the case definition.
         """
-        self.query.parameters['caseDefinitionId'] = id_
-        self.query.parameters['caseDefinitionKey'] = key
-        self.query.parameters['caseDefinitionName'] = name
-        self.query.parameters['caseDefinitionNameLike'] = name_like
+        if id_ is not Ellipsis:
+            self.query.parameters['caseDefinitionId'] = id_
+        if key is not Ellipsis:
+            self.query.parameters['caseDefinitionKey'] = key
+        if name is not Ellipsis:
+            self.query.parameters['caseDefinitionName'] = name
+        if name_like is not Ellipsis:
+            self.query.parameters['caseDefinitionNameLike'] = name_like
 
-    def add_other_criteria(self, active=False, activity_instance_id_in=None, execution_id=None):
+    def add_other_criteria(self, active=..., activity_instance_id_in=..., execution_id=...):
         """Add criteria that filter by active status, activity instance or execution id.
 
         :param active: Filter only active tasks.
         :param activity_instance_id_in: Filter by activity instance ids.
         :param execution_id: Filter by the execution id.
         """
-        self.query.parameters['active'] = active or None
-        self.query.parameters['activityInstanceIdIn'] = activity_instance_id_in
-        self.query.parameters['executionId'] = execution_id
+        if active is not Ellipsis:
+            self.query.parameters['active'] = active or None
+        if activity_instance_id_in is not Ellipsis:
+            self.query.parameters['activityInstanceIdIn'] = activity_instance_id_in
+        if execution_id is not Ellipsis:
+            self.query.parameters['executionId'] = execution_id
 
-    def add_user_criteria(self, assignee=None, assignee_in=None, assignee_like=None, owner=None,
-                          candidate_group=None, candidate_groups=None, candidate_user=None,
-                          involved_user=None, unassigned=None, delegation_resolved=None):
+    def add_user_criteria(self, assignee=..., assignee_in=..., assignee_like=..., owner=...,
+                          candidate_group=..., candidate_groups=..., candidate_user=...,
+                          involved_user=..., unassigned=..., delegation_resolved=...):
         """Add criteria that filter by user.
 
         :param assignee: Filter by the assignee of the task.
@@ -269,25 +287,34 @@ class CriteriaMixin:
         :param unassigned: Filter only unassigned tasks.
         :param delegation_resolved: Filter by delegation state.
         """
-        if candidate_user is not None and (
-                candidate_group is not None or candidate_groups is not None):
+        if candidate_user is not Ellipsis and (
+                candidate_group is not Ellipsis or candidate_groups is not Ellipsis):
             raise pycamunda.PyCamundaInvalidInput('candidate user and candidate groups must not be '
                                                   'both provided.')
 
-        self.query.parameters['assignee'] = assignee
-        self.query.parameters['assigneeIn'] = assignee_in
-        self.query.parameters['assigneeLike'] = assignee_like
-        self.query.parameters['owner'] = owner
-        self.query.parameters['candidateGroup'] = candidate_group
-        self.query.parameters['candidateGroups'] = candidate_groups
-        self.query.parameters['candidateUser'] = candidate_user
-        self.query.parameters['involvedUser'] = involved_user
-        self.query.parameters['unassigned'] = unassigned
-        if delegation_resolved is not None:
+        if assignee is not Ellipsis:
+            self.query.parameters['assignee'] = assignee
+        if assignee_in is not Ellipsis:
+            self.query.parameters['assigneeIn'] = assignee_in
+        if assignee_like is not Ellipsis:
+            self.query.parameters['assigneeLike'] = assignee_like
+        if owner is not Ellipsis:
+            self.query.parameters['owner'] = owner
+        if candidate_group is not Ellipsis:
+            self.query.parameters['candidateGroup'] = candidate_group
+        if candidate_groups is not Ellipsis:
+            self.query.parameters['candidateGroups'] = candidate_groups
+        if candidate_user is not Ellipsis:
+            self.query.parameters['candidateUser'] = candidate_user
+        if involved_user is not Ellipsis:
+            self.query.parameters['involvedUser'] = involved_user
+        if unassigned is not Ellipsis:
+            self.query.parameters['unassigned'] = unassigned
+        if delegation_resolved is None:
+            self.query.parameters['delegationState'] = None
+        elif delegation_resolved is not Ellipsis:
             self.query.parameters['delegationState'] = \
                 'RESOLVED' if delegation_resolved else 'PENDING'
-        else:
-            self.query.parameters['delegationState'] = None
 
         return self
 
