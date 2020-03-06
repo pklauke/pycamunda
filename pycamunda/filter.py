@@ -276,7 +276,7 @@ class CriteriaMixin:
         """Add criteria that filter by user.
 
         :param assignee: Filter by the assignee of the task.
-        :param assignee_in: Filter whether assignee of the task is one multiple ones.
+        :param assignee_in: Filter whether assignee of the task is one of multiple ones.
         :param assignee_like: Filter by a substring of the assignee of the task.
         :param owner: Filter by the owner of the task.
         :param candidate_group: Filter by the candidate group of the task.
@@ -315,6 +315,51 @@ class CriteriaMixin:
         elif delegation_resolved is not Ellipsis:
             self.query.parameters['delegationState'] = \
                 'RESOLVED' if delegation_resolved else 'PENDING'
+
+        return self
+
+    def add_task_criteria(self, definition_key=..., definition_key_in=..., definition_key_like=...,
+                          name=..., name_like=..., description=..., description_like=...,
+                          priority=..., max_priority=..., min_priority=..., tenant_id_in=...,
+                          without_tenant_id=False):
+        """Add criteria that filter by task.
+
+        :param definition_key: Filter by the definition key of the task.
+        :param definition_key_in: Filter whether definition key of the task is one of multiple ones.
+        :param definition_key_like: Filter by a substring of the definition key of the task.
+        :param name: Filter by the name of the task.
+        :param name_like:  Filter by a substring of the name of the task.
+        :param description: Filter by the description of the task.
+        :param description_like: Filter by a substring of the description of the task.
+        :param priority: Filter by the priority of the task.
+        :param max_priority: Filter by a maximum priority of the task.
+        :param min_priority: Filter by a minimum priority of the task.
+        :param tenant_id_in: Filter whether the tenant id is one of multiple ones.
+        :param without_tenant_id: Filter only tasks without tenant id.
+        """
+        if definition_key is not Ellipsis:
+            self.query.parameters['taskDefinitionKey'] = definition_key
+        if definition_key_in is not Ellipsis:
+            self.query.parameters['taskDefinitionKeyIn'] = definition_key_in
+        if definition_key_like is not Ellipsis:
+            self.query.parameters['taskDefinitionKeyLike'] = definition_key_like
+        if name is not Ellipsis:
+            self.query.parameters['name'] = name
+        if name_like is not Ellipsis:
+            self.query.parameters['nameLike'] = name_like
+        if description is not Ellipsis:
+            self.query.parameters['description'] = description
+        if description_like is not Ellipsis:
+            self.query.parameters['descriptionLike'] = description_like
+        if priority is not Ellipsis:
+            self.query.parameters['priority'] = priority
+        if max_priority is not Ellipsis:
+            self.query.parameters['maxPriority'] = max_priority
+        if min_priority is not Ellipsis:
+            self.query.parameters['minPriority'] = min_priority
+        if tenant_id_in is not Ellipsis:
+            self.query.parameters['tenantIdIn'] = tenant_id_in
+        self.query.parameters['withoutTenantId'] = without_tenant_id
 
         return self
 

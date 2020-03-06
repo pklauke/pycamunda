@@ -40,7 +40,11 @@ class PathParameter(RequestParameter):
 
 
 class BodyParameter(RequestParameter):
-    """Parameter that is attached to the request body."""
+
+    def __init__(self, *args, **kwargs):
+        """Parameter that is attached to the request body."""
+        super().__init__(*args, **kwargs)
+        self.hidden = False
 
 
 class BodyParameterContainer:
@@ -49,11 +53,12 @@ class BodyParameterContainer:
     :param key: Camunda key.
     :param args: BodyParameter`s
     """
-    def __init__(self, key, *args):
+    def __init__(self, key, *parameters):
         self.key = key
         self.parameters = {}
-        for arg in args:
-            self.parameters[arg.key] = arg
+        for parameter in parameters:
+            self.parameters[parameter.key] = parameter
+            parameter.hidden = True
 
     def __repr__(self):
         return f'{self.__class__.__qualname__}(key={self.key}, ' \
@@ -127,14 +132,10 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
 
     def body_parameters(self):
         query = {}
-        parameters = []
         for name, attribute in vars(type(self)).items():
             if isinstance(attribute, BodyParameterContainer):
                 query[attribute.key] = self._traverse(attribute)
-                parameters += list(attribute.parameters)
-        parameters = set(parameters)
-        for name, attribute in vars(type(self)).items():
-            if isinstance(attribute, BodyParameter) and attribute.key not in parameters:
+            elif isinstance(attribute, BodyParameter) and not attribute.hidden:
                 try:
                     value = getattr(self, attribute.name)
                 except KeyError:
@@ -142,4 +143,5 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                 else:
                     if value is not None:
                         query[attribute.key] = value
+
         return query
