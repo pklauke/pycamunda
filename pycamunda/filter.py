@@ -445,7 +445,7 @@ class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
         return Filter.load(response.json())
 
 
-class Update(pycamunda.request.CamundaRequest):
+class Update(pycamunda.request.CamundaRequest, CriteriaMixin):
 
     id_ = PathParameter('id')
     resource_type = BodyParameter('resourceType')
@@ -467,12 +467,6 @@ class Update(pycamunda.request.CamundaRequest):
         self.resource_type = 'Task'
         self.name = name
         self.owner = owner
-
-    def add_query(self, **kwargs):
-        for key, value in kwargs.items():
-            self.query.parameters[key] = value
-
-        return self
 
     def add_properties(self, **kwargs):
         for key, value in kwargs.items():
@@ -514,7 +508,7 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Execute(pycamunda.request.CamundaRequest):
+class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
 
     id_ = PathParameter('id')
     query = BodyParameterContainer('query')
@@ -531,8 +525,13 @@ class Execute(pycamunda.request.CamundaRequest):
 
     def send(self):
         """Send the request."""
+        params = self.body_parameters()['query']
+        url = self.url + ('/singleResult' if self.single_result else '/list')
         try:
-            response = requests.get(self.url + ('/singleResult' if self.single_result else '/list'))
+            if params:
+                response = requests.post(url, json=params)
+            else:
+                response = requests.get(url)
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
