@@ -9,6 +9,7 @@ import pycamunda
 import pycamunda.request
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 import pycamunda.task
+import pycamunda.variable
 
 URL_SUFFIX = '/filter'
 
@@ -360,6 +361,41 @@ class CriteriaMixin:
         if tenant_id_in is not Ellipsis:
             self.query.parameters['tenantIdIn'] = tenant_id_in
         self.query.parameters['withoutTenantId'] = without_tenant_id
+
+        return self
+
+    def add_datetime_criteria(self, created_before=..., created_after=..., due_before=...,
+                              due_after=..., follow_up_after=..., follow_up_before=...,
+                              follow_up_before_or_not_existent=...):
+        """Add criteria that filter by datetime. Datetime objects are expected to contain timezone
+        information.
+
+        :param created_before: Filter by tasks that were created before the given date.
+        :param created_after: Filter by tasks that were created after the given date.
+        :param due_before: Filter by tasks where due date has already passed at given date.
+        :param due_after: Filter by tasks where due date has not passed at given date.
+        :param follow_up_after: Filter by tasks that have a follow up date that has not passed yet
+                                at given date.
+        :param follow_up_before: Filter by tasks that have a follow up date that has already passed
+                                 at given date.
+        :param follow_up_before_or_not_existent: Filter by tasks that do not have a follow up date
+                                                 or one that has already passed.
+        """
+        if created_before is not Ellipsis:
+            self.query.parameters['createdBefore'] = pycamunda.variable.isoformat(created_before)
+        if created_after is not Ellipsis:
+            self.query.parameters['createdAfter'] = pycamunda.variable.isoformat(created_after)
+        if due_before is not Ellipsis:
+            self.query.parameters['dueBefore'] = pycamunda.variable.isoformat(due_before)
+        if due_after is not Ellipsis:
+            self.query.parameters['dueAfter'] = pycamunda.variable.isoformat(due_after)
+        if follow_up_after is not Ellipsis:
+            self.query.parameters['followUpAfter'] = pycamunda.variable.isoformat(follow_up_after)
+        if follow_up_before is not Ellipsis:
+            self.query.parameters['followUpBefore'] = pycamunda.variable.isoformat(follow_up_before)
+        if follow_up_before_or_not_existent is not Ellipsis:
+            self.query.parameters['followUpBeforeOrNotExistent'] = pycamunda.variable.isoformat(
+                follow_up_before_or_not_existent)
 
         return self
 
