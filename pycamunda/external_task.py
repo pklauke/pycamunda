@@ -87,12 +87,12 @@ class GetList(pycamunda.request.CamundaRequest):
     id_ = QueryParameter('externalTaskId')
     topic_name = QueryParameter('topicName')
     worker_id = QueryParameter('workerId')
-    locked = QueryParameter('locked', provide=lambda self, obj, _:  getattr(obj, self.key))
-    not_locked = QueryParameter('notLocked', provide=lambda self, obj, _:  getattr(obj, self.key))
+    locked = QueryParameter('locked', provide=pycamunda.request.value_is_true)
+    not_locked = QueryParameter('notLocked', provide=pycamunda.request.value_is_true)
     with_retries_left = QueryParameter('withRetriesLeft',
-                                       provide=lambda self, obj, _:  getattr(obj, self.key))
+                                       provide=pycamunda.request.value_is_true)
     no_retries_left = QueryParameter('noRetriesLeft',
-                                     provide=lambda self, obj, _:  getattr(obj, self.key))
+                                     provide=pycamunda.request.value_is_true)
     lock_expiration_after = QueryParameter('lockExpirationAfter')
     lock_expiration_before = QueryParameter('lockExpirationBefore')
     activity_id = QueryParameter('activityId')
@@ -101,10 +101,10 @@ class GetList(pycamunda.request.CamundaRequest):
     process_instance_id = QueryParameter('processInstanceId')
     process_definition_id = QueryParameter('processDefinitionId')
     tenant_id_in = QueryParameter('tenantIdIn')
-    active = QueryParameter('active', provide=lambda self, obj, _:  getattr(obj, self.key))
+    active = QueryParameter('active', provide=pycamunda.request.value_is_true)
     priority_higher_equals = QueryParameter('priorityHigherThanOrEquals')
     priority_lower_equals = QueryParameter('priorityLowerThanOrEquals')
-    suspended = QueryParameter('suspended', provide=lambda self, obj, _:  getattr(obj, self.key))
+    suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
     sort_by = QueryParameter('sortBy',
                              mapping={
                                  'id_': 'id',

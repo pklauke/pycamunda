@@ -4,11 +4,15 @@ import abc
 from typing import Mapping, Callable
 
 
+def value_is_true(self, obj, obj_type):
+    return getattr(obj, self.key)
+
+
 class RequestParameter:
 
     def __init__(self, key, mapping: Mapping=None, provide: Callable=None):
-        """Parameter that is send with a CamundaRequest when it is attached to the class and its value is set. This
-        class implements the descriptor protocol.
+        """Parameter that is send with a CamundaRequest when it is attached to the class and its
+        value is set. This class implements the descriptor protocol.
 
         :param key: Camunda key of the request parameter.
         :param mapping: Mapping from descriptor value to the parameter that is send to Camunda.
