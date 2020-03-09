@@ -67,9 +67,11 @@ class GetList(pycamunda.request.CamundaRequest):
     name_like = QueryParameter('nameLike')
     owner = QueryParameter('owner')
     item_count = QueryParameter('itemCount')
-    sort_by = QueryParameter('sortBy')
+    sort_by = QueryParameter('sortBy',
+                             mapping={'id_': 'filterId', 'first_name': 'firstName',
+                                      'last_name': 'lastName', 'email': 'email'})
     ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self: 'sort_by' in vars(self))
+                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
@@ -77,7 +79,7 @@ class GetList(pycamunda.request.CamundaRequest):
                  item_count=False, sort_by=None, ascending=True, first_result=None,
                  max_results=None):
         """Query for a list of filters using a list of parameters. The size of the result set can be
-        retrieved by using the Get Filter Count method.
+        retrieved by using the Get Count request.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import abc
-import collections
 from typing import Mapping, Callable
 
 
@@ -12,6 +11,12 @@ class RequestParameter:
         class implements the descriptor protocol.
 
         :param key: Camunda key of the request parameter.
+        :param mapping: Mapping from descriptor value to the parameter that is send to Camunda.
+        :param provide: Callable that determines whether the value is returned. Is expected to
+                        accept 3 arguments:
+                            - Descriptor instance,
+                            - Object instance the descriptor is attached to and
+                            - Type of the object the descriptor is attached to.
         """
         self.key = key
         self.mapping = mapping
@@ -19,7 +24,7 @@ class RequestParameter:
         self.name = None
 
     def __get__(self, obj, obj_type=None):
-        if self.provide is None or self.provide(self):
+        if self.provide is None or self.provide(self, obj, obj_type):
             if self.mapping is None:
                 return obj.__dict__[self.name]
             return self.mapping[obj.__dict__[self.name]]

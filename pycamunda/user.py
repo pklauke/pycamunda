@@ -124,9 +124,11 @@ class GetList(pycamunda.request.CamundaRequest):
     email_like = QueryParameter('emailLike')
     member_of_group = QueryParameter('memberOfGroup')
     member_of_tenant = QueryParameter('memberOfTenant')
-    sort_by = QueryParameter('sortBy')
+    sort_by = QueryParameter('sortBy',
+                             mapping={'id_': 'userId', 'first_name': 'firstName',
+                                      'last_name': 'lastName', 'email': 'email'})
     ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self: 'sort_by' in vars(self))
+                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
