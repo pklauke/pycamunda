@@ -195,3 +195,72 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
+
+
+class Count(GetList):
+
+    def __init__(self, url, id_=None, topic_name=None, worker_id=None, locked=False,
+                 not_locked=False, with_retries_left=False, no_retries_left=False,
+                 lock_expiration_after=None, lock_expiration_before=None, activity_id=None,
+                 activity_id_in=None, execution_id=None, process_instance_id=None,
+                 process_definition_id=None, tenant_id_in=None, active=False,
+                 priority_higher_equals=None, priority_lower_equals=None, suspended=False,
+                 sort_by=None, ascending=True, first_result=None, max_results=None):
+        """Get the size of the result returned by the Get List request.
+
+        :param id_: Filter by the id of the external task.
+        :param topic_name: Filter by the topic name of the external task.
+        :param worker_id: Filter by the id of the worker the task was locked by last.
+        :param locked: Include only locked external tasks.
+        :param not_locked: Include only unlocked tasks.
+        :param with_retries_left: Include only external tasks that have retries left.
+        :param no_retries_left: Include only external tasks that have no retries left.
+        :param lock_expiration_after: Include only external tasks with a lock that expires after a
+                                      date.
+        :param lock_expiration_before: Include only external tasks with a lock that expires before a
+                                       date.
+        :param activity_id: Filter by activity id the external task is created for.
+        :param activity_id_in: Filter whether activity id is one of multiple ones.
+        :param execution_id: Filter by the execution id the external task belongs to.
+        :param process_instance_id: Filter by the process instance id the external task belongs to.
+        :param process_definition_id: Filter by the process definition id the external task belongs
+                                      to.
+        :param tenant_id_in: Filter whether the tenant id is one of multiple ones.
+        :param active: Include only external tasks that are active.
+        :param priority_higher_equals: Include only external tasks with a priority higher than or
+                                       equals to the given value.
+        :param priority_lower_equals: Include only external tasks with a priority lower than or
+                                      equals to the given value.
+        :param suspended: Include only external tasks that are suspended.
+        :param sort_by: Sort the results by `id_`, `lock_expiration_time, `process_instance_id`,
+                        `process_definition_key`, `tenant_id` or `task_priority`.
+        :param ascending: Sort order.
+        :param first_result: Pagination of results. Index of the first result to return.
+        :param max_results: Pagination of results. Maximum number of results to return.
+        """
+        super().__init__(url+'/count',
+                         id_=id_, topic_name=topic_name, worker_id=worker_id,
+                         locked=locked, not_locked=not_locked, with_retries_left=with_retries_left,
+                         no_retries_left=no_retries_left,
+                         lock_expiration_after=lock_expiration_after,
+                         lock_expiration_before=lock_expiration_before, activity_id=activity_id,
+                         activity_id_in=activity_id_in, execution_id=execution_id,
+                         process_instance_id=process_instance_id,
+                         process_definition_id=process_definition_id, tenant_id_in=tenant_id_in,
+                         active=active,
+                         priority_higher_equals=priority_higher_equals,
+                         priority_lower_equals=priority_lower_equals, suspended=suspended,
+                         sort_by=sort_by, ascending=ascending, first_result=first_result,
+                         max_results=max_results)
+
+    def send(self):
+        """Send the request"""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return int(response.json())
