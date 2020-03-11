@@ -3,6 +3,15 @@
 """This module provides utilities for the variable formats Camunda uses."""
 
 import datetime as dt
+import dataclasses
+import typing
+
+
+@dataclasses.dataclass
+class Variable:
+    value: typing.Any
+    type: str
+    value_info: typing.Dict
 
 
 def isoformat(datetime_):

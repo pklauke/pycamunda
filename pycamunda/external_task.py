@@ -3,11 +3,13 @@
 """This module provides access to the external task REST api of Camunda."""
 
 import dataclasses
+import typing
 
 import requests
 
 import pycamunda
 import pycamunda.request
+import pycamunda.variable
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -28,15 +30,16 @@ class ExternalTask:
     process_instance_id: str
     tenant_id: str
     retries: int
-    suspended: bool
     worker_id: str
     priority: str
     topic_name: str
-    business_key: str
+    suspended: bool = None
+    business_key: str = None
+    variables: typing.Dict[str, pycamunda.variable.Variable] = None
 
     @classmethod
     def load(cls, data):
-        return ExternalTask(
+        external_task =  ExternalTask(
             activity_id=data['activityId'],
             activity_instance_id=data['activityInstanceId'],
             error_message=data['errorMessage'],
@@ -49,12 +52,30 @@ class ExternalTask:
             process_instance_id=data['processInstanceId'],
             tenant_id=data['tenantId'],
             retries=data['retries'],
-            suspended=data['suspended'],
             worker_id=data['workerId'],
             priority=data['priority'],
-            topic_name=data['topicName'],
-            business_key=data['businessKey']
+            topic_name=data['topicName']
         )
+        try:
+            external_task.suspended = data['suspended']
+        except KeyError:
+            pass
+        try:
+            external_task.business_key = data['businessKey']
+        except KeyError:
+            pass
+        try:
+            variables = data['variables']
+        except KeyError:
+            pass
+        else:
+            external_task.variables = {
+                var_name: pycamunda.variable.Variable(
+                    type=var['type'], value=var['value'],value_info=var['valueInfo']
+                )
+                for var_name, var in variables.items()
+            }
+        return external_task
 
 
 class Get(pycamunda.request.CamundaRequest):
@@ -71,7 +92,7 @@ class Get(pycamunda.request.CamundaRequest):
         self.id_ = id_
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         try:
             response = requests.get(self.url)
         except requests.exceptions.RequestException:
@@ -89,10 +110,8 @@ class GetList(pycamunda.request.CamundaRequest):
     worker_id = QueryParameter('workerId')
     locked = QueryParameter('locked', provide=pycamunda.request.value_is_true)
     not_locked = QueryParameter('notLocked', provide=pycamunda.request.value_is_true)
-    with_retries_left = QueryParameter('withRetriesLeft',
-                                       provide=pycamunda.request.value_is_true)
-    no_retries_left = QueryParameter('noRetriesLeft',
-                                     provide=pycamunda.request.value_is_true)
+    with_retries_left = QueryParameter('withRetriesLeft', provide=pycamunda.request.value_is_true)
+    no_retries_left = QueryParameter('noRetriesLeft', provide=pycamunda.request.value_is_true)
     lock_expiration_after = QueryParameter('lockExpirationAfter')
     lock_expiration_before = QueryParameter('lockExpirationBefore')
     activity_id = QueryParameter('activityId')
@@ -105,17 +124,22 @@ class GetList(pycamunda.request.CamundaRequest):
     priority_higher_equals = QueryParameter('priorityHigherThanOrEquals')
     priority_lower_equals = QueryParameter('priorityLowerThanOrEquals')
     suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
-    sort_by = QueryParameter('sortBy',
-                             mapping={
-                                 'id_': 'id',
-                                 'lock_expiration_time': 'lockExpirationTime',
-                                 'process_instance_id': 'processInstanceId',
-                                 'process_definition_id': 'processDefinitionId',
-                                 'tenant_id': 'tenantId',
-                                 'task_priority': 'taskPriority'
-                             })
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    sort_by = QueryParameter(
+        'sortBy',
+        mapping={
+         'id_': 'id',
+         'lock_expiration_time': 'lockExpirationTime',
+         'process_instance_id': 'processInstanceId',
+         'process_definition_id': 'processDefinitionId',
+         'tenant_id': 'tenantId',
+         'task_priority': 'taskPriority'
+        }
+    )
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(self)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
@@ -129,6 +153,7 @@ class GetList(pycamunda.request.CamundaRequest):
         """Query for a list of external tasks using a list of parameters. The size of the result set
         can be retrieved by using the Get Count request.
 
+        :param url: Camunda Rest engine URL.
         :param id_: Filter by the id of the external task.
         :param topic_name: Filter by the topic name of the external task.
         :param worker_id: Filter by the id of the worker the task was locked by last.
@@ -185,7 +210,7 @@ class GetList(pycamunda.request.CamundaRequest):
         self.max_results = max_results
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
@@ -208,6 +233,7 @@ class Count(GetList):
                  sort_by=None, ascending=True, first_result=None, max_results=None):
         """Get the size of the result returned by the Get List request.
 
+        :param url: Camunda Rest engine URL.
         :param id_: Filter by the id of the external task.
         :param topic_name: Filter by the topic name of the external task.
         :param worker_id: Filter by the id of the worker the task was locked by last.
@@ -238,8 +264,7 @@ class Count(GetList):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url,
-                         id_=id_, topic_name=topic_name, worker_id=worker_id,
+        super().__init__(url, id_=id_, topic_name=topic_name, worker_id=worker_id,
                          locked=locked, not_locked=not_locked, with_retries_left=with_retries_left,
                          no_retries_left=no_retries_left,
                          lock_expiration_after=lock_expiration_after,
@@ -247,15 +272,14 @@ class Count(GetList):
                          activity_id_in=activity_id_in, execution_id=execution_id,
                          process_instance_id=process_instance_id,
                          process_definition_id=process_definition_id, tenant_id_in=tenant_id_in,
-                         active=active,
-                         priority_higher_equals=priority_higher_equals,
+                         active=active, priority_higher_equals=priority_higher_equals,
                          priority_lower_equals=priority_lower_equals, suspended=suspended,
                          sort_by=sort_by, ascending=ascending, first_result=first_result,
                          max_results=max_results)
         self._url += '/count'
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
@@ -265,3 +289,57 @@ class Count(GetList):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return int(response.json()['count'])
+
+
+class FetchAndLock(pycamunda.request.CamundaRequest):
+
+    worker_id = BodyParameter('workerId')
+    max_tasks = BodyParameter('maxTasks')
+    use_priority = BodyParameter('usePriority')
+    topics = BodyParameter('topics')
+
+    def __init__(self, url, worker_id, max_tasks, use_priority=False):
+        """Fetch and lock external tasks for a specific worker. Only external tasks with topics that
+        are added to this request are fetched.
+
+        :param url: Camunda Rest engine URL.
+        :param worker_id: Id of the worker the external tasks are locked for.
+        :param max_tasks: Maximum number of tasks to fetch.
+        :param use_priority: Whether the tasks should be fetched based on their priority.
+        """
+        super().__init__(url + URL_SUFFIX + '/fetchAndLock')
+        self.worker_id = worker_id
+        self.max_tasks = max_tasks
+        self.use_priority = use_priority
+        self.topics = []
+
+    def add_topic(self, name, lock_duration, variables=None, deserialize_values=False):
+        """Add a topic to this request.
+
+        :param name: Name of the topic.
+        :param lock_duration: Duration to lock the fetched external tasks for in milliseconds.
+        :param variables: Variables to request from the process instance the external task belongs
+                          to. If set to `None` all variables are requested.
+        :param deserialize_values: Whether serializable variable values are deserialized on server
+                                   side.
+        """
+        topic = {
+            'topicName': name,
+            'lockDuration': lock_duration,
+            'deserializeValues': deserialize_values
+        }
+        if variables is not None:
+            topic['variables'] = variables
+        self.topics.append(topic)
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return tuple(ExternalTask.load(task_json) for task_json in response.json())
