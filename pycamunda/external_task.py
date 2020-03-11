@@ -115,7 +115,7 @@ class GetList(pycamunda.request.CamundaRequest):
                                  'task_priority': 'taskPriority'
                              })
     ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self: 'sort_by' in vars(self))
+                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
@@ -238,7 +238,7 @@ class Count(GetList):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url+'/count',
+        super().__init__(url,
                          id_=id_, topic_name=topic_name, worker_id=worker_id,
                          locked=locked, not_locked=not_locked, with_retries_left=with_retries_left,
                          no_retries_left=no_retries_left,
@@ -252,6 +252,7 @@ class Count(GetList):
                          priority_lower_equals=priority_lower_equals, suspended=suspended,
                          sort_by=sort_by, ascending=ascending, first_result=first_result,
                          max_results=max_results)
+        self._url += '/count'
 
     def send(self):
         """Send the request"""
@@ -263,4 +264,4 @@ class Count(GetList):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return int(response.json())
+        return int(response.json()['count'])

@@ -5,7 +5,7 @@ from typing import Mapping, Callable
 
 
 def value_is_true(self, obj, obj_type):
-    return getattr(obj, self.key)
+    return obj.__dict__[self.key]
 
 
 class RequestParameter:
