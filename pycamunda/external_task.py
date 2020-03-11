@@ -332,6 +332,8 @@ class FetchAndLock(pycamunda.request.CamundaRequest):
             topic['variables'] = variables
         self.topics.append(topic)
 
+        return self
+
     def send(self):
         """Send the request"""
         params = self.body_parameters()
