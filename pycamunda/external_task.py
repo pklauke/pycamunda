@@ -355,7 +355,7 @@ class Complete(pycamunda.request.CamundaRequest):
     local_variables = BodyParameter('localVariables')
 
     def __init__(self, url, id_, worker_id):
-        """
+        """Complete an external task that is locked for a worker.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the external task.
