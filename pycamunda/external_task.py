@@ -345,3 +345,61 @@ class FetchAndLock(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
+
+
+class Complete(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    worker_id = BodyParameter('workerId')
+    variables = BodyParameter('variables')
+    local_variables = BodyParameter('localVariables')
+
+    def __init__(self, url, id_, worker_id):
+        """
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        :param worker_id: Id of the worker the external tasks was locked for.
+        :param local_variables: Variables to send to the process instance the external task belongs
+                                to. Local variables exist only in the scope of the external task.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/complete')
+        self.id_ = id_
+        self.worker_id = worker_id
+        self.variables = {}
+        self.local_variables = {}
+
+    def add_variable(self, name, value, type_=None, value_info=None):
+        """Add a variable to send to the Camunda process instance.
+
+        :param name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable.
+        :param value_info: Additional information regarding the value type.
+        """
+        self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+        return self
+
+    def add_local_variable(self, name, value, type_=None, value_info=None):
+        """Add a local variable to send to Camunda. Local variables are set only in the scope of an
+        external task.
+
+        :param name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable.
+        :param value_info: Additional information regarding the value type.
+        """
+        self.local_variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+        return self
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
