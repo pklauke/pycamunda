@@ -403,3 +403,52 @@ class Complete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class HandleExternalTaskBPMNError(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    worker_id = BodyParameter('workerId')
+    error_code = BodyParameter('errorCode')
+    error_message = BodyParameter('errorMessage')
+    variables = BodyParameter('variables')
+
+    def __init__(self, url, id_, worker_id, error_code, error_message=None):
+        """Report a business error for a running external task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        :param worker_id: Id of the worker that locked the external task.
+        :param error_code: Error code that identifies the predefined error.
+        :param error_message: Error message that describes the error.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/bpmnError')
+        self.id_ = id_
+        self.worker_id = worker_id
+        self.error_code = error_code
+        self.error_message = error_message
+        self.variables = {}
+
+    def add_variable(self, name, value, type_=None, value_info=None):
+        """Add a variable to send to the Camunda process instance.
+
+        :param name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable.
+        :param value_info: Additional information regarding the value type.
+        """
+        self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+        return self
+
+    def send(self):
+        """Send the request"""
+        print(self.url)
+        params = self.body_parameters()
+        print(params)
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
