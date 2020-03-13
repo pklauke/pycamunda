@@ -3,6 +3,8 @@
 import abc
 from typing import Mapping, Callable
 
+import pycamunda
+
 
 def value_is_true(self, obj, obj_type):
     return obj.__dict__[self.key]
@@ -10,7 +12,7 @@ def value_is_true(self, obj, obj_type):
 
 class RequestParameter:
 
-    def __init__(self, key, mapping: Mapping=None, provide: Callable=None):
+    def __init__(self, key, mapping: Mapping=None, provide: Callable=None, validate: Callable=None):
         """Parameter that is send with a CamundaRequest when it is attached to the class and its
         value is set. This class implements the descriptor protocol.
 
@@ -21,10 +23,12 @@ class RequestParameter:
                             - Descriptor instance,
                             - Object instance the descriptor is attached to and
                             - Type of the object the descriptor is attached to.
+        :param validate: Callable that validates the value that is tried to be set.
         """
         self.key = key
         self.mapping = mapping
         self.provide = provide
+        self.validate = validate
         self.name = None
 
     def __get__(self, obj, obj_type=None):
@@ -34,6 +38,8 @@ class RequestParameter:
             return self.mapping[obj.__dict__[self.name]]
 
     def __set__(self, obj, value):
+        if self.validate is not None and not self.validate(value):
+            raise pycamunda.PyCamundaInvalidInput(f'Cannot set value "{value}" for "{self.name}"')
         obj.__dict__[self.name] = value
 
     def __repr__(self):

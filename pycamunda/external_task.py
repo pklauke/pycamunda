@@ -405,7 +405,7 @@ class Complete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class HandleExternalTaskBPMNError(pycamunda.request.CamundaRequest):
+class HandleBPMNError(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -440,6 +440,50 @@ class HandleExternalTaskBPMNError(pycamunda.request.CamundaRequest):
         self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
 
         return self
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class HandleFailure(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    worker_id = BodyParameter('workerId')
+    error_message = BodyParameter('errorMessage')
+    error_details = BodyParameter('errorDetails')
+    retries = BodyParameter('retries', validate=lambda val: val >= 0)
+    retry_timeout = BodyParameter('retryTimeout', validate=lambda val: val >= 0)
+
+    def __init__(self, url, id_, worker_id, error_message, error_details, retries, retry_timeout):
+        """Report a failure to execute a running external task.
+
+        A number of retries and a timeout until the external task can be tried can be specified.
+        If retries are set to 0, the external task cannot be fetched anymore and an incident is
+        created. The message of the incident is set to the value of `error_message`.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        :param worker_id: Id of the worker that locked the external task.
+        :param error_message: Error message that describes the reason of the failure.
+        :param error_details: Error description.
+        :param retries: How often the external task can be retried.
+        :param retry_timeout: Timeout in milliseconds until the external task becomes available
+        again for fetching.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/failure')
+        self.id_ = id_
+        self.worker_id = worker_id
+        self.error_message = error_message
+        self.error_details = error_details
+        self.retries = retries
+        self.retry_timeout = retry_timeout
 
     def send(self):
         """Send the request"""
