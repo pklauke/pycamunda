@@ -443,9 +443,7 @@ class HandleExternalTaskBPMNError(pycamunda.request.CamundaRequest):
 
     def send(self):
         """Send the request"""
-        print(self.url)
         params = self.body_parameters()
-        print(params)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
