@@ -494,3 +494,110 @@ class HandleFailure(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Unlock(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url, id_):
+        """Unlock an external task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/unlock')
+        self.id_ = id_
+
+    def send(self):
+        """Send the request"""
+        try:
+            response = requests.post(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class ExtendLock(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    new_duration = BodyParameter('newDuration')
+    worker_id = BodyParameter('workerId')
+
+    def __init__(self, url, id_, new_duration, worker_id):
+        """Unlock an external task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        :param new_duration: New duration how long the external task wants to be locked.
+        :param worker_id: Id of the worker that locked this external task.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/extendLock')
+        self.id_ = id_
+        self.new_duration = new_duration
+        self.worker_id = worker_id
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class SetPriority(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    priority = BodyParameter('priority')
+
+    def __init__(self, url, id_, priority):
+        """Sets the priority of an external task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        :param priority: New priority of the external task.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/priority')
+        self.id_ = id_
+        self.priority = priority
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class SetRetries(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    retries = BodyParameter('retries', validate=lambda val: val >= 0)
+
+    def __init__(self, url, id_, retries):
+        """Sets the number of retries of an external task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the external task.
+        :param retries: New number of retries of the external task.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/retries')
+        self.id_ = id_
+        self.retries = retries
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
