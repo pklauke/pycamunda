@@ -39,7 +39,7 @@ class ExternalTask:
 
     @classmethod
     def load(cls, data):
-        external_task =  ExternalTask(
+        external_task = cls(
             activity_id=data['activityId'],
             activity_instance_id=data['activityInstanceId'],
             error_message=data['errorMessage'],
@@ -76,6 +76,39 @@ class ExternalTask:
                 for var_name, var in variables.items()
             }
         return external_task
+
+
+@dataclasses.dataclass
+class Batch:
+    id_: str
+    type_: str
+    total_jobs: int
+    jobs_created: int
+    batch_jobs_per_seed: int
+    invocations_per_batch_job: int
+    seed_job_definition_id: str
+    monitor_job_definition_id: str
+    batch_job_definition_id: str
+    suspended: bool
+    tenant_id: str
+    create_user_id: str
+
+    @classmethod
+    def load(cls, data):
+        return cls(
+            id_=data['id'],
+            type_=data['type'],
+            total_jobs=data['totalJobs'],
+            jobs_created=data['jobsCreated'],
+            batch_jobs_per_seed=data['batchJobsPerSeed'],
+            invocations_per_batch_job=data['invocationsPerBatchJob'],
+            seed_job_definition_id=data['seedJobDefinitionId'],
+            monitor_job_definition_id=data['monitorJobDefinitionId'],
+            batch_job_definition_id=data['batchJobDefinitionId'],
+            suspended=data['suspended'],
+            tenant_id=data['tenantId'],
+            create_user_id=data['createUserId']
+        )
 
 
 class Get(pycamunda.request.CamundaRequest):
@@ -591,6 +624,78 @@ class SetRetries(pycamunda.request.CamundaRequest):
         super().__init__(url + URL_SUFFIX + '/{id}/retries')
         self.id_ = id_
         self.retries = retries
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class SetRetriesAsync(pycamunda.request.CamundaRequest):
+
+    retries = BodyParameter('retries', validate=lambda val: val >= 0)
+    external_task_ids = BodyParameter('externalTaskIds')
+    process_instance_ids = BodyParameter('processInstanceIds')
+    external_task_query = BodyParameter('externalTaskQuery')
+    process_instance_query = BodyParameter('processInstanceQuery')
+    historic_process_instance_query = BodyParameter('historicProcessInstanceQuery')
+
+    def __init__(self, url, retries, external_task_ids):
+        """Sets the number of retries of external tasks asynchronously.
+
+        :param url: Camunda Rest engine URL.
+        :param retries: New number of retries of the external tasks.
+        :param external_task_ids: Ids of the external tasks.
+        """
+        super().__init__(url + URL_SUFFIX + '/retries-async')
+        self.retries = retries
+        self.external_task_ids = external_task_ids
+        self.process_instance_ids = None  # TODO
+        self.external_task_query = None  # TODO
+        self.process_instance_query = None  # TODO
+        self.historic_process_instance_query = None  # TODO
+
+    def send(self):
+        """Send the request"""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return Batch.load(response.json())
+
+
+class SetRetriesSync(pycamunda.request.CamundaRequest):
+
+    retries = BodyParameter('retries', validate=lambda val: val >= 0)
+    external_task_ids = BodyParameter('externalTaskIds')
+    process_instance_ids = BodyParameter('processInstanceIds')
+    external_task_query = BodyParameter('externalTaskQuery')
+    process_instance_query = BodyParameter('processInstanceQuery')
+    historic_process_instance_query = BodyParameter('historicProcessInstanceQuery')
+
+    def __init__(self, url, retries, external_task_ids):
+        """Sets the number of retries of external tasks synchronously.
+
+        :param url: Camunda Rest engine URL.
+        :param retries: New number of retries of the external tasks.
+        :param external_task_ids: Ids of the external tasks.
+        """
+        super().__init__(url + URL_SUFFIX + '/retries')
+        self.retries = retries
+        self.external_task_ids = external_task_ids
+        self.process_instance_ids = None  # TODO
+        self.external_task_query = None  # TODO
+        self.process_instance_query = None  # TODO
+        self.historic_process_instance_query = None  # TODO
 
     def send(self):
         """Send the request"""

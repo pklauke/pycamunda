@@ -48,7 +48,7 @@ class Filter:
 
     @classmethod
     def load(cls, data):
-        return Filter(
+        return cls(
             id_=data['id'],
             resource_type=data['resourceType'],
             name=data['name'],

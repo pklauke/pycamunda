@@ -28,7 +28,7 @@ class Task:
 
     @classmethod
     def load(cls, data):
-        return Task(
+        return cls(
             assignee=data['assignee'],
             case_definition_id=data['caseDefinitionId'],
             case_execution_id=data['caseExecutionId'],

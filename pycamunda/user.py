@@ -22,7 +22,7 @@ class User:
 
     @classmethod
     def load(cls, data):
-        return User(
+        return cls(
             id_=data['id'],
             first_name=data['firstName'],
             last_name=data['lastName'],
