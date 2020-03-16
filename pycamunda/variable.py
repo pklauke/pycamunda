@@ -2,6 +2,7 @@
 
 """This module provides utilities for the variable formats Camunda uses."""
 
+from __future__ import annotations
 import datetime as dt
 import dataclasses
 import typing
@@ -10,8 +11,22 @@ import typing
 @dataclasses.dataclass
 class Variable:
     value: typing.Any
-    type: str
+    type_: str
     value_info: typing.Dict
+    local: bool = None
+
+    @classmethod
+    def load(cls, data) -> Variable:
+        variable =  cls(
+            value=data['value'],
+            type_=data['type'],
+            value_info=data['valueInfo']
+        )
+        try:
+            variable.local = data['local']
+        except KeyError:
+            pass
+        return variable
 
 
 def isoformat(datetime_):

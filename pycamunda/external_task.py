@@ -2,6 +2,7 @@
 
 """This module provides access to the external task REST api of Camunda."""
 
+from __future__ import annotations
 import dataclasses
 import typing
 
@@ -38,7 +39,7 @@ class ExternalTask:
     variables: typing.Dict[str, pycamunda.variable.Variable] = None
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> ExternalTask:
         external_task = cls(
             activity_id=data['activityId'],
             activity_instance_id=data['activityInstanceId'],
@@ -94,7 +95,7 @@ class Batch:
     create_user_id: str
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> Batch:
         return cls(
             id_=data['id'],
             type_=data['type'],
@@ -393,8 +394,6 @@ class Complete(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the external task.
         :param worker_id: Id of the worker the external tasks was locked for.
-        :param local_variables: Variables to send to the process instance the external task belongs
-                                to. Local variables exist only in the scope of the external task.
         """
         super().__init__(url + URL_SUFFIX + '/{id}/complete')
         self.id_ = id_

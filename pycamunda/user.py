@@ -2,12 +2,13 @@
 
 """This module provides access to the user REST api of Camunda."""
 
+from __future__ import annotations
 import requests
 import dataclasses
-import typing
 
 import pycamunda
 import pycamunda.request
+from pycamunda import ResourceOptions
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/user'
@@ -21,38 +22,12 @@ class User:
     email: str
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> User:
         return cls(
             id_=data['id'],
             first_name=data['firstName'],
             last_name=data['lastName'],
             email=data['email']
-        )
-
-
-@dataclasses.dataclass
-class Link:
-    method: str
-    href: str
-    rel: str
-
-    @classmethod
-    def load(cls, data):
-        return Link(
-            method=data['method'],
-            href=data['href'],
-            rel=data['rel'],
-        )
-
-
-@dataclasses.dataclass
-class ResourceOptions:
-    links: typing.Tuple[Link]
-
-    @classmethod
-    def load(cls, data):
-        return ResourceOptions(
-            links=tuple(Link(**link) for link in data['links'])
         )
 
 

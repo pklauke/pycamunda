@@ -2,6 +2,7 @@
 
 """This module provides access to the filter REST api of Camunda."""
 
+from __future__ import annotations
 import requests
 import dataclasses
 
@@ -18,7 +19,7 @@ URL_SUFFIX = '/filter'
 class Query:
 
     @classmethod
-    def load(cls, **kwargs):
+    def load(cls, **kwargs) -> Query:
         query = cls()
         for key, value in kwargs.items():
             setattr(query, key, value)
@@ -29,7 +30,7 @@ class Query:
 class Properties:
 
     @classmethod
-    def load(cls, **kwargs):
+    def load(cls, **kwargs) -> Properties:
         properties = cls()
         for key, value in kwargs.items():
             setattr(properties, key, value)
@@ -47,7 +48,7 @@ class Filter:
     item_count: int = None
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> Filter:
         return cls(
             id_=data['id'],
             resource_type=data['resourceType'],

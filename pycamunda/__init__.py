@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+import dataclasses
+import typing
 
 
 class PyCamundaException(Exception):
@@ -14,3 +17,29 @@ class PyCamundaInvalidInput(PyCamundaNoSuccess):
 
 class PyCamundaUserAlreadyExists(PyCamundaNoSuccess):
     """Exception that is raised when it is tried to create a user that already exists."""
+
+
+@dataclasses.dataclass
+class Link:
+    method: str
+    href: str
+    rel: str
+
+    @classmethod
+    def load(cls, data) -> Link:
+        return Link(
+            method=data['method'],
+            href=data['href'],
+            rel=data['rel'],
+        )
+
+
+@dataclasses.dataclass
+class ResourceOptions:
+    links: typing.Tuple[Link]
+
+    @classmethod
+    def load(cls, data) -> ResourceOptions:
+        return ResourceOptions(
+            links=tuple(Link(**link) for link in data['links'])
+        )

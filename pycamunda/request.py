@@ -51,7 +51,14 @@ class QueryParameter(RequestParameter):
 
 
 class PathParameter(RequestParameter):
-    """Parameter that is attached to the request URL by adding it to the endpoint name."""
+
+    def __init__(self, *args, **kwargs):
+        """Parameter that is attached to the request URL by adding it to the endpoint name."""
+        super().__init__(*args, **kwargs)
+        self.instance = None
+
+    def __call__(self, *args, **kwargs):
+        return getattr(self.instance, self.name)
 
 
 class BodyParameter(RequestParameter):
@@ -98,6 +105,10 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
         """
         self._url = url
 
+        for name, attribute in vars(type(self)).items():
+            if isinstance(attribute, PathParameter):
+                attribute.instance = self
+
     @property
     def url(self):
         params = {}
@@ -105,17 +116,17 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
         for name, attribute in vars(type(self)).items():
             if isinstance(attribute, PathParameter):
                 try:
-                    params[attribute.key] = getattr(self, attribute.name)
-                except KeyError:
+                    params[attribute.key] = attribute()
+                except AttributeError:
                     missing_params[attribute.key] = ''
         return self._url.format(**{**params, **missing_params}).rstrip('/')
 
     def __call__(self, *args, **kwargs):
-        return self.send()
+        return self.send(*args, **kwargs)
 
     @abc.abstractmethod
     def send(self):
-        return NotImplemented
+        return NotImplementedError
 
     def query_parameters(self):
         query = {}
