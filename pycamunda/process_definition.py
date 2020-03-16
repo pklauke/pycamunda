@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides access to the process definition REST api of Camunda."""
+
 import enum
 import typing
 import dataclasses

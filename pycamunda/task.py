@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides access to the task REST api of Camunda."""
+
 import dataclasses
 
 
