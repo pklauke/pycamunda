@@ -111,8 +111,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
             type_: typing.Union[str, InstructionType],
             activity_id: str = None,
             transition_id: str = None,
-            variables: typing.Mapping[str, pycamunda.variable.Variable] = None
-    ):
+            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
         """Add an instruction that specify at which activities the process instance is started.
 
         :param type_: Type of the instruction. Possible values are
@@ -138,10 +137,9 @@ class StartInstance(pycamunda.request.CamundaRequest):
         self.start_instructions.append(instruction)
 
     def add_start_before_activity_instruction(
-        self,
-        activity_id,
-        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
-    ):
+            self,
+            activity_id,
+            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
         """Add an instruction to start execution before a given activity is entered.
 
         :param activity_id: Id of the activity.
@@ -156,10 +154,9 @@ class StartInstance(pycamunda.request.CamundaRequest):
         return self
 
     def add_start_after_activity_instruction(
-        self,
-        activity_id,
-        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
-    ):
+            self,
+            activity_id,
+            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
         """Add an instruction to start execution at the single outgoing sequence flow of an
         activity.
 
@@ -175,10 +172,9 @@ class StartInstance(pycamunda.request.CamundaRequest):
         return self
 
     def add_start_transition_instruction(
-        self,
-        transition_id,
-        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
-    ):
+            self,
+            transition_id,
+            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
         """Add an instruction to start execution at the single outgoing sequence flow of an
         activity.
 
