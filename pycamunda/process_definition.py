@@ -112,8 +112,38 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
         return tuple(ActivityStatistics.load(activity_json) for activity_json in response.json())
 
 
-class InstructionType(enum.Enum):
+class GetProcessDiagram(pycamunda.request.CamundaRequest):
 
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None):
+        """Get the diagram of a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}/diagram')
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+
+    def send(self):
+        """Send the request"""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return response.content
+
+
+class InstructionType(enum.Enum):
     start_before_activity = 'startBeforeActivity'
     start_after_activity = 'startAfterActivity'
     start_transition = 'startTransition'
