@@ -72,7 +72,7 @@ class ExternalTask:
         else:
             external_task.variables = {
                 var_name: pycamunda.variable.Variable(
-                    type=var['type'], value=var['value'],value_info=var['valueInfo']
+                    type_=var['type'], value=var['value'], value_info=var['valueInfo']
                 )
                 for var_name, var in variables.items()
             }

@@ -17,7 +17,7 @@ from pycamunda.request import PathParameter, QueryParameter, BodyParameter, Body
 URL_SUFFIX = '/process-definition'
 
 
-class _StartInstancePathParameter(PathParameter):
+class _ProcessDefinitionPathParameter(PathParameter):
 
     def __init__(self, key, id_parameter, key_parameter, tenant_id_parameter):
         super().__init__(key=key)
@@ -33,6 +33,85 @@ class _StartInstancePathParameter(PathParameter):
         return f'key/{self.key_parameter()}'
 
 
+class IncidentType(enum.Enum):
+    failed_job = 'failedJob'
+    failed_external_task = 'failedExternalTask'
+
+
+@dataclasses.dataclass
+class Incident:
+    incident_type: IncidentType
+    incident_count: int
+
+    @classmethod
+    def load(cls, data):
+        return cls(
+            incident_type=IncidentType(data['incidentType']),
+            incident_count=data['incidentCount']
+        )
+
+
+@dataclasses.dataclass
+class ActivityStatistics:
+    id_: str
+    instances: int
+    failed_jobs: int
+    incidents: typing.Iterable[Incident]
+
+    @classmethod
+    def load(cls, data):
+        return cls(
+            id_=data['id'],
+            instances=data['instances'],
+            failed_jobs=data['failedJobs'],
+            incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
+        )
+
+
+class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    failed_jobs = QueryParameter('failedJobs')
+    incidents = QueryParameter('incidents')
+    incidents_for_type = QueryParameter('incidentsForType')
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None, failed_jobs=None, incidents=False,
+                 incidents_for_type=None):
+        """Get runtime statistics for a process definition. Does not include historic data.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        :param failed_jobs: Whether the number of failed jobs should be included.
+        :param incidents: Whether to include the number of incidents.
+        :param incidents_for_type: Include only incidents of a specific type.
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}/statistics')
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+        self.failed_jobs = failed_jobs
+        self.incidents = incidents
+        self.incidents_for_type = incidents_for_type
+
+    def send(self):
+        """Send the request"""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return tuple(ActivityStatistics.load(activity_json) for activity_json in response.json())
+
+
 class InstructionType(enum.Enum):
 
     start_before_activity = 'startBeforeActivity'
@@ -45,14 +124,14 @@ class StartInstance(pycamunda.request.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _StartInstancePathParameter('path', id_, key, tenant_id)
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     variables = BodyParameter('variables')
     business_key = BodyParameter('businessKey')
     case_instance_key = BodyParameter('caseInstanceId')
-    start_instructions = BodyParameter('startInstructions')  # TODO
-    skip_custom_listeners = BodyParameter('skipCustomListeners')  # TODO
-    skip_io_mappings = BodyParameter('skipIoMappings')  # TODO
+    start_instructions = BodyParameter('startInstructions')
+    skip_custom_listeners = BodyParameter('skipCustomListeners')
+    skip_io_mappings = BodyParameter('skipIoMappings')
     with_variables_in_return = BodyParameter('withVariablesInReturn')
 
     def __init__(self, url, id_=None, key=None, tenant_id=None, business_key=None,
@@ -194,7 +273,6 @@ class StartInstance(pycamunda.request.CamundaRequest):
     def send(self):
         """Send the request"""
         params = self.body_parameters()
-        print(params)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
