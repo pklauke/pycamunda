@@ -105,6 +105,42 @@ class ActivityStatistics:
         )
 
 
+@dataclasses.dataclass
+class ActivityStatistics:
+    id_: str
+    instances: int
+    failed_jobs: int
+    incidents: typing.Iterable[Incident]
+
+    @classmethod
+    def load(cls, data):
+        return cls(
+            id_=data['id'],
+            instances=data['instances'],
+            failed_jobs=data['failedJobs'],
+            incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
+        )
+
+
+@dataclasses.dataclass
+class ProcessInstanceStatistics:
+    id_: str
+    instances: int
+    failed_jobs: int
+    definition: ProcessDefinition
+    incidents: typing.Iterable[Incident]
+
+    @classmethod
+    def load(cls, data):
+        return cls(
+            id_=data['id'],
+            instances=data['instances'],
+            failed_jobs=data['failedJobs'],
+            definition=ProcessDefinition.load(data['definition']),
+            incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
+        )
+
+
 class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
@@ -113,7 +149,7 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
     path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     failed_jobs = QueryParameter('failedJobs')
-    incidents = QueryParameter('incidents')
+    incidents = QueryParameter('incidents', provide=pycamunda.request.value_is_true)
     incidents_for_type = QueryParameter('incidentsForType')
 
     def __init__(self, url, id_=None, key=None, tenant_id=None, failed_jobs=None, incidents=False,
@@ -128,6 +164,10 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
         :param incidents: Whether to include the number of incidents.
         :param incidents_for_type: Include only incidents of a specific type.
         """
+        if incidents and incidents_for_type is not None:
+            raise pycamunda.PyCamundaInvalidInput(
+                'Either \'incidents\' or \'incidents_for_type\' can be provided, not both.'
+            )
         super().__init__(url + URL_SUFFIX + '/{path}/statistics')
         self.id_ = id_
         self.key = key
@@ -481,6 +521,49 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
+
+
+class GetProcessInstanceStatistics(pycamunda.request.CamundaRequest):
+
+    failed_jobs = QueryParameter('failedJobs')
+    incidents = QueryParameter('incidents', provide=pycamunda.request.value_is_true)
+    root_incidents = QueryParameter('rootIncidents', provide=pycamunda.request.value_is_true)
+    incidents_for_type = QueryParameter('incidentsForType')
+
+    def __init__(self, url, failed_jobs=False, incidents=False, root_incidents=False,
+                 incidents_for_type=None):
+        """Get runtime statistics grouped by process definition. Does not include historic data.
+
+        :param url: Camunda Rest engine URL.
+        :param failed_jobs: Whether the number of failed jobs should be included.
+        :param incidents: Whether to include the number of incidents.
+        :param root_incidents: Whether to include the corresponding number of root incidents for
+                               each incident type.
+        :param incidents_for_type: Include only incidents of a specific type.
+        """
+        if sum((incidents, root_incidents, incidents_for_type is not None)) > 1:
+            raise pycamunda.PyCamundaInvalidInput(
+                'Either \'incidents\', \'root_incidents\' or \'incidents_for_type\' can be '
+                'provided, not multiple of them.'
+            )
+        super().__init__(url + URL_SUFFIX + '/statistics')
+        self.failed_jobs = failed_jobs
+        self.incidents = incidents
+        self.root_incidents = root_incidents
+        self.incidents_for_type = incidents_for_type
+
+    def send(self):
+        """Send the request"""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return tuple(ProcessInstanceStatistics.load(statistics_json)
+                     for statistics_json in response.json())
 
 
 class InstructionType(enum.Enum):
