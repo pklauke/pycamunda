@@ -141,6 +141,12 @@ class ProcessInstanceStatistics:
         )
 
 
+class InstructionType(enum.Enum):
+    start_before_activity = 'startBeforeActivity'
+    start_after_activity = 'startAfterActivity'
+    start_transition = 'startTransition'
+
+
 class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
@@ -177,7 +183,7 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
         self.incidents_for_type = incidents_for_type
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
@@ -209,7 +215,7 @@ class GetProcessDiagram(pycamunda.request.CamundaRequest):
         self.tenant_id = tenant_id
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         try:
             response = requests.get(self.url)
         except requests.exceptions.RequestException:
@@ -359,7 +365,7 @@ class Count(pycamunda.request.CamundaRequest):
         self.max_results = max_results
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
@@ -511,7 +517,7 @@ class GetList(pycamunda.request.CamundaRequest):
         self.max_results = max_results
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
@@ -553,7 +559,7 @@ class GetProcessInstanceStatistics(pycamunda.request.CamundaRequest):
         self.incidents_for_type = incidents_for_type
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
@@ -566,10 +572,69 @@ class GetProcessInstanceStatistics(pycamunda.request.CamundaRequest):
                      for statistics_json in response.json())
 
 
-class InstructionType(enum.Enum):
-    start_before_activity = 'startBeforeActivity'
-    start_after_activity = 'startAfterActivity'
-    start_transition = 'startTransition'
+class GetXML(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None):
+        """Get the BPMN xml diagram of a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}/xml')
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+
+    def send(self):
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return response.json()['bpmn20Xml']
+
+
+class Get(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None):
+        """Get a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}')
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+
+    def send(self):
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return ProcessDefinition.load(response.json())
 
 
 class StartInstance(pycamunda.request.CamundaRequest):
@@ -724,7 +789,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
         return self
 
     def send(self):
-        """Send the request"""
+        """Send the request."""
         params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
@@ -734,3 +799,112 @@ class StartInstance(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return pycamunda.process_instance.ProcessInstance.load(response.json())
+
+
+class _ActivateSuspend(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    suspended = BodyParameter('suspended')
+    include_process_instances = BodyParameter('include_process_instances')
+    execution_datetime = BodyParameter('executionDate')
+
+    def __init__(self, url, suspended, id_=None, key=None, tenant_id=None,
+                 include_process_instances=None, execution_datetime=None):
+        """Activate or Suspend a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param suspended: Whether to suspend or activate the process definition.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        :param include_process_instances: Whether to cascade the action to process instances.
+        :param execution_datetime: When to execute the action. If 'None' the action is immediately.
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}/suspended')
+        self.suspended = suspended
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+        self.include_process_instances = include_process_instances
+        if execution_datetime is not None:
+            self.execution_datetime = pycamunda.variable.isoformat(execution_datetime)
+
+    def send(self):
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Activate(_ActivateSuspend):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    suspended = BodyParameter('suspended')
+    include_process_instances = BodyParameter('include_process_instances')
+    execution_datetime = BodyParameter('executionDate')
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None, include_process_instances=None,
+                 execution_datetime=None):
+        """Activate a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        :param include_process_instances: Whether to cascade the action to process instances.
+        :param execution_datetime: When to execute the action. If 'None' the action is immediately.
+        """
+        super().__init__(
+            url=url,
+            suspended=False,
+            id_=id_,
+            key=key,
+            tenant_id=tenant_id,
+            include_process_instances=include_process_instances,
+            execution_datetime=execution_datetime
+        )
+
+
+class Suspend(_ActivateSuspend):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    suspended = BodyParameter('suspended')
+    include_process_instances = BodyParameter('include_process_instances')
+    execution_datetime = BodyParameter('executionDate')
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None, include_process_instances=None,
+                 execution_datetime=None):
+        """Suspend a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        :param include_process_instances: Whether to cascade the action to process instances.
+        :param execution_datetime: When to execute the action. If 'None' the action is immediately.
+        """
+        super().__init__(
+            url=url,
+            suspended=True,
+            id_=id_,
+            key=key,
+            tenant_id=tenant_id,
+            include_process_instances=include_process_instances,
+            execution_datetime=execution_datetime
+        )

@@ -98,8 +98,8 @@ class CamundaRequestMeta(abc.ABCMeta):
 class CamundaRequest(metaclass=CamundaRequestMeta):
 
     def __init__(self, url):
-        """Abstract base class for Camunda requests. Extracts parameters to send with the requests by parsing the class
-            for RequestParameter`s.
+        """Abstract base class for Camunda requests. Extracts parameters to send with the requests
+        by parsing the class for RequestParameter`s.
 
         :param url: Camunda Rest engine url.
         """
