@@ -908,3 +908,202 @@ class Suspend(_ActivateSuspend):
             include_process_instances=include_process_instances,
             execution_datetime=execution_datetime
         )
+
+
+class UpdateHistoryTimeToLive(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
+
+    history_time_to_live = BodyParameter('historyTimeToLive', validate=lambda val: val is None or val >= 0)
+
+    def __init__(self, url, history_time_to_live, id_=None, key=None, tenant_id=None,):
+        """Update the history time to live of a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param history_time_to_live: New history time to live. Can be set to 'None'.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}/history-time-to-live')
+        self.history_time_to_live = history_time_to_live
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+
+    def send(self):
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class _ProcessDefinitionDeletePathParameter(PathParameter):
+
+    def __init__(self, key, id_parameter, key_parameter, tenant_id_parameter):
+        super().__init__(key=key)
+        self.id_parameter = id_parameter
+        self.key_parameter = key_parameter
+        self.tenant_id_parameter = tenant_id_parameter
+
+    def __call__(self, *args, **kwargs):
+        if self.id_parameter() is not None:
+            return self.id_parameter()
+        if self.tenant_id_parameter() is not None:
+            return f'key/{self.key_parameter()}/tenant-id/{self.tenant_id_parameter()}/delete'
+        return f'key/{self.key_parameter()}/delete'
+
+
+class Delete(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    key = PathParameter('key')
+    tenant_id = PathParameter('tenant-id')
+    path = _ProcessDefinitionDeletePathParameter('path', id_, key, tenant_id)
+
+    cascade = QueryParameter('cascade')
+    skip_custom_listeners = QueryParameter('skipCustomListeners')
+    skip_io_mappings = QueryParameter('skipIoMappings')
+
+    def __init__(self, url, id_=None, key=None, tenant_id=None, cascade=False,
+                 skip_custom_listeners=False, skip_io_mappings=False):
+        """Delete a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        :param key: Key of the process definition.
+        :param tenant_id: Id of the tenant the process definition belongs to.
+        :param cascade: Whether to cascade the deletion to process instances of the definition.
+        :param skip_custom_listeners: Whether to notify only the built-in execution listeners.
+        :param skip_io_mappings: Whether to skip input/output mappings.
+        """
+        super().__init__(url + URL_SUFFIX + '/{path}')
+        self.id_ = id_
+        self.key = key
+        self.tenant_id = tenant_id
+        self.cascade = cascade
+        self.skip_custom_listeners = skip_custom_listeners
+        self.skip_io_mappings = skip_io_mappings
+
+    def send(self):
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.delete(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class RestartProcessInstance(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    process_instance_ids = BodyParameter('processInstanceIds')
+    historic_process_instance_query = BodyParameterContainer('historicProcessInstanceQuery')  # TODO create method to add this parameter
+    skip_custom_listeners = BodyParameter('skipCustomListeners')
+    skip_io_mappings = BodyParameter('skipIoMappings')
+    initial_variales = BodyParameter('initialVariables')
+    without_business_key = BodyParameter('withoutBusinessKey')
+    instructions = BodyParameter('instructions')
+
+    def __init__(self, url, id_, process_instance_ids, skip_custom_listeners=False,
+                 skip_io_mappings=False, initial_variables=True, without_business_key=False):
+        """Restart process instances of a specific process definition.
+
+        :param url: Camunda Rest engine url.
+        :param id_: Id of the process definition.
+        :param process_instance_ids: Ids of the process instances to restart.
+        :param skip_custom_listeners: Whether to notify only the built-in execution listeners.
+        :param skip_io_mappings: Whether to skip input/output mappings.
+        :param initial_variables: Whether to set the initial set of variables.
+        :param without_business_key: Whether not to add the business key of the process instance.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/restart')
+        self.id_ = id_
+        self.process_instance_ids = process_instance_ids
+        self.skip_custom_listeners = skip_custom_listeners
+        self.skip_io_mappings = skip_io_mappings
+        self.initial_variables = initial_variables
+        self.without_business_key = without_business_key
+
+        self.instructions = []
+
+    def _add_instruction(
+            self,
+            type_: typing.Union[str, InstructionType],
+            activity_id: str = None,
+            transition_id: str = None):
+        """Add an instruction that specify at which activities the process instance is started.
+
+        :param type_: Type of the instruction. Possible values are
+                          - startBeforeActivity
+                          - startAfterActivity
+                          - startTransition
+        :param activity_id: Id of the activity in case `type_` is `startBeforeActivity` or
+                            `startAfterActivity.
+        :param transition_id: Id of the sequence flow to start.
+        :return:
+        """
+        instruction = {'type': InstructionType(type_).value}
+        if activity_id is not None:
+            instruction['activityId'] = activity_id
+        if transition_id is not None:
+            instruction['transitionId'] = transition_id
+
+        self.instructions.append(instruction)
+
+    def add_before_activity_instruction(self, activity_id):
+        """Add an instruction to start execution before a given activity is entered.
+
+        :param activity_id: Id of the activity.
+        """
+        self._add_instruction(
+            type_=InstructionType.start_before_activity,
+            activity_id=activity_id
+        )
+
+        return self
+
+    def add_after_activity_instruction(self, activity_id):
+        """Add an instruction to start execution at the single outgoing sequence flow of an
+        activity.
+
+        :param activity_id: Id of the activity.
+        """
+        self._add_instruction(
+            type_=InstructionType.start_after_activity,
+            activity_id=activity_id
+        )
+
+        return self
+
+    def add_transition_instruction(self, transition_id):
+        """Add an instruction to start execution at the single outgoing sequence flow of an
+        activity.
+
+        :param transition_id: Id of the sequence flow to start.
+        """
+        self._add_instruction(
+            type_=InstructionType.start_transition,
+            transition_id=transition_id
+        )
+
+        return self
+
+    def send(self):
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
