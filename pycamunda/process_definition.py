@@ -652,10 +652,8 @@ class StartInstance(pycamunda.request.CamundaRequest):
         :param tenant_id: Id of the tenant the process definition belongs to.
         :param business_key: The business key to initialize the process instance with.
         :param case_instance_id: The case instance id to initialize the process instance with.
-        :param skip_custom_listeners: Skip execution listener invocation for activities that are
-                                      started or ended as part of this request.
-        :param skip_io_mappings: Skip execution of input/output variable mappings for activities
-                                 that are started or ended as part of this request.
+        :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
+        :param skip_io_mappings: Whether to skip input/output mappings.
         :param with_variables_in_return: Whether the variable that were used by the process instance
                                          during execution should be returned.
         """
@@ -966,7 +964,7 @@ class Delete(pycamunda.request.CamundaRequest):
         :param key: Key of the process definition.
         :param tenant_id: Id of the tenant the process definition belongs to.
         :param cascade: Whether to cascade the deletion to process instances of the definition.
-        :param skip_custom_listeners: Whether to notify only the built-in execution listeners.
+        :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
         :param skip_io_mappings: Whether to skip input/output mappings.
         """
         super().__init__(url + URL_SUFFIX + '/{path}')
@@ -1007,7 +1005,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         :param id_: Id of the process definition.
         :param process_instance_ids: Ids of the process instances to restart.
         :param async_: Whether to restart the processes asynchronously.
-        :param skip_custom_listeners: Whether to notify only the built-in execution listeners.
+        :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
         :param skip_io_mappings: Whether to skip input/output mappings.
         :param initial_variables: Whether to set the initial set of variables.
         :param without_business_key: Whether not to add the business key of the process instance.
