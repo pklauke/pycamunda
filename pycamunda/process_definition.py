@@ -2,6 +2,7 @@
 
 """This module provides access to the process definition REST api of Camunda."""
 
+from __future__ import annotations
 import enum
 import typing
 import dataclasses
@@ -11,6 +12,7 @@ import requests
 import pycamunda.request
 import pycamunda.variable
 import pycamunda.process_instance
+import pycamunda.batch
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -35,7 +37,7 @@ class ProcessDefinition:
     startable_in_tasklist: bool
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> ProcessDefinition:
         return cls(
             id_=data['id'],
             key=data['key'],
@@ -81,7 +83,7 @@ class Incident:
     incident_count: int
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> Incident:
         return cls(
             incident_type=IncidentType(data['incidentType']),
             incident_count=data['incidentCount']
@@ -96,24 +98,7 @@ class ActivityStatistics:
     incidents: typing.Iterable[Incident]
 
     @classmethod
-    def load(cls, data):
-        return cls(
-            id_=data['id'],
-            instances=data['instances'],
-            failed_jobs=data['failedJobs'],
-            incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
-        )
-
-
-@dataclasses.dataclass
-class ActivityStatistics:
-    id_: str
-    instances: int
-    failed_jobs: int
-    incidents: typing.Iterable[Incident]
-
-    @classmethod
-    def load(cls, data):
+    def load(cls, data) -> ActivityStatistics:
         return cls(
             id_=data['id'],
             instances=data['instances'],
@@ -131,7 +116,7 @@ class ProcessInstanceStatistics:
     incidents: typing.Iterable[Incident]
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data) -> ProcessInstanceStatistics:
         return cls(
             id_=data['id'],
             instances=data['instances'],
@@ -1014,13 +999,14 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
     without_business_key = BodyParameter('withoutBusinessKey')
     instructions = BodyParameter('instructions')
 
-    def __init__(self, url, id_, process_instance_ids, skip_custom_listeners=False,
+    def __init__(self, url, id_, process_instance_ids, async_=False, skip_custom_listeners=False,
                  skip_io_mappings=False, initial_variables=True, without_business_key=False):
         """Restart process instances of a specific process definition.
 
         :param url: Camunda Rest engine url.
         :param id_: Id of the process definition.
         :param process_instance_ids: Ids of the process instances to restart.
+        :param async_: Whether to restart the processes asynchronously.
         :param skip_custom_listeners: Whether to notify only the built-in execution listeners.
         :param skip_io_mappings: Whether to skip input/output mappings.
         :param initial_variables: Whether to set the initial set of variables.
@@ -1033,6 +1019,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         self.skip_io_mappings = skip_io_mappings
         self.initial_variables = initial_variables
         self.without_business_key = without_business_key
+        self.async_ = async_
 
         self.instructions = []
 
@@ -1101,9 +1088,15 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
     def send(self):
         """Send the request."""
         params = self.body_parameters()
+        url = self.url
+        if self.async_:
+            url += '-async'
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        if self.async_:
+            return pycamunda.batch.Batch.load(response.json())
