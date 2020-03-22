@@ -10,6 +10,7 @@ import requests
 
 import pycamunda.variable
 import pycamunda.request
+import pycamunda.activity_instance
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -93,3 +94,28 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class GetActivityInstance(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get an activity instance tree for a specific process instance.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process instance.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/activity-instances')
+        self.id_ = id_
+
+    def send(self):
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return pycamunda.activity_instance.ActivityInstance.load(response.json())

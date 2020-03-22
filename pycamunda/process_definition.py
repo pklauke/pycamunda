@@ -13,6 +13,7 @@ import pycamunda.request
 import pycamunda.variable
 import pycamunda.process_instance
 import pycamunda.batch
+from pycamunda.incident import Incident
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -70,24 +71,6 @@ class _ProcessDefinitionPathParameter(PathParameter):
         if self.tenant_id_parameter() is not None:
             return f'key/{self.key_parameter()}/tenant-id/{self.tenant_id_parameter()}'
         return f'key/{self.key_parameter()}'
-
-
-class IncidentType(enum.Enum):
-    failed_job = 'failedJob'
-    failed_external_task = 'failedExternalTask'
-
-
-@dataclasses.dataclass
-class Incident:
-    incident_type: IncidentType
-    incident_count: int
-
-    @classmethod
-    def load(cls, data) -> Incident:
-        return cls(
-            incident_type=IncidentType(data['incidentType']),
-            incident_count=data['incidentCount']
-        )
 
 
 @dataclasses.dataclass
