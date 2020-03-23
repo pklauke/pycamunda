@@ -666,11 +666,12 @@ class StartInstance(pycamunda.request.CamundaRequest):
         return self
 
     def _add_start_instruction(
-            self,
-            type_: typing.Union[str, InstructionType],
-            activity_id: str = None,
-            transition_id: str = None,
-            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
+        self,
+        type_: typing.Union[str, InstructionType],
+        activity_id: str = None,
+        transition_id: str = None,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
         """Add an instruction that specifies at which activities the process instance is started.
 
         :param type_: Type of the instruction. Possible values are
@@ -696,53 +697,56 @@ class StartInstance(pycamunda.request.CamundaRequest):
         self.start_instructions.append(instruction)
 
     def add_start_before_activity_instruction(
-            self,
-            activity_id,
-            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
+        self,
+            id_,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
         """Add an instruction to start execution before a given activity is entered.
 
-        :param activity_id: Id of the activity.
+        :param id_: Id of the activity.
         :param variables: Mapping from names to the corresponding variables.
         """
         self._add_start_instruction(
             type_=InstructionType.start_before_activity,
-            activity_id=activity_id,
+            activity_id=id_,
             variables=variables
         )
 
         return self
 
     def add_start_after_activity_instruction(
-            self,
-            activity_id,
-            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
+        self,
+        id_,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
         """Add an instruction to start execution at the single outgoing sequence flow of an
         activity.
 
-        :param activity_id: Id of the activity.
+        :param id_: Id of the activity.
         :param variables: Mapping from names to the corresponding variables.
         """
         self._add_start_instruction(
             type_=InstructionType.start_after_activity,
-            activity_id=activity_id,
+            activity_id=id_,
             variables=variables
         )
 
         return self
 
     def add_start_transition_instruction(
-            self,
-            transition_id,
-            variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
+        self,
+        id_,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
         """Add an instruction to start execution at the single outgoing sequence flow of an
         activity.
 
-        :param transition_id: Id of the sequence flow to start.
+        :param id_: Id of the sequence flow to start.
         :param variables: Mapping from names to the corresponding variables.
         """
         self._add_start_instruction(
             type_=InstructionType.start_transition,
-            transition_id=transition_id,
+            transition_id=id_,
             variables=variables
         )
 
@@ -999,10 +1003,11 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         self.instructions = []
 
     def _add_instruction(
-            self,
-            type_: typing.Union[str, InstructionType],
-            activity_id: str = None,
-            transition_id: str = None):
+        self,
+        type_: typing.Union[str, InstructionType],
+        activity_id: str = None,
+        transition_id: str = None
+    ):
         """Add an instruction that specifies at which activities the process instance is started.
 
         :param type_: Type of the instruction. Possible values are
@@ -1012,7 +1017,6 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         :param activity_id: Id of the activity in case `type_` is `startBeforeActivity` or
                             `startAfterActivity.
         :param transition_id: Id of the sequence flow to start.
-        :return:
         """
         instruction = {'type': InstructionType(type_).value}
         if activity_id is not None:
@@ -1022,40 +1026,40 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
 
         self.instructions.append(instruction)
 
-    def add_before_activity_instruction(self, activity_id):
+    def add_before_activity_instruction(self, id_):
         """Add an instruction to start execution before a given activity is entered.
 
-        :param activity_id: Id of the activity.
+        :param id_: Id of the activity.
         """
         self._add_instruction(
             type_=InstructionType.start_before_activity,
-            activity_id=activity_id
+            activity_id=id_
         )
 
         return self
 
-    def add_after_activity_instruction(self, activity_id):
+    def add_after_activity_instruction(self, id_):
         """Add an instruction to start execution at the single outgoing sequence flow of an
         activity.
 
-        :param activity_id: Id of the activity.
+        :param id_: Id of the activity.
         """
         self._add_instruction(
             type_=InstructionType.start_after_activity,
-            activity_id=activity_id
+            activity_id=id_
         )
 
         return self
 
-    def add_transition_instruction(self, transition_id):
+    def add_transition_instruction(self, id_):
         """Add an instruction to start execution at the single outgoing sequence flow of an
         activity.
 
-        :param transition_id: Id of the sequence flow to start.
+        :param id_: Id of the sequence flow to start.
         """
         self._add_instruction(
             type_=InstructionType.start_transition,
-            transition_id=transition_id
+            transition_id=id_
         )
 
         return self

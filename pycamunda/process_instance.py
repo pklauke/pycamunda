@@ -12,6 +12,7 @@ import requests
 import pycamunda.variable
 import pycamunda.request
 import pycamunda.activity_instance
+import pycamunda.instruction
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -319,3 +320,231 @@ class Get(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return ProcessInstance.load(response.json())
+
+
+class Modify(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    skip_custom_listeners = BodyParameter('skipCustomListeners')
+    skip_io_mappings = BodyParameter('skipIoMappings')
+    annotation = BodyParameter('annotation')
+
+    def __init__(
+            self,
+            url: str,
+            id_: str,
+            skip_custom_listeners: bool = False,
+            skip_io_mappings: bool = False,
+            annotation: str = None
+    ):
+        """Modify a running process instance. This is done by adding instructions that are executed
+        on a process instance.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process instance.
+        :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
+        :param skip_io_mappings: Whether to skip input/output mappings.
+        :param annotation: Arbitrary text annotation for auditing reasons.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/modification')
+        self.id_ = id_
+        self.skip_custom_listeners = skip_custom_listeners
+        self.skip_io_mappings = skip_io_mappings
+        self.annotation = annotation
+
+        self.instructions = []
+
+    def _add_instruction(
+        self,
+        type_: typing.Union[str, pycamunda.instruction.ModifyInstructionType],
+        activity_id: str = None,
+        transition_id: str = None,
+        activity_instance_id: str = None,
+        transition_instance_id: str = None,
+        ancestor_activity_instance_id: str = None,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
+        """Add an instruction that specify at which activities the process instance is started.
+
+        :param type_: Type of the instruction. Possible values are
+                          - startBeforeActivity
+                          - startAfterActivity
+                          - startTransition
+                          - cancel
+        :param activity_id: Id of the activity in case `type_` is `startBeforeActivity` or
+                            `startAfterActivity.
+        :param transition_id: Id of the sequence flow to start in case 'type_' is 'startTransition'.
+        :param activity_instance_id: Id of the activity instance in case 'type_' is 'cancel'.
+        :param transition_instance_id: Id of the transition instance in case 'type_' is 'cancel'.
+        :param ancestor_activity_instance_id: Id of the ancestor instance id in case 'type'
+                                              'startBeforeActivity', 'startAfterActivity' or
+                                              'startTransition'.
+        :param variables: Mapping from names to the corresponding variables.
+        """
+        instruction = {'type': pycamunda.instruction.ModifyInstructionType(type_).value}
+        if activity_id is not None:
+            instruction['activityId'] = activity_id
+        if transition_id is not None:
+            instruction['transitionId'] = transition_id
+        if activity_instance_id is not None:
+            instruction['activityInstanceId'] = activity_instance_id
+        if transition_instance_id:
+            instruction['transitionInstanceId'] = transition_instance_id
+        if ancestor_activity_instance_id is not None:
+            instruction['ancestorActivityInstanceId'] = ancestor_activity_instance_id
+        if variables is not None:
+            instruction['variables'] = variables
+
+        self.instructions.append(instruction)
+
+    def add_before_activity_instruction(
+        self,
+        id_: str,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
+        """Add an instruction to start execution before a given activity is entered.
+
+        :param id_: Id of the activity.
+        :param variables: Mapping from names to the corresponding variables.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.start_before_activity,
+            activity_id=id_,
+            variables=variables
+        )
+
+        return self
+
+    def add_after_activity_instruction(
+        self,
+        id_: str,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
+        """Add an instruction to start execution at the single outgoing sequence flow of an
+        activity.
+
+        :param id_: Id of the activity.
+        :param variables: Mapping from names to the corresponding variables.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.start_after_activity,
+            activity_id=id_,
+            variables=variables
+        )
+
+        return self
+
+    def add_cancel_activity_instruction(self, id_):
+        """Add an instruction to cancel an activity.
+
+        :param id_: Id of the activity.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.cancel,
+            activity_id=id_
+        )
+
+        return self
+
+    def add_transition_instruction(
+        self,
+        id_,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
+        """Add an instruction to start execution at the single outgoing sequence flow of an
+        activity.
+
+        :param id_: Id of the sequence flow to start.
+        :param variables: Mapping from names to the corresponding variables.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.start_transition,
+            transition_id=id_,
+            variables=variables
+        )
+
+        return self
+
+    def add_cancel_activity_instance_instruction(self, id_):
+        """Add an instruction to cancel an activity instance.
+
+        :param id_: Id of the activity.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.cancel,
+            activity_instance_id=id_
+        )
+
+        return self
+
+    def add_cancel_transition_instance_instruction(self, id_):
+        """Add an instruction to cancel an activity instance.
+
+        :param id_: Id of the transition instance.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.cancel,
+            transition_instance_id=id_
+        )
+
+        return self
+
+    def add_start_before_ancestor_activity_instance_instruction(
+        self,
+        id_: str,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
+        """Add an instruction to start execution before a given ancestor activity instance
+        is entered.
+
+        :param id_: Id of the ancestor activity instance.
+        :param variables: Mapping from names to the corresponding variables.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.start_before_activity,
+            ancestor_activity_instance_id=id_,
+            variables=variables
+        )
+
+        return self
+
+    def add_start_after_ancestor_activity_instance_instruction(
+        self,
+        id_: str,
+        variables: typing.Mapping[str, pycamunda.variable.Variable] = None
+    ):
+        """Add an instruction to start execution at the single outgoing sequence flow of an
+        ancestor activity instance.
+
+        :param id_: Id of the ancestor activity instance.
+        :param variables: Mapping from names to the corresponding variables.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.start_after_activity,
+            ancestor_activity_instance_id=id_,
+            variables=variables
+        )
+
+        return self
+
+    def add_cancel_ancestor_activity_instance_instruction(self, id_: str):
+        """Add an instruction to cancel an ancestor activity instance.
+
+        :param id_: Id of the ancestor activity instance.
+        """
+        self._add_instruction(
+            type_=pycamunda.instruction.ModifyInstructionType.cancel,
+            ancestor_activity_instance_id=id_
+        )
+
+        return self
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
