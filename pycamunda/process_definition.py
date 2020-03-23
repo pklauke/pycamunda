@@ -3,7 +3,6 @@
 """This module provides access to the process definition REST api of Camunda."""
 
 from __future__ import annotations
-import enum
 import typing
 import dataclasses
 
@@ -14,6 +13,7 @@ import pycamunda.variable
 import pycamunda.process_instance
 import pycamunda.batch
 from pycamunda.incident import Incident
+from pycamunda.instruction import InstructionType
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -107,12 +107,6 @@ class ProcessInstanceStatistics:
             definition=ProcessDefinition.load(data['definition']),
             incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
         )
-
-
-class InstructionType(enum.Enum):
-    start_before_activity = 'startBeforeActivity'
-    start_after_activity = 'startAfterActivity'
-    start_transition = 'startTransition'
 
 
 class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
@@ -677,7 +671,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
             activity_id: str = None,
             transition_id: str = None,
             variables: typing.Mapping[str, pycamunda.variable.Variable] = None):
-        """Add an instruction that specify at which activities the process instance is started.
+        """Add an instruction that specifies at which activities the process instance is started.
 
         :param type_: Type of the instruction. Possible values are
                           - startBeforeActivity
@@ -1009,7 +1003,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
             type_: typing.Union[str, InstructionType],
             activity_id: str = None,
             transition_id: str = None):
-        """Add an instruction that specify at which activities the process instance is started.
+        """Add an instruction that specifies at which activities the process instance is started.
 
         :param type_: Type of the instruction. Possible values are
                           - startBeforeActivity
