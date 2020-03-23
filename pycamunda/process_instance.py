@@ -327,6 +327,7 @@ class Modify(pycamunda.request.CamundaRequest):
     id_ = PathParameter('id')
     skip_custom_listeners = BodyParameter('skipCustomListeners')
     skip_io_mappings = BodyParameter('skipIoMappings')
+    instructions = BodyParameter('instructions')
     annotation = BodyParameter('annotation')
 
     def __init__(
