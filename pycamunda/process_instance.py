@@ -293,3 +293,29 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(ProcessInstance.load(instance_json) for instance_json in response.json())
+
+
+class Get(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get a process instance.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process instance.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def send(self) -> ProcessInstance:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return ProcessInstance.load(response.json())
