@@ -13,6 +13,7 @@ import pycamunda.variable
 import pycamunda.request
 import pycamunda.activity_instance
 import pycamunda.instruction
+import pycamunda.batch
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 
@@ -334,6 +335,7 @@ class Modify(pycamunda.request.CamundaRequest):
             self,
             url: str,
             id_: str,
+            async_: bool = False,
             skip_custom_listeners: bool = False,
             skip_io_mappings: bool = False,
             annotation: str = None
@@ -343,17 +345,23 @@ class Modify(pycamunda.request.CamundaRequest):
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the process instance.
+        :param async_: Whether to run this request asynchronously.
         :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
         :param skip_io_mappings: Whether to skip input/output mappings.
         :param annotation: Arbitrary text annotation for auditing reasons.
         """
         super().__init__(url + URL_SUFFIX + '/{id}/modification')
         self.id_ = id_
+        self.async_ = async_
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
         self.annotation = annotation
 
         self.instructions = []
+
+    @property
+    def url(self):
+        return super().url + ('-async' if self.async_ else '')
 
     def _add_instruction(
         self,
@@ -540,7 +548,7 @@ class Modify(pycamunda.request.CamundaRequest):
 
         return self
 
-    def send(self) -> None:
+    def send(self) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -549,3 +557,6 @@ class Modify(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        if self.async_:
+            return pycamunda.batch.Batch.load(response.json())

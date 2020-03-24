@@ -994,13 +994,17 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         super().__init__(url + URL_SUFFIX + '/{id}/restart')
         self.id_ = id_
         self.process_instance_ids = process_instance_ids
+        self.async_ = async_
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
         self.initial_variables = initial_variables
         self.without_business_key = without_business_key
-        self.async_ = async_
 
         self.instructions = []
+
+    @property
+    def url(self):
+        return super().url + ('-async' if self.async_ else '')
 
     def _add_instruction(
         self,
@@ -1064,12 +1068,9 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
 
         return self
 
-    def send(self):
+    def send(self) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
         params = self.body_parameters()
-        url = self.url
-        if self.async_:
-            url += '-async'
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
