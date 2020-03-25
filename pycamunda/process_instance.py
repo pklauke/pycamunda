@@ -560,3 +560,66 @@ class Modify(pycamunda.request.CamundaRequest):
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())
+
+
+class _ActivateSuspend(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    suspended = BodyParameter('suspended')
+
+    def __init__(self, url: str, id_: str, suspended: bool):
+        """Activate or Suspend a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process instance.
+        :param suspended: Whether to suspend or activate the process instance.
+        """
+        super().__init__(url + URL_SUFFIX + '/{id}/suspended')
+        self.id_ = id_
+        self.suspended = suspended
+
+    def send(self):
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Activate(_ActivateSuspend):
+
+    id_ = PathParameter('id')
+    suspended = BodyParameter('suspended')
+
+    def __init__(self, url: str, id_: str):
+        """Activate a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        """
+        super().__init__(
+            url=url,
+            id_=id_,
+            suspended=False
+        )
+
+
+class Suspend(_ActivateSuspend):
+
+    id_ = PathParameter('id')
+    suspended = BodyParameter('suspended')
+
+    def __init__(self, url: str, id_: str):
+        """Suspend a process definition.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the process definition.
+        """
+        super().__init__(
+            url=url,
+            id_=id_,
+            suspended=True
+        )
