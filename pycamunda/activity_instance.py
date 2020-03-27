@@ -17,7 +17,7 @@ class TransitionInstance:
     process_definition_id: str
     execution_ids: typing.Tuple[str]
     incident_ids: typing.Tuple[str]
-    incidents: typing.Tuple[pycamunda.incident.Incident]
+    incidents: typing.Tuple[pycamunda.incident.IncidentTypeCount]
 
     @classmethod
     def load(cls, data):
@@ -31,7 +31,7 @@ class TransitionInstance:
             execution_ids=tuple(data['executionId']),
             incident_ids=tuple(data['incidentIds']),
             incidents=tuple(
-                pycamunda.incident.Incident.load(incident_json)
+                pycamunda.incident.IncidentTypeCount.load(incident_json)
                 for incident_json in data['incidents'])
         )
 
@@ -50,7 +50,7 @@ class ActivityInstance:
     execution_ids: typing.Tuple[str]
     name: str
     incident_ids: typing.Tuple[str] = None
-    incidents: typing.Tuple[pycamunda.incident.Incident] = None
+    incidents: typing.Tuple[pycamunda.incident.IncidentTypeCount] = None
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]):
@@ -78,7 +78,7 @@ class ActivityInstance:
             pass
         try:
             activity_instance.incidents = tuple(
-                pycamunda.incident.Incident.load(incident_json)
+                pycamunda.incident.IncidentTypeCount.load(incident_json)
                 for incident_json in data['incidents']
             )
         except KeyError:

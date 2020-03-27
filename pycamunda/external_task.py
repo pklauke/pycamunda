@@ -83,14 +83,17 @@ class Get(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_):
+    def __init__(self, url, id_, request_error_details=True):
         """Query for an external task.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the external task.
+        :param request_error_details: Whether to request error details for tasks. Requires an
+                                      additional request.
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.request_error_details = request_error_details
 
     def send(self):
         """Send the request."""
@@ -100,8 +103,19 @@ class Get(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+        external_task = ExternalTask.load(response.json())
 
-        return ExternalTask.load(response.json())
+        if self.request_error_details:
+            if external_task.error_details is None:
+                try:
+                    response = requests.get(self.url + '/errorDetails')
+                except requests.exceptions.RequestException:
+                    raise pycamunda.PyCamundaException()
+                if not response:
+                    raise pycamunda.PyCamundaNoSuccess(response.text)
+                external_task.error_details = response.text
+
+        return external_task
 
 
 class GetList(pycamunda.request.CamundaRequest):
@@ -150,7 +164,8 @@ class GetList(pycamunda.request.CamundaRequest):
                  activity_id_in=None, execution_id=None, process_instance_id=None,
                  process_definition_id=None, tenant_id_in=None, active=False,
                  priority_higher_equals=None, priority_lower_equals=None, suspended=False,
-                 sort_by=None, ascending=True, first_result=None, max_results=None):
+                 sort_by=None, ascending=True, first_result=None, max_results=None,
+                 request_error_details=True):
         """Query for a list of external tasks using a list of parameters. The size of the result set
         can be retrieved by using the Get Count request.
 
@@ -184,6 +199,8 @@ class GetList(pycamunda.request.CamundaRequest):
         :param ascending: Sort order.
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
+        :param request_error_details: Whether to request error details for tasks. Requires
+                                      additional requests.
         """
         super().__init__(url + URL_SUFFIX)
         self.id_ = id_
@@ -209,6 +226,7 @@ class GetList(pycamunda.request.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.request_error_details = request_error_details
 
     def send(self):
         """Send the request."""
@@ -219,8 +237,20 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+        external_tasks = tuple(ExternalTask.load(task_json) for task_json in response.json())
 
-        return tuple(ExternalTask.load(task_json) for task_json in response.json())
+        if self.request_error_details:
+            for external_task in external_tasks:
+                if external_task.error_details is None:
+                    try:
+                        response = requests.get(self.url + f'/{external_task.id_}/errorDetails')
+                    except requests.exceptions.RequestException:
+                        raise pycamunda.PyCamundaException()
+                    if not response:
+                        raise pycamunda.PyCamundaNoSuccess(response.text)
+                    external_task.error_details = response.text
+
+        return external_tasks
 
 
 class Count(GetList):
