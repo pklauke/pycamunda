@@ -12,7 +12,7 @@ import pycamunda.request
 import pycamunda.variable
 import pycamunda.process_instance
 import pycamunda.batch
-from pycamunda.incident import Incident
+from pycamunda.incident import IncidentTypeCount
 from pycamunda.instruction import InstructionType
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
@@ -78,7 +78,7 @@ class ActivityStatistics:
     id_: str
     instances: int
     failed_jobs: int
-    incidents: typing.Iterable[Incident]
+    incidents: typing.Iterable[IncidentTypeCount]
 
     @classmethod
     def load(cls, data) -> ActivityStatistics:
@@ -86,7 +86,7 @@ class ActivityStatistics:
             id_=data['id'],
             instances=data['instances'],
             failed_jobs=data['failedJobs'],
-            incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
+            incidents=tuple(IncidentTypeCount.load(incident_data) for incident_data in data['incidents'])
         )
 
 
@@ -96,7 +96,7 @@ class ProcessInstanceStatistics:
     instances: int
     failed_jobs: int
     definition: ProcessDefinition
-    incidents: typing.Iterable[Incident]
+    incidents: typing.Iterable[IncidentTypeCount]
 
     @classmethod
     def load(cls, data) -> ProcessInstanceStatistics:
@@ -105,7 +105,7 @@ class ProcessInstanceStatistics:
             instances=data['instances'],
             failed_jobs=data['failedJobs'],
             definition=ProcessDefinition.load(data['definition']),
-            incidents=tuple(Incident.load(incident_data) for incident_data in data['incidents'])
+            incidents=tuple(IncidentTypeCount.load(incident_data) for incident_data in data['incidents'])
         )
 
 
@@ -1080,3 +1080,30 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())
+
+
+if __name__ == '__main__':
+    url = 'http://localhost:8080/engine-rest'
+    start = StartInstance(url, key='MyProcess')
+    instance = start()
+
+    get = Get(url, key='MyProcess')
+    process_definition = get()
+
+    from pycamunda import external_task
+    fetchlock = external_task.FetchAndLock(url, worker_id='1', max_tasks=10)
+    fetchlock.add_topic('MyServiceTaskTopic', lock_duration=10000)
+    tasks = fetchlock()
+
+    for task in tasks:
+        complete = external_task.Complete(url, id_=task.id_, worker_id='1')
+        complete()
+
+    import time
+    time.sleep(5)
+
+    restart = RestartProcessInstance(url, id_=process_definition.id_, process_instance_ids=[instance.id_],
+                                     skip_io_mappings=True, skip_custom_listeners=True, without_business_key=True)
+    restart.add_before_activity_instruction(activity_id='ServiceTask')
+    restart.historic_process_instance_query = {'processDefinitionId': process_definition.id_}
+    restart()

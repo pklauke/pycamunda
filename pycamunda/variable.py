@@ -17,7 +17,7 @@ class Variable:
 
     @classmethod
     def load(cls, data) -> Variable:
-        variable =  cls(
+        variable = cls(
             value=data['value'],
             type_=data['type'],
             value_info=data['valueInfo']
