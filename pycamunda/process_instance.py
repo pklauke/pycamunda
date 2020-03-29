@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 import dataclasses
-import numbers
 import typing
 
 import requests
@@ -14,7 +13,7 @@ import pycamunda.request
 import pycamunda.activity_instance
 import pycamunda.instruction
 import pycamunda.batch
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
+from pycamunda.request import PathParameter, QueryParameter, BodyParameter
 
 
 URL_SUFFIX = '/process-instance'
@@ -200,8 +199,8 @@ class GetList(pycamunda.request.CamundaRequest):
             variable_values_ignore_case: bool = None,
             sort_by: str = None,
             ascending: bool = True,
-            first_result: numbers.Integral = None,
-            max_results: numbers.Integral = None
+            first_result: int = None,
+            max_results: int = None
     ):
         """Get a list of process instances.
 
