@@ -17,7 +17,6 @@ URL_SUFFIX = '/signal'
 class _Event(pycamunda.request.CamundaRequest):
 
     name = BodyParameter('name')
-    variables = BodyParameter('variables')
     execution_id = BodyParameter('executionId')
     variables = BodyParameter('variables')
     tenant_id = BodyParameter('tenantId')
