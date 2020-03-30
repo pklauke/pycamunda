@@ -119,7 +119,7 @@ class GetList(pycamunda.request.CamundaRequest):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
         self.name = name
         self.name_like = name_like
@@ -160,7 +160,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine url.
         :param id_: Id of the deployment.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
     def send(self):
@@ -204,7 +204,7 @@ class Create(pycamunda.request.CamundaRequest):
                                     will not created again.
         :param tenant_id: Id of the tenant to create the deployment for.
         """
-        super().__init__(url + URL_SUFFIX + '/create')
+        super().__init__(url=url + URL_SUFFIX + '/create')
         self.name = name
         self.source = source
         self.enable_duplicate_filtering = enable_duplicate_filtering
@@ -246,7 +246,7 @@ class GetResources(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the the deployment.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/resources')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/resources')
         self.id_ = id_
 
     def send(self) -> typing.Tuple[Resource]:
@@ -274,7 +274,7 @@ class GetResource(pycamunda.request.CamundaRequest):
         :param resource_id: Id of the resource.
         :param binary: Whether to request binary content of the resource.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/resources/{resourceId}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/resources/{resourceId}')
         self.id_ = id_
         self.resource_id = resource_id
         self.binary = binary
@@ -320,7 +320,7 @@ class Delete(pycamunda.request.CamundaRequest):
         :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
         :param skip_io_mappings: Whether to skip input/output mappings.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
         self.cascade = cascade
         self.skip_custom_listeners = skip_custom_listeners

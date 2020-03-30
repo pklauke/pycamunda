@@ -202,7 +202,7 @@ class GetList(pycamunda.request.CamundaRequest):
         :param request_error_details: Whether to request error details for tasks. Requires
                                       additional requests.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
         self.topic_name = topic_name
         self.worker_id = worker_id
@@ -295,7 +295,7 @@ class Count(GetList):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url, id_=id_, topic_name=topic_name, worker_id=worker_id,
+        super().__init__(url=url, id_=id_, topic_name=topic_name, worker_id=worker_id,
                          locked=locked, not_locked=not_locked, with_retries_left=with_retries_left,
                          no_retries_left=no_retries_left,
                          lock_expiration_after=lock_expiration_after,
@@ -338,7 +338,7 @@ class FetchAndLock(pycamunda.request.CamundaRequest):
         :param max_tasks: Maximum number of tasks to fetch.
         :param use_priority: Whether the tasks should be fetched based on their priority.
         """
-        super().__init__(url + URL_SUFFIX + '/fetchAndLock')
+        super().__init__(url=url + URL_SUFFIX + '/fetchAndLock')
         self.worker_id = worker_id
         self.max_tasks = max_tasks
         self.use_priority = use_priority
@@ -392,7 +392,7 @@ class Complete(pycamunda.request.CamundaRequest):
         :param id_: Id of the external task.
         :param worker_id: Id of the worker the external tasks was locked for.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/complete')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/complete')
         self.id_ = id_
         self.worker_id = worker_id
         self.variables = {}
@@ -451,7 +451,7 @@ class HandleBPMNError(pycamunda.request.CamundaRequest):
         :param error_code: Error code that identifies the predefined error.
         :param error_message: Error message that describes the error.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/bpmnError')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/bpmnError')
         self.id_ = id_
         self.worker_id = worker_id
         self.error_code = error_code
@@ -506,7 +506,7 @@ class HandleFailure(pycamunda.request.CamundaRequest):
         :param retry_timeout: Timeout in milliseconds until the external task becomes available
         again for fetching.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/failure')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/failure')
         self.id_ = id_
         self.worker_id = worker_id
         self.error_message = error_message
@@ -535,7 +535,7 @@ class Unlock(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the external task.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/unlock')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/unlock')
         self.id_ = id_
 
     def send(self):
@@ -562,7 +562,7 @@ class ExtendLock(pycamunda.request.CamundaRequest):
         :param new_duration: New duration how long the external task wants to be locked.
         :param worker_id: Id of the worker that locked this external task.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/extendLock')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/extendLock')
         self.id_ = id_
         self.new_duration = new_duration
         self.worker_id = worker_id
@@ -590,7 +590,7 @@ class SetPriority(pycamunda.request.CamundaRequest):
         :param id_: Id of the external task.
         :param priority: New priority of the external task.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/priority')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/priority')
         self.id_ = id_
         self.priority = priority
 
@@ -617,7 +617,7 @@ class SetRetries(pycamunda.request.CamundaRequest):
         :param id_: Id of the external task.
         :param retries: New number of retries of the external task.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/retries')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/retries')
         self.id_ = id_
         self.retries = retries
 
@@ -648,7 +648,7 @@ class SetRetriesAsync(pycamunda.request.CamundaRequest):
         :param retries: New number of retries of the external tasks.
         :param external_task_ids: Ids of the external tasks.
         """
-        super().__init__(url + URL_SUFFIX + '/retries-async')
+        super().__init__(url=url + URL_SUFFIX + '/retries-async')
         self.retries = retries
         self.external_task_ids = external_task_ids
         self.process_instance_ids = None  # TODO
@@ -685,7 +685,7 @@ class SetRetriesSync(pycamunda.request.CamundaRequest):
         :param retries: New number of retries of the external tasks.
         :param external_task_ids: Ids of the external tasks.
         """
-        super().__init__(url + URL_SUFFIX + '/retries')
+        super().__init__(url=url + URL_SUFFIX + '/retries')
         self.retries = retries
         self.external_task_ids = external_task_ids
         self.process_instance_ids = None  # TODO

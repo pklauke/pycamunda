@@ -93,7 +93,7 @@ class GetList(pycamunda.request.CamundaRequest):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
         self.resource_type = 'Task'
         self.name = name
@@ -135,7 +135,7 @@ class Count(pycamunda.request.CamundaRequest):
         :param name_like: Filter by a substring of the name of the filter.
         :param owner: Filter by the user id of the owner of the filter.
         """
-        super().__init__(url + URL_SUFFIX + '/count')
+        super().__init__(url=url + URL_SUFFIX + '/count')
         self.id_ = id_
         self.resource_type = 'Task'
         self.name = name
@@ -167,7 +167,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param id_: Id of the filter.
         :param item_count: Return the number of items matched by the respective filter.
         """
-        super().__init__(url + URL_SUFFIX + '/{filterId}')
+        super().__init__(url=url + URL_SUFFIX + '/{filterId}')
         self.id_ = id_
         self.item_count = item_count
 
@@ -408,7 +408,7 @@ class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
     owner = BodyParameter('owner')
-    query = BodyParameterContainer('query')
+    query = BodyParameterContainer('query')  # TODO test if this can be removed
     properties = BodyParameterContainer('properties')
 
     def __init__(self, url, name, owner=None):
@@ -454,7 +454,7 @@ class Update(pycamunda.request.CamundaRequest, CriteriaMixin):
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
     owner = BodyParameter('owner')
-    query = BodyParameterContainer('query')
+    query = BodyParameterContainer('query')  # TODO test if this can be removed
     properties = BodyParameterContainer('properties')
 
     def __init__(self, url, id_, name=None, owner=None):
@@ -498,7 +498,7 @@ class Delete(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
     def send(self):
@@ -514,7 +514,7 @@ class Delete(pycamunda.request.CamundaRequest):
 class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
 
     id_ = PathParameter('id')
-    query = BodyParameterContainer('query')
+    query = BodyParameterContainer('query')  # TODO test if this can be removed
 
     def __init__(self, url, id_, single_result=False):
         """Execute a filter.
@@ -522,7 +522,7 @@ class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
         self.single_result = single_result
 
@@ -555,7 +555,7 @@ class ExecuteCount(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the filter.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/count')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/count')
         self.id_ = id_
 
     def send(self):

@@ -80,7 +80,7 @@ class Delete(pycamunda.request.CamundaRequest):
         :param skip_subprocesses: Whether to skip subprocesses.
         :param fail_if_not_exists: Whether to fail if the provided process instance id is not found.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
@@ -108,7 +108,7 @@ class GetActivityInstance(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the process instance.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/activity-instances')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/activity-instances')
         self.id_ = id_
 
     def send(self) -> pycamunda.activity_instance.ActivityInstance:
@@ -248,7 +248,7 @@ class GetList(pycamunda.request.CamundaRequest):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.process_instance_ids = process_instance_ids
         self.business_key = business_key
         self.business_key_like = business_key_like
@@ -306,7 +306,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the process instance.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
     def send(self) -> ProcessInstance:
@@ -331,13 +331,13 @@ class Modify(pycamunda.request.CamundaRequest):
     annotation = BodyParameter('annotation')
 
     def __init__(
-            self,
-            url: str,
-            id_: str,
-            async_: bool = False,
-            skip_custom_listeners: bool = False,
-            skip_io_mappings: bool = False,
-            annotation: str = None
+        self,
+        url: str,
+        id_: str,
+        async_: bool = False,
+        skip_custom_listeners: bool = False,
+        skip_io_mappings: bool = False,
+        annotation: str = None
     ):
         """Modify a running process instance. This is done by adding instructions that are executed
         on a process instance.
@@ -349,7 +349,7 @@ class Modify(pycamunda.request.CamundaRequest):
         :param skip_io_mappings: Whether to skip input/output mappings.
         :param annotation: Arbitrary text annotation for auditing reasons.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/modification')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/modification')
         self.id_ = id_
         self.async_ = async_
         self.skip_custom_listeners = skip_custom_listeners
@@ -573,7 +573,7 @@ class _ActivateSuspend(pycamunda.request.CamundaRequest):
         :param id_: Id of the process instance.
         :param suspended: Whether to suspend or activate the process instance.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/suspended')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/suspended')
         self.id_ = id_
         self.suspended = suspended
 
@@ -590,9 +590,6 @@ class _ActivateSuspend(pycamunda.request.CamundaRequest):
 
 class Activate(_ActivateSuspend):
 
-    id_ = PathParameter('id')
-    suspended = BodyParameter('suspended')
-
     def __init__(self, url: str, id_: str):
         """Activate a process definition.
 
@@ -607,9 +604,6 @@ class Activate(_ActivateSuspend):
 
 
 class Suspend(_ActivateSuspend):
-
-    id_ = PathParameter('id')
-    suspended = BodyParameter('suspended')
 
     def __init__(self, url: str, id_: str):
         """Suspend a process definition.

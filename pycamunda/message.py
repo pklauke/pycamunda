@@ -93,7 +93,7 @@ class _Correlate(pycamunda.request.CamundaRequest):
         :param variables_in_result_enabled: Whether the returned message correlation results contain
                                             process instance variables.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.message_name = message_name
         self.all_ = all_
         self.business_key = business_key
@@ -183,19 +183,6 @@ class _Correlate(pycamunda.request.CamundaRequest):
 
 class CorrelateSingle(_Correlate):
 
-    message_name = BodyParameter('messageName')
-    business_key = BodyParameter('businessKey')
-    tenant_id = BodyParameter('tenantId')
-    without_tenant_id = BodyParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
-    process_instance_id = BodyParameter('processInstanceId')
-    correlation_keys = BodyParameter('correlationKeys')
-    local_correlation_keys = BodyParameter('localCorrelationKeys')
-    process_variables = BodyParameter('processVariables')
-    process_variables_local = BodyParameter('processVariablesLocal')
-    all_ = BodyParameter('all')
-    result_enabled = BodyParameter('resultEnabled')
-    variables_in_result_enabled = BodyParameter('variablesInResultEnabled')
-
     def __init__(
         self,
         url,
@@ -236,19 +223,6 @@ class CorrelateSingle(_Correlate):
 
 
 class CorrelateAll(_Correlate):
-
-    message_name = BodyParameter('messageName')
-    business_key = BodyParameter('businessKey')
-    tenant_id = BodyParameter('tenantId')
-    without_tenant_id = BodyParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
-    process_instance_id = BodyParameter('processInstanceId')
-    correlation_keys = BodyParameter('correlationKeys')
-    local_correlation_keys = BodyParameter('localCorrelationKeys')
-    process_variables = BodyParameter('processVariables')
-    process_variables_local = BodyParameter('processVariablesLocal')
-    all_ = BodyParameter('all')
-    result_enabled = BodyParameter('resultEnabled')
-    variables_in_result_enabled = BodyParameter('variablesInResultEnabled')
 
     def __init__(
         self,

@@ -79,7 +79,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the incident.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
     def send(self) -> Incident:
@@ -171,7 +171,7 @@ class GetList(pycamunda.request.CamundaRequest):
                         'configuration' or 'tenant_id'.
         :param ascending: Sort order.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.incident_id = incident_id
         self.incident_type = incident_type
         self.incident_message = incident_message
@@ -210,7 +210,7 @@ class Resolve(pycamunda.request.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the incident.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
     def send(self) -> None:

@@ -72,6 +72,15 @@ class _ProcessDefinitionPathParameter(PathParameter):
             return f'key/{self.key_parameter()}/tenant-id/{self.tenant_id_parameter()}'
         return f'key/{self.key_parameter()}'
 
+    def __repr__(self):
+        return (
+            f'{self.__class__.__qualname__}'
+            f'(key=\'{self.key}\', '
+            f'id_parameter={self.id_parameter}, '
+            f'key_parameter={self.key_parameter}, '
+            f'tenant_id_parameter={self.tenant_id_parameter})'
+        )
+
 
 @dataclasses.dataclass
 class ActivityStatistics:
@@ -136,7 +145,7 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaInvalidInput(
                 'Either \'incidents\' or \'incidents_for_type\' can be provided, not both.'
             )
-        super().__init__(url + URL_SUFFIX + '/{path}/statistics')
+        super().__init__(url=url + URL_SUFFIX + '/{path}/statistics')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
@@ -171,7 +180,7 @@ class GetProcessDiagram(pycamunda.request.CamundaRequest):
         :param id_: Id of the process definition.
         :param key: Key of the process definition.
         """
-        super().__init__(url + URL_SUFFIX + '/{path}/diagram')
+        super().__init__(url=url + URL_SUFFIX + '/{path}/diagram')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
@@ -290,7 +299,7 @@ class Count(pycamunda.request.CamundaRequest):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url + URL_SUFFIX + '/count')
+        super().__init__(url=url + URL_SUFFIX + '/count')
         self.id_ = id_
         self.id_in = id_in
         self.name = name
@@ -442,7 +451,7 @@ class GetList(pycamunda.request.CamundaRequest):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url + URL_SUFFIX)
+        super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
         self.id_in = id_in
         self.name = name
@@ -514,7 +523,7 @@ class GetProcessInstanceStatistics(pycamunda.request.CamundaRequest):
                 'Either \'incidents\', \'root_incidents\' or \'incidents_for_type\' can be '
                 'provided, not multiple of them.'
             )
-        super().__init__(url + URL_SUFFIX + '/statistics')
+        super().__init__(url=url + URL_SUFFIX + '/statistics')
         self.failed_jobs = failed_jobs
         self.incidents = incidents
         self.root_incidents = root_incidents
@@ -549,7 +558,7 @@ class GetXML(pycamunda.request.CamundaRequest):
         :param key: Key of the process definition.
         :param tenant_id: Id of the tenant the process definition belongs to.
         """
-        super().__init__(url + URL_SUFFIX + '/{path}/xml')
+        super().__init__(url=url + URL_SUFFIX + '/{path}/xml')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
@@ -582,7 +591,7 @@ class Get(pycamunda.request.CamundaRequest):
         :param tenant_id: Id of the tenant the process definition belongs to.
 
         """
-        super().__init__(url + URL_SUFFIX + '/{path}')
+        super().__init__(url=url + URL_SUFFIX + '/{path}')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
@@ -640,7 +649,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaInvalidInput(
                 'If `tenant_id is provided `key also has to be provided.'
             )
-        super().__init__(url + URL_SUFFIX + '/{path}/start')
+        super().__init__(url=url + URL_SUFFIX + '/{path}/start')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
@@ -698,7 +707,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
 
     def add_start_before_activity_instruction(
         self,
-            id_,
+        id_: str,
         variables: typing.Mapping[str, pycamunda.variable.Variable] = None
     ):
         """Add an instruction to start execution before a given activity is entered.
@@ -788,7 +797,7 @@ class _ActivateSuspend(pycamunda.request.CamundaRequest):
         :param include_process_instances: Whether to cascade the action to process instances.
         :param execution_datetime: When to execute the action. If 'None' the action is immediately.
         """
-        super().__init__(url + URL_SUFFIX + '/{path}/suspended')
+        super().__init__(url=url + URL_SUFFIX + '/{path}/suspended')
         self.suspended = suspended
         self.id_ = id_
         self.key = key
@@ -809,15 +818,6 @@ class _ActivateSuspend(pycamunda.request.CamundaRequest):
 
 
 class Activate(_ActivateSuspend):
-
-    id_ = PathParameter('id')
-    key = PathParameter('key')
-    tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
-
-    suspended = BodyParameter('suspended')
-    include_process_instances = BodyParameter('include_process_instances')
-    execution_datetime = BodyParameter('executionDate')
 
     def __init__(self, url, id_=None, key=None, tenant_id=None, include_process_instances=None,
                  execution_datetime=None):
@@ -842,15 +842,6 @@ class Activate(_ActivateSuspend):
 
 
 class Suspend(_ActivateSuspend):
-
-    id_ = PathParameter('id')
-    key = PathParameter('key')
-    tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
-
-    suspended = BodyParameter('suspended')
-    include_process_instances = BodyParameter('include_process_instances')
-    execution_datetime = BodyParameter('executionDate')
 
     def __init__(self, url, id_=None, key=None, tenant_id=None, include_process_instances=None,
                  execution_datetime=None):
@@ -892,7 +883,7 @@ class UpdateHistoryTimeToLive(pycamunda.request.CamundaRequest):
         :param key: Key of the process definition.
         :param tenant_id: Id of the tenant the process definition belongs to.
         """
-        super().__init__(url + URL_SUFFIX + '/{path}/history-time-to-live')
+        super().__init__(url=url + URL_SUFFIX + '/{path}/history-time-to-live')
         self.history_time_to_live = history_time_to_live
         self.id_ = id_
         self.key = key
@@ -924,6 +915,15 @@ class _ProcessDefinitionDeletePathParameter(PathParameter):
             return f'key/{self.key_parameter()}/tenant-id/{self.tenant_id_parameter()}/delete'
         return f'key/{self.key_parameter()}/delete'
 
+    def __repr__(self):
+        return (
+            f'{self.__class__.__qualname__}'
+            f'(key=\'{self.key}\', '
+            f'id_parameter={self.id_parameter}, '
+            f'key_parameter={self.key_parameter}, '
+            f'tenant_id_parameter={self.tenant_id_parameter})'
+        )
+
 
 class Delete(pycamunda.request.CamundaRequest):
 
@@ -948,7 +948,7 @@ class Delete(pycamunda.request.CamundaRequest):
         :param skip_custom_listeners: Whether to skip custom listeners and notify only builtin ones.
         :param skip_io_mappings: Whether to skip input/output mappings.
         """
-        super().__init__(url + URL_SUFFIX + '/{path}')
+        super().__init__(url=url + URL_SUFFIX + '/{path}')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
@@ -991,7 +991,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         :param initial_variables: Whether to set the initial set of variables.
         :param without_business_key: Whether not to add the business key of the process instance.
         """
-        super().__init__(url + URL_SUFFIX + '/{id}/restart')
+        super().__init__(url=url + URL_SUFFIX + '/{id}/restart')
         self.id_ = id_
         self.process_instance_ids = process_instance_ids
         self.async_ = async_
@@ -1080,30 +1080,3 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())
-
-
-if __name__ == '__main__':
-    url = 'http://localhost:8080/engine-rest'
-    start = StartInstance(url, key='MyProcess')
-    instance = start()
-
-    get = Get(url, key='MyProcess')
-    process_definition = get()
-
-    from pycamunda import external_task
-    fetchlock = external_task.FetchAndLock(url, worker_id='1', max_tasks=10)
-    fetchlock.add_topic('MyServiceTaskTopic', lock_duration=10000)
-    tasks = fetchlock()
-
-    for task in tasks:
-        complete = external_task.Complete(url, id_=task.id_, worker_id='1')
-        complete()
-
-    import time
-    time.sleep(5)
-
-    restart = RestartProcessInstance(url, id_=process_definition.id_, process_instance_ids=[instance.id_],
-                                     skip_io_mappings=True, skip_custom_listeners=True, without_business_key=True)
-    restart.add_before_activity_instruction(activity_id='ServiceTask')
-    restart.historic_process_instance_query = {'processDefinitionId': process_definition.id_}
-    restart()

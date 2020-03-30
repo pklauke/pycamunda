@@ -43,7 +43,7 @@ class RequestParameter:
         obj.__dict__[self.name] = value
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(key={self.key})'
+        return f'{self.__class__.__qualname__}(key=\'{self.key}\')'
 
 
 class QueryParameter(RequestParameter):
@@ -88,11 +88,26 @@ class BodyParameterContainer:
 
 
 class CamundaRequestMeta(abc.ABCMeta):
+
     def __init__(cls, name, bases, attr_dict):
+
         super().__init__(name, bases, attr_dict)
+
+        try:
+            cls._parameters = dict(cls._parameters)
+        except AttributeError:
+            cls._parameters = {}
+        try:
+            cls._containers = dict(cls._containers)
+        except AttributeError:
+            cls._containers = {}
+
         for key, attr in attr_dict.items():
             if isinstance(attr, RequestParameter):
                 attr.name = key
+                cls._parameters[key] = attr
+            elif isinstance(attr, BodyParameterContainer):
+                cls._containers[key] = attr
 
 
 class CamundaRequest(metaclass=CamundaRequestMeta):
@@ -103,17 +118,19 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
 
         :param url: Camunda Rest engine url.
         """
+        super().__init__()
         self._url = url
 
-        for name, attribute in vars(type(self)).items():
+        for name, attribute in self._parameters.items():
             if isinstance(attribute, PathParameter):
-                attribute.instance = self
+                attribute.instance = self  # TODO Fix incorrect instance assignment when Pathparameter is overwritten in child class
 
     @property
     def url(self):
         params = {}
         missing_params = {}
-        for name, attribute in vars(type(self)).items():
+        for name, attribute in self._parameters.items():
+            print(name, attribute, isinstance(attribute, PathParameter))
             if isinstance(attribute, PathParameter):
                 try:
                     params[attribute.key] = attribute()
@@ -130,7 +147,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
 
     def query_parameters(self):
         query = {}
-        for name, attribute in vars(type(self)).items():
+        for name, attribute in self._parameters:
             if isinstance(attribute, QueryParameter):
                 try:
                     query[attribute.key] = getattr(self, attribute.name)
@@ -158,10 +175,11 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
 
     def body_parameters(self):
         query = {}
-        for name, attribute in vars(type(self)).items():
+        for name, attribute in self._containers.items():
             if isinstance(attribute, BodyParameterContainer):
                 query[attribute.key] = self._traverse(attribute)
-            elif isinstance(attribute, BodyParameter) and not attribute.hidden:
+        for name, attribute in self._parameters.items():
+            if isinstance(attribute, BodyParameter) and not attribute.hidden:
                 try:
                     value = getattr(self, attribute.name)
                 except KeyError:

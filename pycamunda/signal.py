@@ -80,12 +80,6 @@ class _Event(pycamunda.request.CamundaRequest):
 
 class EventAll(_Event):
 
-    name = BodyParameter('name')
-    variables = BodyParameter('variables')
-    tenant_id = BodyParameter('tenantId')
-    without_tenant_id = BodyParameter('withoutTenantId',
-                                      provide=pycamunda.request.value_is_true)
-
     def __init__(
         self,
         url: str,
@@ -109,10 +103,6 @@ class EventAll(_Event):
 
 
 class EventSingle(_Event):
-
-    name = BodyParameter('name')
-    variables = BodyParameter('variables')
-    execution_id = BodyParameter('executionId')
 
     def __init__(
         self,
