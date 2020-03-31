@@ -177,10 +177,10 @@ class GetList(pycamunda.request.CamundaRequest):
         :param not_locked: Include only unlocked tasks.
         :param with_retries_left: Include only external tasks that have retries left.
         :param no_retries_left: Include only external tasks that have no retries left.
-        :param lock_expiration_after: Include only external tasks with a lock that expires after a
-                                      date.
-        :param lock_expiration_before: Include only external tasks with a lock that expires before a
-                                       date.
+        :param lock_expiration_after: Include only external tasks with a lock that expires after the
+                                      provided date.
+        :param lock_expiration_before: Include only external tasks with a lock that expires before
+                                       the provided date.
         :param activity_id: Filter by activity id the external task is created for.
         :param activity_id_in: Filter whether activity id is one of multiple ones.
         :param execution_id: Filter by the execution id the external task belongs to.

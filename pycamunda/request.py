@@ -130,7 +130,6 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
         params = {}
         missing_params = {}
         for name, attribute in self._parameters.items():
-            print(name, attribute, isinstance(attribute, PathParameter))
             if isinstance(attribute, PathParameter):
                 try:
                     params[attribute.key] = attribute()
@@ -147,12 +146,15 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
 
     def query_parameters(self):
         query = {}
-        for name, attribute in self._parameters:
+        for name, attribute in self._parameters.items():
             if isinstance(attribute, QueryParameter):
                 try:
-                    query[attribute.key] = getattr(self, attribute.name)
+                    value = getattr(self, attribute.name)
                 except KeyError:
                     pass
+                else:
+                    if value is not None:
+                        query[attribute.key] = value
         return query
 
     def _traverse(self, container):
