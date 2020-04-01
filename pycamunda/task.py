@@ -425,3 +425,198 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(Task.load(task_json) for task_json in response.json())
+
+
+class Claim(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = BodyParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Claim a user task for a specific user. Only tasks that are not already claimed by other
+        users can be claimed. To change the assignee of a task independently on whether it is
+        already claimed by an user, the class 'SetAssignee' can be used.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user task.
+        :param user_id: Id of the user to set as assignee for the task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/claim')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Unclaim(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Unclaim an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/unclaim')
+        self.id_ = id_
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Complete(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    variables = BodyParameter('variables')
+    with_variables_in_return = BodyParameter('withVariablesInReturn')
+
+    def __init__(self, url: str, id_: str, with_variables_in_return: bool = False):
+        """Complete an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/complete')
+        self.id_ = id_
+        self.with_variables_in_return = with_variables_in_return
+
+        self.variables = {}
+
+    def add_variable(self, name, value, type_=None, value_info=None):
+        """Add a variable to send to the Camunda process instance.
+
+        :param name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable.
+        :param value_info: Additional information regarding the value type.
+        """
+        self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+        return self
+
+    def send(self) -> typing.Dict[str, pycamunda.variable.Variable]:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        if self.with_variables_in_return:
+            return {
+                name: pycamunda.variable.Variable.load(var_json)
+                for name, var_json in response.json().items()
+            }
+
+
+class Resolve(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    variables = BodyParameter('variables')
+
+    def __init__(self, url: str, id_: str):
+        """Resolve an user task that was delegated to the current assignee and send it back to the
+        original owner. It is necessary that the task was delegated. The assignee of the user task
+        will be set back to the owner of the task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/resolve')
+        self.id_ = id_
+
+        self.variables = {}
+
+    def add_variable(self, name: str, value: typing.Any, type_: str=None, value_info: str=None):
+        """Add a variable to send to the Camunda process instance.
+
+        :param name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable.
+        :param value_info: Additional information regarding the value type.
+        """
+        self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+        return self
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class SetAssignee(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = BodyParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Set the assignee for an user task. Overwrites existing assignees.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user task.
+        :param user_id: Id of the user to set as assignee for the task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/assignee')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Delegate(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = BodyParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Delegate an user task to an user.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user task.
+        :param user_id: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/delegate')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
