@@ -620,3 +620,148 @@ class Delegate(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Create(pycamunda.request.CamundaRequest):
+
+    id_ = BodyParameter('id')
+    name = BodyParameter('name')
+    description = BodyParameter('description')
+    assignee = BodyParameter('assignee')
+    owner = BodyParameter('owner')
+    delegation_state = BodyParameter('delegationState')
+    due = BodyParameter('due')
+    follow_up = BodyParameter('followUp')
+    priority = BodyParameter('priority')
+    parent_task_id = BodyParameter('parentTaskId')
+    case_instance_id = BodyParameter('caseInstanceId')
+    tenant_id = BodyParameter('tenantId')
+
+    def __init__(
+        self,
+        url: str,
+        id_: str,
+        name: str = None,
+        description: str = None,
+        assignee: str = None,
+        owner: str = None,
+        delegation_state: str = None,  # TODO consider enum
+        due: str = None,  # TODO datetime
+        follow_up: str = None,  # TODO datetime
+        priority: int = None,
+        parent_task_id: str = None,
+        case_instance_id: str = None,
+        tenant_id: str = None
+    ):
+        """Create an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the task.
+        :param name: Name of the task.
+        :param description: Description of the task.
+        :param assignee: The user the task is assigned to.
+        :param owner: The owner of the task.
+        :param delegation_state: The delegation state. Valid values are 'RESOLVED' and 'PENDING'.
+        :param due: Due date of the task.
+        :param follow_up: Follow up date of the task.
+        :param priority: Priority of the task.
+        :param parent_task_id: Id of the parent task in case this task is a subtask.
+        :param case_instance_id: Id of the case instance.
+        :param tenant_id: Id of the tenant.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/create')
+        self.id_ = id_
+        self.name = name
+        self.description = description
+        self.assignee = assignee
+        self.owner = owner
+        self.delegation_state = delegation_state
+        self.due = due
+        self.follow_up = follow_up
+        self.priority = priority
+        self.parent_task_id = parent_task_id
+        self.case_instance_id = case_instance_id
+        self.tenant_id = tenant_id
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Update(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    name = BodyParameter('name')
+    description = BodyParameter('description')
+    assignee = BodyParameter('assignee')
+    owner = BodyParameter('owner')
+    delegation_state = BodyParameter('delegationState')
+    due = BodyParameter('due')
+    follow_up = BodyParameter('followUp')
+    priority = BodyParameter('priority')
+    parent_task_id = BodyParameter('parentTaskId')
+    case_instance_id = BodyParameter('caseInstanceId')
+    tenant_id = BodyParameter('tenantId')
+
+    def __init__(
+        self,
+        url: str,
+        id_: str,
+        name: str,
+        description: str,
+        assignee: str,
+        owner: str,
+        delegation_state: str,  # TODO consider enum
+        due: str,  # TODO datetime
+        follow_up: str,  # TODO datetime
+        priority: int,
+        parent_task_id: str,
+        case_instance_id: str,
+        tenant_id: str
+    ):
+        """Update an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the task.
+        :param name: Name of the task.
+        :param description: Description of the task.
+        :param assignee: The user the task is assigned to.
+        :param owner: The owner of the task.
+        :param delegation_state: The delegation state. Valid values are 'RESOLVED' and 'PENDING'.
+        :param due: Due date of the task.
+        :param follow_up: Follow up date of the task.
+        :param priority: Priority of the task.
+        :param parent_task_id: Id of the parent task in case this task is a subtask.
+        :param case_instance_id: Id of the case instance.
+        :param tenant_id: Id of the tenant. Cannot be changed. Has to be the same value as the task
+                          already has.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.name = name
+        self.description = description
+        self.assignee = assignee
+        self.owner = owner
+        self.delegation_state = delegation_state
+        self.due = due
+        self.follow_up = follow_up
+        self.priority = priority
+        self.parent_task_id = parent_task_id
+        self.case_instance_id = case_instance_id
+        self.tenant_id = tenant_id
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
