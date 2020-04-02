@@ -3,8 +3,9 @@
 """This module provides access to the user REST api of Camunda."""
 
 from __future__ import annotations
-import requests
 import dataclasses
+
+import requests
 
 import pycamunda
 import pycamunda.request
