@@ -38,6 +38,12 @@ class Link:
 class ResourceOptions:
     links: typing.Tuple[Link]
 
+    def __iter__(self):
+        return (link for link in self.links)
+
+    def __len__(self):
+        return len(self.links)
+
     @classmethod
     def load(cls, data) -> ResourceOptions:
         return ResourceOptions(

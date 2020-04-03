@@ -31,6 +31,31 @@ class Group:
         )
 
 
+class Get(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def send(self) -> Group:
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return Group.load(response.json())
+
+
 class GetList(pycamunda.request.CamundaRequest):
 
     id_ = QueryParameter('id')
@@ -100,3 +125,112 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(Group.load(group_json) for group_json in response.json())
+
+
+class Create(pycamunda.request.CamundaRequest):
+
+    id_ = BodyParameter('id')
+    name = BodyParameter('name')
+    type_ = BodyParameter('type')
+
+    def __init__(self, url: str, id_: str, name: str, type_: str):
+        """Create a new group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        :param name: Name of the group.
+        :param type_: Type of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/create')
+        self.id_ = id_
+        self.name = name
+        self.type_ = type_
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Update(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    name = BodyParameter('name')
+    type_ = BodyParameter('type')
+
+    def __init__(self, url: str, id_: str, name: str, type_: str):
+        """Update a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        :param name: New name of the group.
+        :param type_: New zype of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.name = name
+        self.type_ = type_
+
+    def send(self) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        params['id'] = self.id_
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class Options(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url, id_=None):
+        """Get a list of options the currently authenticated user can perform on the group resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def send(self):
+        """Send the request"""
+        try:
+            response = requests.options(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return pycamunda.ResourceOptions.load(response.json())
+
+
+class Delete(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Delete a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def send(self) -> None:
+        """Send the request."""
+        try:
+            response = requests.delete(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)

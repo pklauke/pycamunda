@@ -9,7 +9,6 @@ import requests
 
 import pycamunda
 import pycamunda.request
-from pycamunda import ResourceOptions
 from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/user'
@@ -163,7 +162,7 @@ class GetProfile(pycamunda.request.CamundaRequest):
     id_ = PathParameter('id')
 
     def __init__(self, url, id_):
-        """
+        """Get the profile of an user.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user.
@@ -188,8 +187,7 @@ class Options(pycamunda.request.CamundaRequest):
     id_ = PathParameter('id')
 
     def __init__(self, url, id_=None):
-        """Query for a list of users using a list of parameters. The size of the result set can be
-        retrieved by using the Get User Count method.
+        """Get a list of options the currently authenticated user can perform on the user resource.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user.
@@ -206,7 +204,7 @@ class Options(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return ResourceOptions.load(response.json())
+        return pycamunda.ResourceOptions.load(response.json())
 
 
 class Create(pycamunda.request.CamundaRequest):
