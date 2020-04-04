@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 import dataclasses
+import typing
 
 import requests
 
@@ -22,7 +23,7 @@ class User:
     email: str
 
     @classmethod
-    def load(cls, data) -> User:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> User:
         return cls(
             id_=data['id'],
             first_name=data['firstName'],
@@ -35,7 +36,7 @@ class Delete(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_):
+    def __init__(self, url: str, id_: str):
         """Deletes a user by id.
 
         :param url: Camunda Rest engine URL.
@@ -44,7 +45,7 @@ class Delete(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self):
+    def send(self) -> None:
         """Send the request"""
         try:
             response = requests.delete(self.url)
@@ -66,7 +67,7 @@ class Count(pycamunda.request.CamundaRequest):
     member_of_group = QueryParameter('memberOfGroup')
     member_of_tenant = QueryParameter('memberOfTenant')
 
-    def __init__(self, url, id_=None):
+    def __init__(self, url: str, id_: str = None):
         """Count users.
 
         :param url: Camunda Rest engine URL.
@@ -75,7 +76,7 @@ class Count(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/count')
         self.id_ = id_
 
-    def send(self):
+    def send(self) -> int:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -107,10 +108,23 @@ class GetList(pycamunda.request.CamundaRequest):
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
-    def __init__(self, url, id_=None, first_name=None, first_name_like=None, last_name=None,
-                 last_name_like=None, email=None, email_like=None, member_of_group=None,
-                 member_of_tenant=None, sort_by=None, ascending=True, first_result=None,
-                 max_results=None):
+    def __init__(
+        self,
+        url: str,
+        id_: str = None,
+        first_name: str = None,
+        first_name_like: str = None,
+        last_name: str = None,
+        last_name_like: str = None,
+        email: str = None,
+        email_like: str = None,
+        member_of_group: str = None,
+        member_of_tenant: str = None,
+        sort_by: str = None,
+        ascending: bool = True,
+        first_result: int = None,
+        max_results: int = None
+    ):
         """Query for a list of users using a list of parameters. The size of the result set can be
         retrieved by using the Get User Count method.
 
@@ -144,7 +158,7 @@ class GetList(pycamunda.request.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self):
+    def send(self) -> typing.Tuple[User]:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -161,7 +175,7 @@ class GetProfile(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_):
+    def __init__(self, url: str, id_: str):
         """Get the profile of an user.
 
         :param url: Camunda Rest engine URL.
@@ -170,7 +184,7 @@ class GetProfile(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/profile')
         self.id_ = id_
 
-    def send(self):
+    def send(self) -> User:
         """Send the request"""
         try:
             response = requests.get(self.url)
@@ -186,7 +200,7 @@ class Options(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_=None):
+    def __init__(self, url: str, id_: str = None):
         """Get a list of options the currently authenticated user can perform on the user resource.
 
         :param url: Camunda Rest engine URL.
@@ -195,7 +209,7 @@ class Options(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self):
+    def send(self) -> pycamunda.ResourceOptions:
         """Send the request"""
         try:
             response = requests.options(self.url)
@@ -218,7 +232,15 @@ class Create(pycamunda.request.CamundaRequest):
     password = BodyParameter('password')
     credentials = BodyParameterContainer('credentials', password)
 
-    def __init__(self, url, id_=None, first_name=None, last_name=None, email=None, password=None):
+    def __init__(
+        self,
+        url: str,
+        id_: str = None,
+        first_name: str = None,
+        last_name: str = None,
+        email: str = None,
+        password: str = None
+    ):
         """Create a new user.
 
         :param url: Camunda Rest engine URL.
@@ -235,7 +257,7 @@ class Create(pycamunda.request.CamundaRequest):
         self.email = email
         self.password = password
 
-    def send(self):
+    def send(self) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -257,7 +279,7 @@ class UpdateCredentials(pycamunda.request.CamundaRequest):
     password = BodyParameter('password')
     authenticated_user_password = BodyParameter('authenticatedUserPassword')
 
-    def __init__(self, url, id_, password, authenticated_user_password):
+    def __init__(self, url: str, id_: str, password: str, authenticated_user_password: str):
         """Updates a user's credentials (password).
 
         :param url: Camunda Rest engine URL.
@@ -271,7 +293,7 @@ class UpdateCredentials(pycamunda.request.CamundaRequest):
         self.password = password
         self.authenticated_user_password = authenticated_user_password
 
-    def send(self):
+    def send(self) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -290,7 +312,15 @@ class UpdateProfile(pycamunda.request.CamundaRequest):
     last_name = BodyParameter('lastName')
     email = BodyParameter('email')
 
-    def __init__(self, url, id_, new_user_id=None, first_name=None, last_name=None, email=None):
+    def __init__(
+        self,
+        url: str,
+        id_: str,
+        new_user_id: str = None,
+        first_name: str = None,
+        last_name: str = None,
+        email: str = None
+    ):
         """Updates the profile information of an already existing user.
 
         :param url: Camunda Rest engine URL.
@@ -307,7 +337,7 @@ class UpdateProfile(pycamunda.request.CamundaRequest):
         self.last_name = last_name
         self.email = email
 
-    def send(self):
+    def send(self) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
