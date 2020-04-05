@@ -15,7 +15,7 @@ class Execution:
     tenant_id: str
 
     @classmethod
-    def load(cls, data: typing.Mapping) -> Execution:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Execution:
         return cls(
             id_=data['id'],
             process_instance_id=data['processInstanceId'],

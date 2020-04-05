@@ -68,7 +68,7 @@ class _Correlate(pycamunda.request.CamundaRequest):
 
     def __init__(
         self,
-        url,
+        url: str,
         message_name: str,
         all_: bool,
         business_key: str = None,
@@ -170,7 +170,7 @@ class _Correlate(pycamunda.request.CamundaRequest):
 
         return self
 
-    def send(self):
+    def send(self) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -185,7 +185,7 @@ class CorrelateSingle(_Correlate):
 
     def __init__(
         self,
-        url,
+        url: str,
         message_name: str,
         business_key: str = None,
         tenant_id: str = None,
@@ -226,7 +226,7 @@ class CorrelateAll(_Correlate):
 
     def __init__(
         self,
-        url,
+        url: str,
         message_name: str,
         business_key: str = None,
         tenant_id: str = None,

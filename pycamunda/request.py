@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 
 import abc
-from typing import Mapping, Callable
+import typing
 
 import pycamunda
 
 
-def value_is_true(self, obj, obj_type):
+def value_is_true(self, obj: typing.Any, obj_type: typing.Any) -> bool:
     return obj.__dict__[self.key]
 
 
 class RequestParameter:
 
-    def __init__(self, key, mapping: Mapping=None, provide: Callable=None, validate: Callable=None):
+    def __init__(
+        self,
+        key: str,
+        mapping: typing.Mapping = None,
+        provide: typing.Callable = None,
+        validate: typing.Callable = None
+    ):
         """Parameter that is send with a CamundaRequest when it is attached to the class and its
         value is set. This class implements the descriptor protocol.
 
@@ -31,18 +37,18 @@ class RequestParameter:
         self.validate = validate
         self.name = None
 
-    def __get__(self, obj, obj_type=None):
+    def __get__(self, obj: typing.Any, obj_type: typing.Any = None) -> typing.Any:
         if self.provide is None or self.provide(self, obj, obj_type):
             if self.mapping is None:
                 return obj.__dict__[self.name]
             return self.mapping[obj.__dict__[self.name]]
 
-    def __set__(self, obj, value):
+    def __set__(self, obj: typing.Any, value: typing.Any):
         if self.validate is not None and not self.validate(value):
             raise pycamunda.PyCamundaInvalidInput(f'Cannot set value "{value}" for "{self.name}"')
         obj.__dict__[self.name] = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.__class__.__qualname__}(key=\'{self.key}\')'
 
 
@@ -57,7 +63,7 @@ class PathParameter(RequestParameter):
         super().__init__(*args, **kwargs)
         self.instance = None
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> str:
         return getattr(self.instance, self.name)
 
 
@@ -75,21 +81,21 @@ class BodyParameterContainer:
     :param key: Camunda key.
     :param args: BodyParameter`s
     """
-    def __init__(self, key, *parameters):
+    def __init__(self, key: str, *parameters):
         self.key = key
         self.parameters = {}
         for parameter in parameters:
             self.parameters[parameter.key] = parameter
             parameter.hidden = True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.__class__.__qualname__}(key={self.key}, ' \
                f'{", ".join(k+"="+str(v) for k, v in self.parameters.items())})'
 
 
 class CamundaRequestMeta(abc.ABCMeta):
 
-    def __init__(cls, name, bases, attr_dict):
+    def __init__(cls, name: str, bases: typing.Any, attr_dict: typing.Dict[str, typing.Any]):
 
         super().__init__(name, bases, attr_dict)
 
@@ -112,7 +118,7 @@ class CamundaRequestMeta(abc.ABCMeta):
 
 class CamundaRequest(metaclass=CamundaRequestMeta):
 
-    def __init__(self, url):
+    def __init__(self, url: str):
         """Abstract base class for Camunda requests. Extracts parameters to send with the requests
         by parsing the class for RequestParameter`s.
 
@@ -126,7 +132,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                 attribute.instance = self  # TODO Fix incorrect instance assignment when Pathparameter is overwritten in child class
 
     @property
-    def url(self):
+    def url(self) -> str:
         params = {}
         missing_params = {}
         for name, attribute in self._parameters.items():
@@ -144,7 +150,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
     def send(self):
         return NotImplementedError
 
-    def query_parameters(self):
+    def query_parameters(self) -> typing.Dict[str, typing.Any]:
         query = {}
         for name, attribute in self._parameters.items():
             if isinstance(attribute, QueryParameter):
@@ -157,7 +163,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                         query[attribute.key] = value
         return query
 
-    def _traverse(self, container):
+    def _traverse(self, container: BodyParameterContainer) -> typing.Dict[str, typing.Any]:
         query = {}
         for key, val in container.parameters.items():
             if isinstance(val, BodyParameterContainer):
@@ -175,7 +181,7 @@ class CamundaRequest(metaclass=CamundaRequestMeta):
                         query[key] = value
         return query
 
-    def body_parameters(self):
+    def body_parameters(self) -> typing.Dict[str, typing.Any]:
         query = {}
         for name, attribute in self._containers.items():
             if isinstance(attribute, BodyParameterContainer):

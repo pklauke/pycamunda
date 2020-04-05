@@ -32,7 +32,7 @@ class ProcessInstance:
     variables: typing.Dict[str, pycamunda.variable.Variable] = None
 
     @classmethod
-    def load(cls, data) -> ProcessInstance:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> ProcessInstance:
         process_instance = cls(
             id_=data['id'],
             definition_id=data['definitionId'],

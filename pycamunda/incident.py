@@ -129,7 +129,8 @@ class GetList(pycamunda.request.CamundaRequest):
     ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
                                provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
 
-    def __init__(self,
+    def __init__(
+        self,
         url: str,
         incident_id: str = None,
         incident_type: str = None,

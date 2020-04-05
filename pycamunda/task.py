@@ -2,6 +2,7 @@
 
 """This module provides access to the task REST api of Camunda."""
 
+from __future__ import annotations
 import datetime
 import dataclasses
 import typing
@@ -40,7 +41,7 @@ class Task:
     task_definition_key: str
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Task:
         return cls(
             assignee=data["assignee"],
             case_definition_id=data["caseDefinitionId"],
@@ -414,7 +415,7 @@ class GetList(pycamunda.request.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self):
+    def send(self) -> typing.Tuple[Task]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -498,7 +499,7 @@ class Complete(pycamunda.request.CamundaRequest):
 
         self.variables = {}
 
-    def add_variable(self, name, value, type_=None, value_info=None):
+    def add_variable(self, name: str, value: typing.Any, type_: str = None, value_info: str = None):
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
@@ -510,7 +511,7 @@ class Complete(pycamunda.request.CamundaRequest):
 
         return self
 
-    def send(self) -> typing.Dict[str, pycamunda.variable.Variable]:
+    def send(self) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
         """Send the request."""
         params = self.body_parameters()
         try:

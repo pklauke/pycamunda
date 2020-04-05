@@ -67,7 +67,7 @@ class _Event(pycamunda.request.CamundaRequest):
 
         return self
 
-    def send(self):
+    def send(self) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:

@@ -16,7 +16,7 @@ class Variable:
     local: bool = None
 
     @classmethod
-    def load(cls, data) -> Variable:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Variable:
         variable = cls(
             value=data['value'],
             type_=data['type'],
@@ -29,12 +29,12 @@ class Variable:
         return variable
 
 
-def isoformat(datetime_):
+def isoformat(datetime_: typing.Union[dt.date, dt.datetime]) -> str:
     """Convert a datetime object to the isoformat string Camunda expects. Datetime objects are
     expected to contain timezoneinformation.
 
-    :param datetime_: Datetime object to convert.
-    :return: Isoformat datetime string.
+    :param datetime_: Datetime or date object to convert.
+    :return: Isoformat datetime or date string.
     """
     if isinstance(datetime_, dt.datetime):
         dt_str = datetime_.strftime('%Y-%m-%dT%H:%M:%S.{ms}%z')

@@ -3,8 +3,11 @@
 """This module provides access to the filter REST api of Camunda."""
 
 from __future__ import annotations
-import requests
+import datetime as dt
 import dataclasses
+import typing
+
+import requests
 
 import pycamunda
 import pycamunda.request
@@ -48,7 +51,7 @@ class Filter:
     item_count: int = None
 
     @classmethod
-    def load(cls, data) -> Filter:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Filter:
         return cls(
             id_=data['id'],
             resource_type=data['resourceType'],
@@ -76,9 +79,19 @@ class GetList(pycamunda.request.CamundaRequest):
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
-    def __init__(self, url, id_=None, name=None, name_like=None, owner=None,
-                 item_count=False, sort_by=None, ascending=True, first_result=None,
-                 max_results=None):
+    def __init__(
+        self,
+        url: str,
+        id_: str = None,
+        name: str = None,
+        name_like: str = None,
+        owner: str = None,
+        item_count: bool = False,
+        sort_by: str = None,
+        ascending: bool = True,
+        first_result: int = None,
+        max_results: int = None
+    ):
         """Query for a list of filters using a list of parameters. The size of the result set can be
         retrieved by using the Get Count request.
 
@@ -105,7 +118,7 @@ class GetList(pycamunda.request.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self):
+    def send(self) -> typing.Tuple[Filter]:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -126,7 +139,14 @@ class Count(pycamunda.request.CamundaRequest):
     name_like = QueryParameter('nameLike')
     owner = QueryParameter('owner')
 
-    def __init__(self, url, id_=None, name=None, name_like=None, owner=None):
+    def __init__(
+        self,
+        url: str,
+        id_:str = None,
+        name: str = None,
+        name_like: str = None,
+        owner: str = None
+    ):
         """Count filters.
 
         :param url: Camunda Rest engine URL.
@@ -142,7 +162,7 @@ class Count(pycamunda.request.CamundaRequest):
         self.name_like = name_like
         self.owner = owner
 
-    def send(self):
+    def send(self) -> int:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -160,7 +180,7 @@ class Get(pycamunda.request.CamundaRequest):
     id_ = PathParameter('filterId')
     item_count = QueryParameter('itemCount')
 
-    def __init__(self, url, id_, item_count=False):
+    def __init__(self, url: str, id_: str, item_count: bool = False):
         """Query for a filter.
 
         :param url: Camunda Rest engine URL.
@@ -171,7 +191,7 @@ class Get(pycamunda.request.CamundaRequest):
         self.id_ = id_
         self.item_count = item_count
 
-    def send(self):
+    def send(self) -> Filter:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -188,7 +208,12 @@ class CriteriaMixin:
 
     query = BodyParameterContainer('query')
 
-    def add_process_instance_criteria(self, id_=..., business_key=..., business_key_like=...):
+    def add_process_instance_criteria(
+        self,
+        id_: str = ...,
+        business_key: str = ...,
+        business_key_like: str = ...
+    ):
         """Add criteria that filter by process instance.
 
         :param id_: Filter by the id of the process instance.
@@ -204,8 +229,14 @@ class CriteriaMixin:
 
         return self
 
-    def add_process_definition_criteria(self, id_=..., key=..., key_in=..., name=...,
-                                        name_like=...):
+    def add_process_definition_criteria(
+        self,
+        id_: str = ...,
+        key: str = ...,
+        key_in: typing.Iterable[str] = ...,
+        name: str = ...,
+        name_like: str = ...
+    ):
         """Add criteria that filter by the process definition.
 
         :param id_: Filter by the id of the process definition.
@@ -227,7 +258,12 @@ class CriteriaMixin:
 
         return self
 
-    def add_case_instance_criteria(self, id_=..., business_key=..., business_key_like=...):
+    def add_case_instance_criteria(
+        self,
+        id_: str = ...,
+        business_key: str = ...,
+        business_key_like: str = ...
+    ):
         """Add criteria that filter by the case instance.
 
         :param id_: Filter by the id of the case instance.
@@ -243,7 +279,13 @@ class CriteriaMixin:
 
         return self
 
-    def add_case_definition_criteria(self, id_=..., key=..., name=..., name_like=...):
+    def add_case_definition_criteria(
+        self,
+        id_: str = ...,
+        key: str = ...,
+        name: str = ...,
+        name_like: str = ...
+    ):
         """Add criteria that filter by the case definition.
 
         :param id_: Filter by the id of the case definition.
@@ -260,7 +302,12 @@ class CriteriaMixin:
         if name_like is not Ellipsis:
             self.query.parameters['caseDefinitionNameLike'] = name_like
 
-    def add_other_criteria(self, active=..., activity_instance_id_in=..., execution_id=...):
+    def add_other_criteria(
+        self,
+        active: bool = ...,
+        activity_instance_id_in: typing.Iterable[str] = ...,
+        execution_id: str = ...
+    ):
         """Add criteria that filter by active status, activity instance or execution id.
 
         :param active: Filter only active tasks.
@@ -274,9 +321,19 @@ class CriteriaMixin:
         if execution_id is not Ellipsis:
             self.query.parameters['executionId'] = execution_id
 
-    def add_user_criteria(self, assignee=..., assignee_in=..., assignee_like=..., owner=...,
-                          candidate_group=..., candidate_groups=..., candidate_user=...,
-                          involved_user=..., unassigned=..., delegation_resolved=...):
+    def add_user_criteria(
+        self,
+        assignee: str = ...,
+        assignee_in: typing.Iterable[str] = ...,
+        assignee_like: str = ...,
+        owner: str = ...,
+        candidate_group: str = ...,
+        candidate_groups: typing.Iterable[str] = ...,
+        candidate_user: str = ...,
+        involved_user: str = ...,
+        unassigned: bool = ...,
+        delegation_state: str = ...  # TODO add enum?
+    ):
         """Add criteria that filter by user.
 
         :param assignee: Filter by the assignee of the task.
@@ -289,7 +346,7 @@ class CriteriaMixin:
         :param candidate_user: Filter by the candidate user of the task.
         :param involved_user: TODO
         :param unassigned: Filter only unassigned tasks.
-        :param delegation_resolved: Filter by delegation state.
+        :param delegation_state: Filter by delegation state.
         """
         if candidate_user is not Ellipsis and (
                 candidate_group is not Ellipsis or candidate_groups is not Ellipsis):
@@ -314,18 +371,29 @@ class CriteriaMixin:
             self.query.parameters['involvedUser'] = involved_user
         if unassigned is not Ellipsis:
             self.query.parameters['unassigned'] = unassigned
-        if delegation_resolved is None:
+        if delegation_state is None:
             self.query.parameters['delegationState'] = None
-        elif delegation_resolved is not Ellipsis:
+        elif delegation_state is not Ellipsis:
             self.query.parameters['delegationState'] = \
-                'RESOLVED' if delegation_resolved else 'PENDING'
+                'RESOLVED' if delegation_state else 'PENDING'
 
         return self
 
-    def add_task_criteria(self, definition_key=..., definition_key_in=..., definition_key_like=...,
-                          name=..., name_like=..., description=..., description_like=...,
-                          priority=..., max_priority=..., min_priority=..., tenant_id_in=...,
-                          without_tenant_id=False):
+    def add_task_criteria(
+        self,
+        definition_key: str = ...,
+        definition_key_in: typing.Iterable[str] = ...,
+        definition_key_like: str = ...,
+        name: str = ...,
+        name_like: str = ...,
+        description: str = ...,
+        description_like: str = ...,
+        priority: int = ...,
+        max_priority: int = ...,
+        min_priority: int = ...,
+        tenant_id_in: typing.Iterable[str] = ...,
+        without_tenant_id: bool = False
+    ):
         """Add criteria that filter by task.
 
         :param definition_key: Filter by the definition key of the task.
@@ -367,9 +435,16 @@ class CriteriaMixin:
 
         return self
 
-    def add_datetime_criteria(self, created_before=..., created_after=..., due_before=...,
-                              due_after=..., follow_up_after=..., follow_up_before=...,
-                              follow_up_before_or_not_existent=...):
+    def add_datetime_criteria(
+        self,
+        created_before: dt.datetime = ...,
+        created_after: dt.datetime = ...,
+        due_before: dt.datetime = ...,
+        due_after: dt.datetime = ...,
+        follow_up_after: dt.datetime = ...,
+        follow_up_before: dt.datetime = ...,
+        follow_up_before_or_not_existent: dt.datetime = ...
+    ):
         """Add criteria that filter by datetime. Datetime objects are expected to contain timezone
         information.
 
@@ -411,7 +486,7 @@ class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
     query = BodyParameterContainer('query')  # TODO test if this can be removed
     properties = BodyParameterContainer('properties')
 
-    def __init__(self, url, name, owner=None):
+    def __init__(self, url: str, name: str, owner: str = None):
         """Create a new filter.
 
         :param url: Camunda Rest engine URL.
@@ -435,7 +510,7 @@ class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
 
         return self
 
-    def send(self):
+    def send(self) -> Filter:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -457,7 +532,7 @@ class Update(pycamunda.request.CamundaRequest, CriteriaMixin):
     query = BodyParameterContainer('query')  # TODO test if this can be removed
     properties = BodyParameterContainer('properties')
 
-    def __init__(self, url, id_, name=None, owner=None):
+    def __init__(self, url: str, id_: str, name: str = None, owner: str = None):
         """Update a filter.
 
         :param url: Camunda Rest engine URL.
@@ -477,7 +552,7 @@ class Update(pycamunda.request.CamundaRequest, CriteriaMixin):
 
         return self
 
-    def send(self):
+    def send(self) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -492,7 +567,7 @@ class Delete(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_):
+    def __init__(self, url: str, id_: str):
         """Delete a filter.
 
         :param url: Camunda Rest engine URL.
@@ -516,7 +591,7 @@ class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
     id_ = PathParameter('id')
     query = BodyParameterContainer('query')  # TODO test if this can be removed
 
-    def __init__(self, url, id_, single_result=False):
+    def __init__(self, url: str, id_: str, single_result: bool = False):
         """Execute a filter.
 
         :param url: Camunda Rest engine URL.
@@ -526,7 +601,7 @@ class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
         self.id_ = id_
         self.single_result = single_result
 
-    def send(self):
+    def send(self) -> typing.Union[pycamunda.task.Task, typing.Tuple[pycamunda.task.Task]]:
         """Send the request."""
         params = self.body_parameters()['query']
         url = self.url + ('/singleResult' if self.single_result else '/list')
@@ -549,7 +624,7 @@ class ExecuteCount(pycamunda.request.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_):
+    def __init__(self, url: str, id_: str):
         """Get the number of results returned by executing a filter.
 
         :param url: Camunda Rest engine URL.
@@ -558,7 +633,7 @@ class ExecuteCount(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/count')
         self.id_ = id_
 
-    def send(self):
+    def send(self) -> int:
         """Send the request."""
         try:
             response = requests.get(self.url)

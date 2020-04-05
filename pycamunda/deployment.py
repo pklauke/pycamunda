@@ -26,7 +26,7 @@ class Deployment:
     deployment_time: datetime.datetime
 
     @classmethod
-    def load(cls, data: typing.Mapping[str, typing.Any]):
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Deployment:
         return cls(
             id_=data["id"],
             name=data["name"],

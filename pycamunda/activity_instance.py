@@ -20,7 +20,7 @@ class TransitionInstance:
     incidents: typing.Tuple[pycamunda.incident.IncidentTypeCount]
 
     @classmethod
-    def load(cls, data):
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> TransitionInstance:
         return cls(
             id_=data['id'],
             activity_id=data['activityId'],
@@ -53,7 +53,7 @@ class ActivityInstance:
     incidents: typing.Tuple[pycamunda.incident.IncidentTypeCount] = None
 
     @classmethod
-    def load(cls, data: typing.Mapping[str, typing.Any]):
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> ActivityInstance:
         activity_instance = cls(
             id_=data['id'],
             parent_activity_instance_id=data['parentActivityInstanceId'],

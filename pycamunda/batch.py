@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import dataclasses
+import typing
 
 
 @dataclasses.dataclass
@@ -20,7 +21,7 @@ class Batch:
     create_user_id: str
 
     @classmethod
-    def load(cls, data) -> Batch:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Batch:
         return cls(
             id_=data['id'],
             type_=data['type'],
