@@ -14,6 +14,7 @@ from pycamunda.request import PathParameter, QueryParameter, BodyParameter
 
 
 URL_SUFFIX = '/group'
+URL_SUFFIX_MEMBERS = '/members'
 
 
 @dataclasses.dataclass
@@ -234,3 +235,81 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class MemberCreate(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = PathParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Add a member to a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        :param user_id: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS + '/{userId}')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def send(self) -> None:
+        """Send the request."""
+        try:
+            response = requests.put(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class MemberDelete(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = PathParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Delete a member from a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        :param user_id: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS + '/{userId}')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def send(self) -> None:
+        """Send the request."""
+        try:
+            response = requests.delete(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+
+class MemberOptions(pycamunda.request.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get a list of options the currently authenticated user can perform on the group member
+        resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS)
+        self.id_ = id_
+
+    def send(self) -> pycamunda.ResourceOptions:
+        """Send the request."""
+        try:
+            response = requests.options(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return pycamunda.ResourceOptions.load(response.json())
