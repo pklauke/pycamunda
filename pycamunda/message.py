@@ -12,9 +12,8 @@ import requests
 import pycamunda.process_instance
 import pycamunda.execution
 import pycamunda.variable
-import pycamunda.request
-from pycamunda.request import BodyParameter
-
+import pycamunda.base
+from pycamunda.base import BodyParameter
 
 URL_SUFFIX = '/message'
 
@@ -51,12 +50,12 @@ class MessageCorrelationResult:
         return message_result
 
 
-class _Correlate(pycamunda.request.CamundaRequest):
+class _Correlate(pycamunda.base.Request):
 
     message_name = BodyParameter('messageName')
     business_key = BodyParameter('businessKey')
     tenant_id = BodyParameter('tenantId')
-    without_tenant_id = BodyParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
+    without_tenant_id = BodyParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     process_instance_id = BodyParameter('processInstanceId')
     correlation_keys = BodyParameter('correlationKeys')
     local_correlation_keys = BodyParameter('localCorrelationKeys')

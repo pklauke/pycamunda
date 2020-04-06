@@ -7,20 +7,19 @@ import typing
 
 import requests
 
-import pycamunda.request
-from pycamunda.request import BodyParameter
-
+import pycamunda.base
+from pycamunda.base import BodyParameter
 
 URL_SUFFIX = '/signal'
 
 
-class _Event(pycamunda.request.CamundaRequest):
+class _Event(pycamunda.base.Request):
 
     name = BodyParameter('name')
     execution_id = BodyParameter('executionId')
     variables = BodyParameter('variables')
     tenant_id = BodyParameter('tenantId')
-    without_tenant_id = BodyParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
+    without_tenant_id = BodyParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
 
     def __init__(
         self,

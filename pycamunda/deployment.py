@@ -10,9 +10,8 @@ import typing
 import requests
 
 import pycamunda.variable
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter
-
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter
 
 URL_SUFFIX = "/deployment"
 
@@ -51,7 +50,7 @@ class Resource:
         )
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     id_ = QueryParameter("id")
     name = QueryParameter("name")
@@ -59,9 +58,9 @@ class GetList(pycamunda.request.CamundaRequest):
     source = QueryParameter("source")
     without_source = QueryParameter("withoutSource")
     tenant_id_in = QueryParameter("tenantIdIn")
-    without_tenant_id = QueryParameter("withoutTenantId", provide=pycamunda.request.value_is_true)
+    without_tenant_id = QueryParameter("withoutTenantId", provide=pycamunda.base.value_is_true)
     include_deployments_without_tenant_id = QueryParameter(
-        "includeDeploymentsWithoutTenantId", provide=pycamunda.request.value_is_true
+        "includeDeploymentsWithoutTenantId", provide=pycamunda.base.value_is_true
     )
     after = QueryParameter("after")
     before = QueryParameter("before")
@@ -150,7 +149,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(Deployment.load(deployment_json) for deployment_json in response.json())
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -175,7 +174,7 @@ class Get(pycamunda.request.CamundaRequest):
         return Deployment.load(response.json())
 
 
-class Create(pycamunda.request.CamundaRequest):
+class Create(pycamunda.base.Request):
 
     name = BodyParameter('deployment-name')
     enable_duplicate_filtering = BodyParameter('enable-duplicate-filtering')
@@ -236,7 +235,7 @@ class Create(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class GetResources(pycamunda.request.CamundaRequest):
+class GetResources(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -261,7 +260,7 @@ class GetResources(pycamunda.request.CamundaRequest):
         return tuple(Resource.load(resource_json) for resource_json in response.json())
 
 
-class GetResource(pycamunda.request.CamundaRequest):
+class GetResource(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     resource_id = PathParameter('resourceId')
@@ -297,7 +296,7 @@ class GetResource(pycamunda.request.CamundaRequest):
         return Resource.load(response.json())
 
 
-class Delete(pycamunda.request.CamundaRequest):
+class Delete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     cascade = QueryParameter('cascade')

@@ -8,13 +8,13 @@ import typing
 
 import requests
 
+import pycamunda.resource
 import pycamunda.variable
-import pycamunda.request
 import pycamunda.activity_instance
 import pycamunda.instruction
 import pycamunda.batch
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter
-
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter
 
 URL_SUFFIX = '/process-instance'
 
@@ -28,7 +28,7 @@ class ProcessInstance:
     tenant_id: str
     ended: bool
     suspended: bool
-    links: typing.Tuple[pycamunda.Link]
+    links: typing.Tuple[pycamunda.resource.Link]
     variables: typing.Dict[str, pycamunda.variable.Variable] = None
 
     @classmethod
@@ -41,7 +41,7 @@ class ProcessInstance:
             tenant_id=data['tenantId'],
             ended=data['ended'],
             suspended=data['suspended'],
-            links=tuple(pycamunda.Link.load(link_json) for link_json in data['links']),
+            links=tuple(pycamunda.resource.Link.load(link_json) for link_json in data['links']),
         )
         try:
             variables = data['variables']
@@ -54,7 +54,7 @@ class ProcessInstance:
         return process_instance
 
 
-class Delete(pycamunda.request.CamundaRequest):
+class Delete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     skip_custom_listeners = QueryParameter('skipCustomListeners')
@@ -98,7 +98,7 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class GetActivityInstance(pycamunda.request.CamundaRequest):
+class GetActivityInstance(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -123,7 +123,7 @@ class GetActivityInstance(pycamunda.request.CamundaRequest):
         return pycamunda.activity_instance.ActivityInstance.load(response.json())
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     process_instance_ids = QueryParameter('processInstanceIds')
     business_key = QueryParameter('businessKey')
@@ -138,15 +138,15 @@ class GetList(pycamunda.request.CamundaRequest):
     sub_process_instance_id = QueryParameter('subProcessInstance')
     super_case_instance_id = QueryParameter('superCaseInstance')
     sub_case_instance_id = QueryParameter('subCaseInstance')
-    active = QueryParameter('active', provide=pycamunda.request.value_is_true)
-    suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
+    active = QueryParameter('active', provide=pycamunda.base.value_is_true)
+    suspended = QueryParameter('suspended', provide=pycamunda.base.value_is_true)
     with_incident = QueryParameter('withIncident')
     incident_id = QueryParameter('incidentId')
     incident_type = QueryParameter('incidentType')
     incident_message = QueryParameter('incidentMessage')
     incident_message_like = QueryParameter('incidentMessageLike')
     tenant_id_in = QueryParameter('tenantIdIn')
-    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
+    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     activity_id_in = QueryParameter('activityIdIn')
     root_process_instances = QueryParameter('rootProcessInstances')
     leaf_process_instances = QueryParameter('leafProcessInstances')
@@ -296,7 +296,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(ProcessInstance.load(instance_json) for instance_json in response.json())
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -322,7 +322,7 @@ class Get(pycamunda.request.CamundaRequest):
         return ProcessInstance.load(response.json())
 
 
-class Modify(pycamunda.request.CamundaRequest):
+class Modify(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     skip_custom_listeners = BodyParameter('skipCustomListeners')
@@ -561,7 +561,7 @@ class Modify(pycamunda.request.CamundaRequest):
             return pycamunda.batch.Batch.load(response.json())
 
 
-class _ActivateSuspend(pycamunda.request.CamundaRequest):
+class _ActivateSuspend(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     suspended = BodyParameter('suspended')

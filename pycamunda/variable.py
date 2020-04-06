@@ -9,9 +9,8 @@ import typing
 
 import requests
 
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter
-
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter
 
 URL_SUFFIX = '/variable-instance'
 
@@ -51,6 +50,7 @@ class VariableInstance:
     task_id: str
     activity_instance_id: str
     tenant_id: str
+    error_message: str
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> VariableInstance:
@@ -66,7 +66,8 @@ class VariableInstance:
             case_execution_id=data['caseExecutionId'],
             task_id=data['taskId'],
             activity_instance_id=data['activityInstanceId'],
-            tenant_id=data['tenantId']
+            tenant_id=data['tenantId'],
+            error_message=data['errorMessage']
         )
 
 
@@ -87,7 +88,7 @@ def isoformat(datetime_: typing.Union[dt.date, dt.datetime]) -> str:
     return dt_str
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     name = QueryParameter('variableName')
     name_like = QueryParameter('variableNameLike')
@@ -250,3 +251,33 @@ class GetList(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
         return tuple(VariableInstance.load(variable_json) for variable_json in response.json())
+
+
+class Get(pycamunda.base.Request):
+
+    id_ = PathParameter('id')
+    deserialize_value = QueryParameter('deserializeValue')
+
+    def __init__(self, url: str, id_: str, deserialize_value: bool = False):
+        """Get a variable instance.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the variable instance.
+        :param deserialize_value: Whether serializable variable values are deserialized on server
+                                  side.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.deserialize_value = deserialize_value
+
+    def send(self) -> VariableInstance:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            raise pycamunda.PyCamundaNoSuccess(response.text)
+
+        return VariableInstance.load(response.json())

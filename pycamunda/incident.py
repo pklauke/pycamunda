@@ -9,9 +9,8 @@ import typing
 
 import requests
 
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter
-
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter
 
 URL_SUFFIX = '/incident'
 
@@ -69,7 +68,7 @@ class Incident:
         )
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -94,7 +93,7 @@ class Get(pycamunda.request.CamundaRequest):
         return Incident.load(response.json())
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     incident_id = QueryParameter('incidentId')
     incident_type = QueryParameter('incidentType')
@@ -201,7 +200,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(Incident.load(incident_json) for incident_json in response.json())
 
 
-class Resolve(pycamunda.request.CamundaRequest):
+class Resolve(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 

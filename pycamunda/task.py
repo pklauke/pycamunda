@@ -10,11 +10,10 @@ import typing
 import requests
 
 import pycamunda.variable
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter
 
-
-URL_SUFFIX = "/task"
+URL_SUFFIX = '/task'
 
 
 @dataclasses.dataclass
@@ -66,7 +65,7 @@ class Task:
         )
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter("id")
 
@@ -91,7 +90,7 @@ class Get(pycamunda.request.CamundaRequest):
         return Task.load(response.json())
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     process_instance_id = QueryParameter('processInstanceId')
     process_instance_id_in = QueryParameter('processInstanceIdIn')
@@ -114,7 +113,7 @@ class GetList(pycamunda.request.CamundaRequest):
     case_execution_id = QueryParameter('caseExecutionId')
     activity_instance_id_in = QueryParameter('activityInstanceIdIn')
     tenant_id_in = QueryParameter('tenantIdIn')
-    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
+    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     assignee = QueryParameter('assignee')
     assignee_like = QueryParameter('assigneeLike')
     assignee_in = QueryParameter('assigneeIn')
@@ -150,19 +149,19 @@ class GetList(pycamunda.request.CamundaRequest):
     delegation_state = QueryParameter('delegationState')
     candidate_groups = QueryParameter('candidateGroups')
     with_candidate_groups = QueryParameter(
-        'withCandidateGroups', provide=pycamunda.request.value_is_true
+        'withCandidateGroups', provide=pycamunda.base.value_is_true
     )
     without_candidate_groups = QueryParameter(
-        'withoutCandidateGroups', provide=pycamunda.request.value_is_true
+        'withoutCandidateGroups', provide=pycamunda.base.value_is_true
     )
     with_candidate_users = QueryParameter(
-        'withCandidateUsers', provide=pycamunda.request.value_is_true
+        'withCandidateUsers', provide=pycamunda.base.value_is_true
     )
     without_candidate_users = QueryParameter(
-        'withoutCandidateUsers', provide=pycamunda.request.value_is_true
+        'withoutCandidateUsers', provide=pycamunda.base.value_is_true
     )
-    active = QueryParameter('active', provide=pycamunda.request.value_is_true)
-    suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
+    active = QueryParameter('active', provide=pycamunda.base.value_is_true)
+    suspended = QueryParameter('suspended', provide=pycamunda.base.value_is_true)
     # TODO add variables parameters
     parent_task_id = QueryParameter('parentTaskId')
     sort_by = QueryParameter(
@@ -428,7 +427,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(Task.load(task_json) for task_json in response.json())
 
 
-class Claim(pycamunda.request.CamundaRequest):
+class Claim(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
@@ -457,7 +456,7 @@ class Claim(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Unclaim(pycamunda.request.CamundaRequest):
+class Unclaim(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -481,7 +480,7 @@ class Unclaim(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Complete(pycamunda.request.CamundaRequest):
+class Complete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     variables = BodyParameter('variables')
@@ -528,7 +527,7 @@ class Complete(pycamunda.request.CamundaRequest):
             }
 
 
-class Resolve(pycamunda.request.CamundaRequest):
+class Resolve(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     variables = BodyParameter('variables')
@@ -569,7 +568,7 @@ class Resolve(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetAssignee(pycamunda.request.CamundaRequest):
+class SetAssignee(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
@@ -596,7 +595,7 @@ class SetAssignee(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Delegate(pycamunda.request.CamundaRequest):
+class Delegate(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
@@ -623,7 +622,7 @@ class Delegate(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Create(pycamunda.request.CamundaRequest):
+class Create(pycamunda.base.Request):
 
     id_ = BodyParameter('id')
     name = BodyParameter('name')
@@ -695,7 +694,7 @@ class Create(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Update(pycamunda.request.CamundaRequest):
+class Update(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     name = BodyParameter('name')

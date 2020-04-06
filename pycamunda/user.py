@@ -9,8 +9,9 @@ import typing
 import requests
 
 import pycamunda
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
+import pycamunda.resource
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/user'
 
@@ -32,7 +33,7 @@ class User:
         )
 
 
-class Delete(pycamunda.request.CamundaRequest):
+class Delete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -55,7 +56,7 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Count(pycamunda.request.CamundaRequest):
+class Count(pycamunda.base.Request):
 
     id_ = QueryParameter('id')
     first_name = QueryParameter('firstName')
@@ -89,7 +90,7 @@ class Count(pycamunda.request.CamundaRequest):
         return response.json()['count']
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     id_ = QueryParameter('id')
     first_name = QueryParameter('firstName')
@@ -171,7 +172,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(User.load(user_json) for user_json in response.json())
 
 
-class GetProfile(pycamunda.request.CamundaRequest):
+class GetProfile(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -196,7 +197,7 @@ class GetProfile(pycamunda.request.CamundaRequest):
         return User.load(response.json())
 
 
-class Options(pycamunda.request.CamundaRequest):
+class Options(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -209,7 +210,7 @@ class Options(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> pycamunda.ResourceOptions:
+    def send(self) -> pycamunda.resource.ResourceOptions:
         """Send the request"""
         try:
             response = requests.options(self.url)
@@ -218,10 +219,10 @@ class Options(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return pycamunda.ResourceOptions.load(response.json())
+        return pycamunda.resource.ResourceOptions.load(response.json())
 
 
-class Create(pycamunda.request.CamundaRequest):
+class Create(pycamunda.base.Request):
 
     id_ = BodyParameter('id')
     first_name = BodyParameter('firstName')
@@ -273,7 +274,7 @@ class Create(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class UpdateCredentials(pycamunda.request.CamundaRequest):
+class UpdateCredentials(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     password = BodyParameter('password')
@@ -304,7 +305,7 @@ class UpdateCredentials(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class UpdateProfile(pycamunda.request.CamundaRequest):
+class UpdateProfile(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     new_user_id = BodyParameter('id')

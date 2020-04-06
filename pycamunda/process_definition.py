@@ -8,14 +8,13 @@ import dataclasses
 
 import requests
 
-import pycamunda.request
 import pycamunda.variable
 import pycamunda.process_instance
 import pycamunda.batch
-from pycamunda.incident import IncidentTypeCount
-from pycamunda.instruction import InstructionType
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
-
+import pycamunda.incident
+import pycamunda.instruction
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/process-definition'
 
@@ -93,7 +92,7 @@ class ActivityStatistics:
     id_: str
     instances: int
     failed_jobs: int
-    incidents: typing.Iterable[IncidentTypeCount]
+    incidents: typing.Iterable[pycamunda.incident.IncidentTypeCount]
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> ActivityStatistics:
@@ -102,7 +101,8 @@ class ActivityStatistics:
             instances=data['instances'],
             failed_jobs=data['failedJobs'],
             incidents=tuple(
-                IncidentTypeCount.load(incident_data) for incident_data in data['incidents']
+                pycamunda.incident.IncidentTypeCount.load(incident_data)
+                for incident_data in data['incidents']
             )
         )
 
@@ -113,7 +113,7 @@ class ProcessInstanceStatistics:
     instances: int
     failed_jobs: int
     definition: ProcessDefinition
-    incidents: typing.Iterable[IncidentTypeCount]
+    incidents: typing.Iterable[pycamunda.incident.IncidentTypeCount]
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> ProcessInstanceStatistics:
@@ -123,12 +123,13 @@ class ProcessInstanceStatistics:
             failed_jobs=data['failedJobs'],
             definition=ProcessDefinition.load(data['definition']),
             incidents=tuple(
-                IncidentTypeCount.load(incident_data) for incident_data in data['incidents']
+                pycamunda.incident.IncidentTypeCount.load(incident_data)
+                for incident_data in data['incidents']
             )
         )
 
 
-class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
+class GetActivityInstanceStatistics(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -136,7 +137,7 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
     path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     failed_jobs = QueryParameter('failedJobs')
-    incidents = QueryParameter('incidents', provide=pycamunda.request.value_is_true)
+    incidents = QueryParameter('incidents', provide=pycamunda.base.value_is_true)
     incidents_for_type = QueryParameter('incidentsForType')
 
     def __init__(
@@ -184,7 +185,7 @@ class GetActivityInstanceStatistics(pycamunda.request.CamundaRequest):
         return tuple(ActivityStatistics.load(activity_json) for activity_json in response.json())
 
 
-class GetProcessDiagram(pycamunda.request.CamundaRequest):
+class GetProcessDiagram(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -215,7 +216,7 @@ class GetProcessDiagram(pycamunda.request.CamundaRequest):
         return response.content
 
 
-class Count(pycamunda.request.CamundaRequest):
+class Count(pycamunda.base.Request):
 
     id_ = QueryParameter('processDefinitionId')
     id_in = QueryParameter('processDefinitionIdIn')
@@ -228,21 +229,21 @@ class Count(pycamunda.request.CamundaRequest):
     category = QueryParameter('category')
     category_like = QueryParameter('categoryLike')
     version = QueryParameter('version')
-    latest_version = QueryParameter('latestVersion', provide=pycamunda.request.value_is_true)
+    latest_version = QueryParameter('latestVersion', provide=pycamunda.base.value_is_true)
     resource_name = QueryParameter('resourceName')
     resource_name_like = QueryParameter('resourceNameLike')
     startable_by = QueryParameter('startableBy')
-    active = QueryParameter('active', provide=pycamunda.request.value_is_true)
-    suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
+    active = QueryParameter('active', provide=pycamunda.base.value_is_true)
+    suspended = QueryParameter('suspended', provide=pycamunda.base.value_is_true)
     incident_id = QueryParameter('incidentId')
     incident_type = QueryParameter('incidentType')
     incident_message = QueryParameter('incidentMessage')
     incident_message_like = QueryParameter('incidentMessageLike')
     tenant_id_in = QueryParameter('tenantIdIn')
-    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
+    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     include_without_tenant_id = QueryParameter(
         'includeProcessDefinitionsWithoutTenantId',
-        provide = pycamunda.request.value_is_true
+        provide = pycamunda.base.value_is_true
     )
     version_tag = QueryParameter('versionTag')
     version_tag_like = QueryParameter('versionTagLike')
@@ -370,7 +371,7 @@ class Count(pycamunda.request.CamundaRequest):
         return response.json()['count']
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     id_ = QueryParameter('processDefinitionId')
     id_in = QueryParameter('processDefinitionIdIn')
@@ -383,21 +384,21 @@ class GetList(pycamunda.request.CamundaRequest):
     category = QueryParameter('category')
     category_like = QueryParameter('categoryLike')
     version = QueryParameter('version')
-    latest_version = QueryParameter('latestVersion', provide=pycamunda.request.value_is_true)
+    latest_version = QueryParameter('latestVersion', provide=pycamunda.base.value_is_true)
     resource_name = QueryParameter('resourceName')
     resource_name_like = QueryParameter('resourceNameLike')
     startable_by = QueryParameter('startableBy')
-    active = QueryParameter('active', provide=pycamunda.request.value_is_true)
-    suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
+    active = QueryParameter('active', provide=pycamunda.base.value_is_true)
+    suspended = QueryParameter('suspended', provide=pycamunda.base.value_is_true)
     incident_id = QueryParameter('incidentId')
     incident_type = QueryParameter('incidentType')
     incident_message = QueryParameter('incidentMessage')
     incident_message_like = QueryParameter('incidentMessageLike')
     tenant_id_in = QueryParameter('tenantIdIn')
-    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.request.value_is_true)
+    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     include_without_tenant_id = QueryParameter(
         'includeProcessDefinitionsWithoutTenantId',
-        provide = pycamunda.request.value_is_true
+        provide = pycamunda.base.value_is_true
     )
     version_tag = QueryParameter('versionTag')
     version_tag_like = QueryParameter('versionTagLike')
@@ -550,11 +551,11 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
 
 
-class GetProcessInstanceStatistics(pycamunda.request.CamundaRequest):
+class GetProcessInstanceStatistics(pycamunda.base.Request):
 
     failed_jobs = QueryParameter('failedJobs')
-    incidents = QueryParameter('incidents', provide=pycamunda.request.value_is_true)
-    root_incidents = QueryParameter('rootIncidents', provide=pycamunda.request.value_is_true)
+    incidents = QueryParameter('incidents', provide=pycamunda.base.value_is_true)
+    root_incidents = QueryParameter('rootIncidents', provide=pycamunda.base.value_is_true)
     incidents_for_type = QueryParameter('incidentsForType')
 
     def __init__(
@@ -599,7 +600,7 @@ class GetProcessInstanceStatistics(pycamunda.request.CamundaRequest):
                      for statistics_json in response.json())
 
 
-class GetXML(pycamunda.request.CamundaRequest):
+class GetXML(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -631,7 +632,7 @@ class GetXML(pycamunda.request.CamundaRequest):
         return response.json()['bpmn20Xml']
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -664,7 +665,7 @@ class Get(pycamunda.request.CamundaRequest):
         return ProcessDefinition.load(response.json())
 
 
-class StartInstance(pycamunda.request.CamundaRequest):
+class StartInstance(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -741,7 +742,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
 
     def _add_start_instruction(
         self,
-        type_: typing.Union[str, InstructionType],
+        type_: typing.Union[str, pycamunda.instruction.InstructionType],
         activity_id: str = None,
         transition_id: str = None,
         variables: typing.Mapping[str, pycamunda.variable.Variable] = None
@@ -758,7 +759,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
         :param variables: Mapping from names to the corresponding variables.
         :return:
         """
-        instruction = {'type': InstructionType(type_).value}
+        instruction = {'type': pycamunda.instruction.InstructionType(type_).value}
         if activity_id is not None:
             instruction['activityId'] = activity_id
         if transition_id is not None:
@@ -781,7 +782,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
         :param variables: Mapping from names to the corresponding variables.
         """
         self._add_start_instruction(
-            type_=InstructionType.start_before_activity,
+            type_=pycamunda.instruction.InstructionType.start_before_activity,
             activity_id=id_,
             variables=variables
         )
@@ -800,7 +801,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
         :param variables: Mapping from names to the corresponding variables.
         """
         self._add_start_instruction(
-            type_=InstructionType.start_after_activity,
+            type_=pycamunda.instruction.InstructionType.start_after_activity,
             activity_id=id_,
             variables=variables
         )
@@ -819,7 +820,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
         :param variables: Mapping from names to the corresponding variables.
         """
         self._add_start_instruction(
-            type_=InstructionType.start_transition,
+            type_=pycamunda.instruction.InstructionType.start_transition,
             transition_id=id_,
             variables=variables
         )
@@ -839,7 +840,7 @@ class StartInstance(pycamunda.request.CamundaRequest):
         return pycamunda.process_instance.ProcessInstance.load(response.json())
 
 
-class _ActivateSuspend(pycamunda.request.CamundaRequest):
+class _ActivateSuspend(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -952,7 +953,7 @@ class Suspend(_ActivateSuspend):
         )
 
 
-class UpdateHistoryTimeToLive(pycamunda.request.CamundaRequest):
+class UpdateHistoryTimeToLive(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -1025,7 +1026,7 @@ class _ProcessDefinitionDeletePathParameter(PathParameter):
         )
 
 
-class Delete(pycamunda.request.CamundaRequest):
+class Delete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -1075,7 +1076,7 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class RestartProcessInstance(pycamunda.request.CamundaRequest):
+class RestartProcessInstance(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     process_instance_ids = BodyParameter('processInstanceIds')
@@ -1125,7 +1126,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
 
     def _add_instruction(
         self,
-        type_: typing.Union[str, InstructionType],
+        type_: typing.Union[str, pycamunda.instruction.InstructionType],
         activity_id: str = None,
         transition_id: str = None
     ):
@@ -1139,7 +1140,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
                             `startAfterActivity.
         :param transition_id: Id of the sequence flow to start.
         """
-        instruction = {'type': InstructionType(type_).value}
+        instruction = {'type': pycamunda.instruction.InstructionType(type_).value}
         if activity_id is not None:
             instruction['activityId'] = activity_id
         if transition_id is not None:
@@ -1153,7 +1154,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         :param id_: Id of the activity.
         """
         self._add_instruction(
-            type_=InstructionType.start_before_activity,
+            type_=pycamunda.instruction.InstructionType.start_before_activity,
             activity_id=id_
         )
 
@@ -1166,7 +1167,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         :param id_: Id of the activity.
         """
         self._add_instruction(
-            type_=InstructionType.start_after_activity,
+            type_=pycamunda.instruction.InstructionType.start_after_activity,
             activity_id=id_
         )
 
@@ -1179,7 +1180,7 @@ class RestartProcessInstance(pycamunda.request.CamundaRequest):
         :param id_: Id of the sequence flow to start.
         """
         self._add_instruction(
-            type_=InstructionType.start_transition,
+            type_=pycamunda.instruction.InstructionType.start_transition,
             transition_id=id_
         )
 

@@ -9,9 +9,9 @@ import typing
 import requests
 
 import pycamunda
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter
-
+import pycamunda.base
+import pycamunda.resource
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter
 
 URL_SUFFIX = '/group'
 URL_SUFFIX_MEMBERS = '/members'
@@ -32,7 +32,7 @@ class Group:
         )
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -57,7 +57,7 @@ class Get(pycamunda.request.CamundaRequest):
         return Group.load(response.json())
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     id_ = QueryParameter('id')
     id_in = QueryParameter('idIn')
@@ -128,7 +128,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(Group.load(group_json) for group_json in response.json())
 
 
-class Create(pycamunda.request.CamundaRequest):
+class Create(pycamunda.base.Request):
 
     id_ = BodyParameter('id')
     name = BodyParameter('name')
@@ -158,7 +158,7 @@ class Create(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Update(pycamunda.request.CamundaRequest):
+class Update(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     name = BodyParameter('name')
@@ -189,7 +189,7 @@ class Update(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Options(pycamunda.request.CamundaRequest):
+class Options(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -211,10 +211,10 @@ class Options(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return pycamunda.ResourceOptions.load(response.json())
+        return pycamunda.resource.ResourceOptions.load(response.json())
 
 
-class Delete(pycamunda.request.CamundaRequest):
+class Delete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -237,7 +237,7 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class MemberCreate(pycamunda.request.CamundaRequest):
+class MemberCreate(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     user_id = PathParameter('userId')
@@ -263,7 +263,7 @@ class MemberCreate(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class MemberDelete(pycamunda.request.CamundaRequest):
+class MemberDelete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     user_id = PathParameter('userId')
@@ -289,7 +289,7 @@ class MemberDelete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class MemberOptions(pycamunda.request.CamundaRequest):
+class MemberOptions(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -303,7 +303,7 @@ class MemberOptions(pycamunda.request.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS)
         self.id_ = id_
 
-    def send(self) -> pycamunda.ResourceOptions:
+    def send(self) -> pycamunda.resource.ResourceOptions:
         """Send the request."""
         try:
             response = requests.options(self.url)
@@ -312,4 +312,4 @@ class MemberOptions(pycamunda.request.CamundaRequest):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return pycamunda.ResourceOptions.load(response.json())
+        return pycamunda.resource.ResourceOptions.load(response.json())

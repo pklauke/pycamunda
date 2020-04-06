@@ -10,10 +10,10 @@ import typing
 import requests
 
 import pycamunda
-import pycamunda.request
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 import pycamunda.task
 import pycamunda.variable
+import pycamunda.base
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/filter'
 
@@ -63,7 +63,7 @@ class Filter:
         )
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     id_ = QueryParameter('filterId')
     resource_type = QueryParameter('resourceType')
@@ -131,7 +131,7 @@ class GetList(pycamunda.request.CamundaRequest):
         return tuple(Filter.load(filter_json) for filter_json in response.json())
 
 
-class Count(pycamunda.request.CamundaRequest):
+class Count(pycamunda.base.Request):
 
     id_ = QueryParameter('filterId')
     resource_type = QueryParameter('resourceType')
@@ -175,7 +175,7 @@ class Count(pycamunda.request.CamundaRequest):
         return response.json()['count']
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('filterId')
     item_count = QueryParameter('itemCount')
@@ -478,7 +478,7 @@ class CriteriaMixin:
         return self
 
 
-class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
+class Create(pycamunda.base.Request, CriteriaMixin):
 
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
@@ -523,7 +523,7 @@ class Create(pycamunda.request.CamundaRequest, CriteriaMixin):
         return Filter.load(response.json())
 
 
-class Update(pycamunda.request.CamundaRequest, CriteriaMixin):
+class Update(pycamunda.base.Request, CriteriaMixin):
 
     id_ = PathParameter('id')
     resource_type = BodyParameter('resourceType')
@@ -563,7 +563,7 @@ class Update(pycamunda.request.CamundaRequest, CriteriaMixin):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Delete(pycamunda.request.CamundaRequest):
+class Delete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -586,7 +586,7 @@ class Delete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
+class Execute(pycamunda.base.Request, CriteriaMixin):
 
     id_ = PathParameter('id')
     query = BodyParameterContainer('query')  # TODO test if this can be removed
@@ -620,7 +620,7 @@ class Execute(pycamunda.request.CamundaRequest, CriteriaMixin):
         return tuple(pycamunda.task.Task.load(task_json) for task_json in response.json())
 
 
-class ExecuteCount(pycamunda.request.CamundaRequest):
+class ExecuteCount(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 

@@ -9,10 +9,10 @@ import typing
 import requests
 
 import pycamunda
-import pycamunda.request
+import pycamunda.base
 import pycamunda.variable
 import pycamunda.batch
-from pycamunda.request import PathParameter, QueryParameter, BodyParameter
+from pycamunda.base import PathParameter, QueryParameter, BodyParameter
 
 URL_SUFFIX = '/external-task'
 
@@ -79,7 +79,7 @@ class ExternalTask:
         return external_task
 
 
-class Get(pycamunda.request.CamundaRequest):
+class Get(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -118,15 +118,15 @@ class Get(pycamunda.request.CamundaRequest):
         return external_task
 
 
-class GetList(pycamunda.request.CamundaRequest):
+class GetList(pycamunda.base.Request):
 
     id_ = QueryParameter('externalTaskId')
     topic_name = QueryParameter('topicName')
     worker_id = QueryParameter('workerId')
-    locked = QueryParameter('locked', provide=pycamunda.request.value_is_true)
-    not_locked = QueryParameter('notLocked', provide=pycamunda.request.value_is_true)
-    with_retries_left = QueryParameter('withRetriesLeft', provide=pycamunda.request.value_is_true)
-    no_retries_left = QueryParameter('noRetriesLeft', provide=pycamunda.request.value_is_true)
+    locked = QueryParameter('locked', provide=pycamunda.base.value_is_true)
+    not_locked = QueryParameter('notLocked', provide=pycamunda.base.value_is_true)
+    with_retries_left = QueryParameter('withRetriesLeft', provide=pycamunda.base.value_is_true)
+    no_retries_left = QueryParameter('noRetriesLeft', provide=pycamunda.base.value_is_true)
     lock_expiration_after = QueryParameter('lockExpirationAfter')
     lock_expiration_before = QueryParameter('lockExpirationBefore')
     activity_id = QueryParameter('activityId')
@@ -135,10 +135,10 @@ class GetList(pycamunda.request.CamundaRequest):
     process_instance_id = QueryParameter('processInstanceId')
     process_definition_id = QueryParameter('processDefinitionId')
     tenant_id_in = QueryParameter('tenantIdIn')
-    active = QueryParameter('active', provide=pycamunda.request.value_is_true)
+    active = QueryParameter('active', provide=pycamunda.base.value_is_true)
     priority_higher_equals = QueryParameter('priorityHigherThanOrEquals')
     priority_lower_equals = QueryParameter('priorityLowerThanOrEquals')
-    suspended = QueryParameter('suspended', provide=pycamunda.request.value_is_true)
+    suspended = QueryParameter('suspended', provide=pycamunda.base.value_is_true)
     sort_by = QueryParameter(
         'sortBy',
         mapping={
@@ -376,7 +376,7 @@ class Count(GetList):
         return int(response.json()['count'])
 
 
-class FetchAndLock(pycamunda.request.CamundaRequest):
+class FetchAndLock(pycamunda.base.Request):
 
     worker_id = BodyParameter('workerId')
     max_tasks = BodyParameter('maxTasks')
@@ -438,7 +438,7 @@ class FetchAndLock(pycamunda.request.CamundaRequest):
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
 
 
-class Complete(pycamunda.request.CamundaRequest):
+class Complete(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -494,7 +494,7 @@ class Complete(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class HandleBPMNError(pycamunda.request.CamundaRequest):
+class HandleBPMNError(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -548,7 +548,7 @@ class HandleBPMNError(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class HandleFailure(pycamunda.request.CamundaRequest):
+class HandleFailure(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -601,7 +601,7 @@ class HandleFailure(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Unlock(pycamunda.request.CamundaRequest):
+class Unlock(pycamunda.base.Request):
 
     id_ = PathParameter('id')
 
@@ -624,7 +624,7 @@ class Unlock(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class ExtendLock(pycamunda.request.CamundaRequest):
+class ExtendLock(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     new_duration = BodyParameter('newDuration')
@@ -654,7 +654,7 @@ class ExtendLock(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetPriority(pycamunda.request.CamundaRequest):
+class SetPriority(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     priority = BodyParameter('priority')
@@ -681,7 +681,7 @@ class SetPriority(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetRetries(pycamunda.request.CamundaRequest):
+class SetRetries(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
@@ -708,7 +708,7 @@ class SetRetries(pycamunda.request.CamundaRequest):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetRetriesAsync(pycamunda.request.CamundaRequest):
+class SetRetriesAsync(pycamunda.base.Request):
 
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
     external_task_ids = BodyParameter('externalTaskIds')
@@ -745,7 +745,7 @@ class SetRetriesAsync(pycamunda.request.CamundaRequest):
         return pycamunda.batch.Batch.load(response.json())
 
 
-class SetRetriesSync(pycamunda.request.CamundaRequest):
+class SetRetriesSync(pycamunda.base.Request):
 
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
     external_task_ids = BodyParameter('externalTaskIds')

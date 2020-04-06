@@ -93,7 +93,7 @@ class BodyParameterContainer:
                f'{", ".join(k+"="+str(v) for k, v in self.parameters.items())})'
 
 
-class CamundaRequestMeta(abc.ABCMeta):
+class RequestMeta(abc.ABCMeta):
 
     def __init__(cls, name: str, bases: typing.Any, attr_dict: typing.Dict[str, typing.Any]):
 
@@ -116,13 +116,13 @@ class CamundaRequestMeta(abc.ABCMeta):
                 cls._containers[key] = attr
 
 
-class CamundaRequest(metaclass=CamundaRequestMeta):
+class Request(metaclass=RequestMeta):
 
     def __init__(self, url: str):
-        """Abstract base class for Camunda requests. Extracts parameters to send with the requests
-        by parsing the class for RequestParameter`s.
+        """Abstract base class for requests. Extracts parameters to send with the requests by
+        parsing the class for RequestParameter`s.
 
-        :param url: Camunda Rest engine url.
+        :param url: Rest engine url.
         """
         super().__init__()
         self._url = url
