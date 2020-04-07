@@ -13,7 +13,7 @@ import pycamunda.variable
 import pycamunda.base
 from pycamunda.base import PathParameter, QueryParameter, BodyParameter
 
-URL_SUFFIX = "/deployment"
+URL_SUFFIX = '/deployment'
 
 
 @dataclasses.dataclass
@@ -27,11 +27,11 @@ class Deployment:
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> Deployment:
         return cls(
-            id_=data["id"],
-            name=data["name"],
-            source=data["source"],
-            tenant_id=data["tenantId"],
-            deployment_time=data["deploymentTime"],
+            id_=data['id'],
+            name=data['name'],
+            source=data['source'],
+            tenant_id=data['tenantId'],
+            deployment_time=data['deploymentTime'],
         )
 
 
@@ -52,34 +52,34 @@ class Resource:
 
 class GetList(pycamunda.base.Request):
 
-    id_ = QueryParameter("id")
-    name = QueryParameter("name")
-    name_like = QueryParameter("nameLike")
-    source = QueryParameter("source")
-    without_source = QueryParameter("withoutSource")
-    tenant_id_in = QueryParameter("tenantIdIn")
-    without_tenant_id = QueryParameter("withoutTenantId", provide=pycamunda.base.value_is_true)
+    id_ = QueryParameter('id')
+    name = QueryParameter('name')
+    name_like = QueryParameter('nameLike')
+    source = QueryParameter('source')
+    without_source = QueryParameter('withoutSource')
+    tenant_id_in = QueryParameter('tenantIdIn')
+    without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     include_deployments_without_tenant_id = QueryParameter(
-        "includeDeploymentsWithoutTenantId", provide=pycamunda.base.value_is_true
+        'includeDeploymentsWithoutTenantId', provide=pycamunda.base.value_is_true
     )
-    after = QueryParameter("after")
-    before = QueryParameter("before")
+    after = QueryParameter('after')
+    before = QueryParameter('before')
     sort_by = QueryParameter(
-        "sortBy",
+        'sortBy',
         mapping={
-            "id_": "id",
-            "name": "name",
-            "definition_time": "definitionTime",
-            "tenant_id": "tenantId",
+            'id_': 'id',
+            'name': 'name',
+            'definition_time': 'definitionTime',
+            'tenant_id': 'tenantId',
         },
     )
     ascending = QueryParameter(
-        "sortOrder",
-        mapping={True: "asc", False: "desc"},
-        provide=lambda self, obj, obj_type: "sort_by" in vars(self),
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(self),
     )
-    first_result = QueryParameter("firstResult")
-    max_results = QueryParameter("maxResults")
+    first_result = QueryParameter('firstResult')
+    max_results = QueryParameter('maxResults')
 
     def __init__(
         self,

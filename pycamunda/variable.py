@@ -88,6 +88,15 @@ def isoformat(datetime_: typing.Union[dt.date, dt.datetime]) -> str:
     return dt_str
 
 
+def from_isoformat(datetime_str: str) -> dt.datetime:
+    """Convert an isoformat string to a datetime object.
+
+    :param datetime_str: String to convert.
+    :return: Converted datetime.
+    """
+    return dt.datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%f%z')
+
+
 class GetList(pycamunda.base.Request):
 
     name = QueryParameter('variableName')

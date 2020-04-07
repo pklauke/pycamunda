@@ -3,6 +3,7 @@
 """This module provides access to the external task REST api of Camunda."""
 
 from __future__ import annotations
+import datetime as dt
 import dataclasses
 import typing
 
@@ -25,7 +26,6 @@ class ExternalTask:
     error_details: str
     execution_id: str
     id_: str
-    lock_expiration_time: str
     process_definition_id: str
     process_definition_key: str
     process_instance_id: str
@@ -34,6 +34,7 @@ class ExternalTask:
     worker_id: str
     priority: str
     topic_name: str
+    lock_expiration_time: dt.datetime = None
     suspended: bool = None
     business_key: str = None
     variables: typing.Dict[str, pycamunda.variable.Variable] = None
@@ -47,7 +48,6 @@ class ExternalTask:
             error_details=data['errorDetails'],
             execution_id=data['executionId'],
             id_=data['id'],
-            lock_expiration_time=data['lockExpirationTime'],
             process_definition_id=data['processDefinitionId'],
             process_definition_key=data['processDefinitionKey'],
             process_instance_id=data['processInstanceId'],
@@ -57,6 +57,10 @@ class ExternalTask:
             priority=data['priority'],
             topic_name=data['topicName']
         )
+        if data['lockExpirationTime'] is not None:
+            external_task.lock_expiration_time = pycamunda.variable.from_isoformat(
+                data['lockExpirationTime']
+            )
         try:
             external_task.suspended = data['suspended']
         except KeyError:
@@ -168,8 +172,8 @@ class GetList(pycamunda.base.Request):
         not_locked: bool = False,
         with_retries_left: bool = False,
         no_retries_left: bool = False,
-        lock_expiration_after: str = None,  # TODO datetime
-        lock_expiration_before: str = None,  # TODO datetime
+        lock_expiration_after: dt.datetime = None,
+        lock_expiration_before: dt.datetime = None,
         activity_id: str = None,
         activity_id_in: typing.Iterable[str] = None,
         execution_id: str = None,
@@ -230,8 +234,8 @@ class GetList(pycamunda.base.Request):
         self.not_locked = not_locked
         self.with_retries_left = with_retries_left
         self.no_retries_left = no_retries_left
-        self.lock_expiration_after = lock_expiration_after  # TODO datetime
-        self.lock_expiration_before = lock_expiration_before  # TODO datetime
+        self.lock_expiration_after = lock_expiration_after
+        self.lock_expiration_before = lock_expiration_before
         self.activity_id = activity_id
         self.actitity_id_in = activity_id_in
         self.execution_id = execution_id
@@ -251,6 +255,9 @@ class GetList(pycamunda.base.Request):
     def send(self) -> typing.Tuple[ExternalTask]:
         """Send the request."""
         params = self.query_parameters()
+        for key, value in params.items():
+            if isinstance(value, dt.datetime):
+                params[key] = pycamunda.variable.isoformat(datetime_=value)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -285,8 +292,8 @@ class Count(GetList):
         not_locked: bool = False,
         with_retries_left: bool = False,
         no_retries_left: bool = False,
-        lock_expiration_after: str = None,  # TODO datetime
-        lock_expiration_before: str = None,  # TODO datetime
+        lock_expiration_after: dt.datetime = None,
+        lock_expiration_before: dt.datetime = None,
         activity_id: str = None,
         activity_id_in: typing.Iterable[str] = None,
         execution_id: str = None,
@@ -366,6 +373,9 @@ class Count(GetList):
     def send(self) -> int:
         """Send the request."""
         params = self.query_parameters()
+        for key, value in params.items():
+            if isinstance(value, dt.datetime):
+                params[key] = pycamunda.variable.isoformat(datetime_=value)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:

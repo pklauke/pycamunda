@@ -19,8 +19,8 @@ class RequestParameter:
         provide: typing.Callable = None,
         validate: typing.Callable = None
     ):
-        """Parameter that is send with a CamundaRequest when it is attached to the class and its
-        value is set. This class implements the descriptor protocol.
+        """Parameter that is send with a Request when it is attached to the class and its value is
+        set. This class implements the descriptor protocol.
 
         :param key: Camunda key of the request parameter.
         :param mapping: Mapping from descriptor value to the parameter that is send to Camunda.
