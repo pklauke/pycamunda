@@ -254,10 +254,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ExternalTask]:
         """Send the request."""
-        params = self.query_parameters()
-        for key, value in params.items():
-            if isinstance(value, dt.datetime):
-                params[key] = pycamunda.variable.isoformat(datetime_=value)
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -372,7 +369,7 @@ class Count(GetList):
 
     def send(self) -> int:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         for key, value in params.items():
             if isinstance(value, dt.datetime):
                 params[key] = pycamunda.variable.isoformat(datetime_=value)
@@ -437,7 +434,7 @@ class FetchAndLock(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ExternalTask]:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -495,7 +492,7 @@ class Complete(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -549,7 +546,7 @@ class HandleBPMNError(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -602,7 +599,7 @@ class HandleFailure(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -655,7 +652,7 @@ class ExtendLock(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -682,7 +679,7 @@ class SetPriority(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -709,7 +706,7 @@ class SetRetries(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -744,7 +741,7 @@ class SetRetriesAsync(pycamunda.base.Request):
 
     def send(self) -> pycamunda.batch.Batch:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -781,7 +778,7 @@ class SetRetriesSync(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:

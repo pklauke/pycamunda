@@ -10,6 +10,7 @@ import requests
 
 import pycamunda
 import pycamunda.resource
+import pycamunda.variable
 import pycamunda.base
 from pycamunda.base import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
 
@@ -79,7 +80,7 @@ class Count(pycamunda.base.Request):
 
     def send(self) -> int:
         """Send the request"""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -161,7 +162,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[User]:
         """Send the request"""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -260,7 +261,7 @@ class Create(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException as exc:
@@ -296,7 +297,7 @@ class UpdateCredentials(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -340,7 +341,7 @@ class UpdateProfile(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:

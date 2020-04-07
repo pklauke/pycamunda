@@ -97,6 +97,16 @@ def from_isoformat(datetime_str: str) -> dt.datetime:
     return dt.datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%f%z')
 
 
+def prepare(value: typing.Any) -> typing.Any:
+    """Prepare parameter values for Camunda.
+
+    :param value: Value to prepare.
+    """
+    if isinstance(value, dt.datetime):
+        return isoformat(datetime_=value)
+    return value
+
+
 class GetList(pycamunda.base.Request):
 
     name = QueryParameter('variableName')

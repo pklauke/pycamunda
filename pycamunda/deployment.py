@@ -3,7 +3,7 @@
 """This module provides access to the deployment REST api of Camunda."""
 
 from __future__ import annotations
-import datetime
+import datetime as dt
 import dataclasses
 import typing
 
@@ -22,17 +22,20 @@ class Deployment:
     name: str
     source: str
     tenant_id: str
-    deployment_time: datetime.datetime
+    deployment_time: dt.datetime
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> Deployment:
-        return cls(
+        deployment = cls(
             id_=data['id'],
             name=data['name'],
             source=data['source'],
             tenant_id=data['tenantId'],
-            deployment_time=data['deploymentTime'],
         )
+        if data['deploymentTime'] is not None:
+            deployment.deployment_time = pycamunda.variable.from_isoformat(data['deploymentTime'])
+
+        return deployment
 
 
 @dataclasses.dataclass
@@ -92,8 +95,8 @@ class GetList(pycamunda.base.Request):
         tenant_id_in: typing.Iterable[str] = None,
         without_tenant_id: bool = False,
         include_deployments_without_tenant_id: bool = False,
-        after: datetime.datetime = None,
-        before: datetime.datetime = None,
+        after: dt.datetime = None,
+        before: dt.datetime = None,
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
@@ -127,10 +130,8 @@ class GetList(pycamunda.base.Request):
         self.tenant_id_in = tenant_id_in
         self.without_tenant_id = without_tenant_id
         self.include_deployments_without_tenant_id = include_deployments_without_tenant_id
-        if after is not None:
-            self.after = pycamunda.variable.isoformat(after)
-        if before is not None:
-            self.before = pycamunda.variable.isoformat(before)
+        self.after = after
+        self.before = before
         self.sort_by = sort_by
         self.ascending = ascending
         self.first_result = first_result
@@ -138,7 +139,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[Deployment]:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -222,7 +223,7 @@ class Create(pycamunda.base.Request):
     def send(self):
         """Send the request."""
         assert bool(self.files), 'Cannot create deployment without resources.'
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(
                 self.url,

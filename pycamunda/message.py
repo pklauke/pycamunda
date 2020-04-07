@@ -32,13 +32,16 @@ class MessageCorrelationResult:
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> MessageCorrelationResult:
+
         message_result = cls(result_type=ResultType(data['resultType']))
+
         if message_result.result_type == ResultType.process_definition:
             message_result.process_instance = pycamunda.process_instance.ProcessInstance.load(
                 data['processInstance']
             )
         elif message_result.result_type == ResultType.execution:
             message_result.execution = pycamunda.execution.Execution.load(data['execution'])
+
         try:
             variables = data['variables']
         except KeyError:
@@ -47,6 +50,7 @@ class MessageCorrelationResult:
             message_result.variables = tuple(
                 pycamunda.variable.Variable.load(variable_json) for variable_json in variables
             )
+
         return message_result
 
 
@@ -171,7 +175,7 @@ class _Correlate(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:

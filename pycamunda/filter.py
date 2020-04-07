@@ -120,7 +120,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[Filter]:
         """Send the request"""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -164,7 +164,7 @@ class Count(pycamunda.base.Request):
 
     def send(self) -> int:
         """Send the request"""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -193,7 +193,7 @@ class Get(pycamunda.base.Request):
 
     def send(self) -> Filter:
         """Send the request"""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -460,20 +460,19 @@ class CriteriaMixin:
                                                  or one that has already passed.
         """
         if created_before is not Ellipsis:
-            self.query.parameters['createdBefore'] = pycamunda.variable.isoformat(created_before)
+            self.query.parameters['createdBefore'] = created_before
         if created_after is not Ellipsis:
-            self.query.parameters['createdAfter'] = pycamunda.variable.isoformat(created_after)
+            self.query.parameters['createdAfter'] = created_after
         if due_before is not Ellipsis:
-            self.query.parameters['dueBefore'] = pycamunda.variable.isoformat(due_before)
+            self.query.parameters['dueBefore'] = due_before
         if due_after is not Ellipsis:
-            self.query.parameters['dueAfter'] = pycamunda.variable.isoformat(due_after)
+            self.query.parameters['dueAfter'] = due_after
         if follow_up_after is not Ellipsis:
-            self.query.parameters['followUpAfter'] = pycamunda.variable.isoformat(follow_up_after)
+            self.query.parameters['followUpAfter'] = follow_up_after
         if follow_up_before is not Ellipsis:
-            self.query.parameters['followUpBefore'] = pycamunda.variable.isoformat(follow_up_before)
+            self.query.parameters['followUpBefore'] = follow_up_before
         if follow_up_before_or_not_existent is not Ellipsis:
-            self.query.parameters['followUpBeforeOrNotExistent'] = pycamunda.variable.isoformat(
-                follow_up_before_or_not_existent)
+            self.query.parameters['followUpBeforeOrNotExistent'] = follow_up_before_or_not_existent
 
         return self
 
@@ -512,7 +511,7 @@ class Create(pycamunda.base.Request, CriteriaMixin):
 
     def send(self) -> Filter:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException as exc:
@@ -554,7 +553,7 @@ class Update(pycamunda.base.Request, CriteriaMixin):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException as exc:
@@ -603,7 +602,7 @@ class Execute(pycamunda.base.Request, CriteriaMixin):
 
     def send(self) -> typing.Union[pycamunda.task.Task, typing.Tuple[pycamunda.task.Task]]:
         """Send the request."""
-        params = self.body_parameters()['query']
+        params = self.body_parameters(apply=pycamunda.variable.prepare)['query']
         url = self.url + ('/singleResult' if self.single_result else '/list')
         try:
             if params:

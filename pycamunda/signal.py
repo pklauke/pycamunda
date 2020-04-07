@@ -7,6 +7,7 @@ import typing
 
 import requests
 
+import pycamunda.variable
 import pycamunda.base
 from pycamunda.base import BodyParameter
 
@@ -68,7 +69,7 @@ class _Event(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:

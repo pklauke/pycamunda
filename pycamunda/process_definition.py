@@ -3,6 +3,7 @@
 """This module provides access to the process definition REST api of Camunda."""
 
 from __future__ import annotations
+import datetime as dt
 import typing
 import dataclasses
 
@@ -174,7 +175,7 @@ class GetActivityInstanceStatistics(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ActivityStatistics]:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -243,7 +244,7 @@ class Count(pycamunda.base.Request):
     without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     include_without_tenant_id = QueryParameter(
         'includeProcessDefinitionsWithoutTenantId',
-        provide = pycamunda.base.value_is_true
+        provide=pycamunda.base.value_is_true
     )
     version_tag = QueryParameter('versionTag')
     version_tag_like = QueryParameter('versionTagLike')
@@ -360,7 +361,7 @@ class Count(pycamunda.base.Request):
 
     def send(self) -> int:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -540,7 +541,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ProcessDefinition]:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -588,7 +589,7 @@ class GetProcessInstanceStatistics(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ProcessInstanceStatistics]:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -829,7 +830,7 @@ class StartInstance(pycamunda.base.Request):
 
     def send(self) -> pycamunda.process_instance.ProcessInstance:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -859,7 +860,7 @@ class _ActivateSuspend(pycamunda.base.Request):
         key: str = None,
         tenant_id: str = None,
         include_process_instances: bool = None,
-        execution_datetime: str = None  # TODO datetime
+        execution_datetime: dt.datetime = None
     ):
         """Activate or Suspend a process definition.
 
@@ -877,12 +878,11 @@ class _ActivateSuspend(pycamunda.base.Request):
         self.key = key
         self.tenant_id = tenant_id
         self.include_process_instances = include_process_instances
-        if execution_datetime is not None:
-            self.execution_datetime = pycamunda.variable.isoformat(execution_datetime)
+        self.execution_datetime = pycamunda.variable.isoformat(execution_datetime)
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -986,7 +986,7 @@ class UpdateHistoryTimeToLive(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -1067,7 +1067,7 @@ class Delete(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.delete(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -1188,7 +1188,7 @@ class RestartProcessInstance(pycamunda.base.Request):
 
     def send(self) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:

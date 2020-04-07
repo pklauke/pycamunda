@@ -3,12 +3,14 @@
 """This module provides access to the incident REST api of Camunda."""
 
 from __future__ import annotations
+import datetime as dt
 import dataclasses
 import enum
 import typing
 
 import requests
 
+import pycamunda.variable
 import pycamunda.base
 from pycamunda.base import PathParameter, QueryParameter
 
@@ -39,7 +41,6 @@ class Incident:
     process_definition_id: str
     process_instance_id: str
     execution_id: str
-    incident_timestamp: str  # TODO replace by datetime
     incident_type: IncidentType
     activity_id: str
     cause_incident_id: str
@@ -48,15 +49,15 @@ class Incident:
     tenant_id: str
     incident_message: str
     job_definition_id: str
+    incident_timestamp: dt.datetime = None
 
     @classmethod
-    def load(cls, data) -> Incident:
-        return cls(
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Incident:
+        incident = cls(
             id_=data['id'],
             process_definition_id=data['processDefinitionId'],
             process_instance_id=data['processInstanceId'],
             execution_id=data['executionId'],
-            incident_timestamp=data['incidentTimestamp'],
             incident_type=data['incidentType'],
             activity_id=data['activityId'],
             cause_incident_id=data['causeIncidentId'],
@@ -66,6 +67,12 @@ class Incident:
             incident_message=data['incidentMessage'],
             job_definition_id=data['jobDefinitionId']
         )
+        if data['incidentTimestamp'] is not None:
+            incident.incident_timestamp = pycamunda.variable.from_isoformat(
+                data['incidentTimestamp']
+            )
+
+        return incident
 
 
 class Get(pycamunda.base.Request):

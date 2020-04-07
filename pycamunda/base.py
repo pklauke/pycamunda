@@ -76,9 +76,9 @@ class BodyParameter(RequestParameter):
 
 
 class BodyParameterContainer:
-    """Stores multiple BodyParameters`s and allows sending nested queries.
+    """Stores multiple BodyParameters and allows sending nested queries.
 
-    :param key: Camunda key.
+    :param key: Key for the nested query.
     :param args: BodyParameter`s
     """
     def __init__(self, key: str, *parameters):
@@ -150,7 +150,7 @@ class Request(metaclass=RequestMeta):
     def send(self):
         return NotImplementedError
 
-    def query_parameters(self) -> typing.Dict[str, typing.Any]:
+    def query_parameters(self, apply: typing.Callable = None) -> typing.Dict[str, typing.Any]:
         query = {}
         for name, attribute in self._parameters.items():
             if isinstance(attribute, QueryParameter):
@@ -161,7 +161,10 @@ class Request(metaclass=RequestMeta):
                 else:
                     if value is not None:
                         query[attribute.key] = value
-        return query
+
+        if apply is None:
+            return query
+        return {key: apply(value) for key, value in query.items()}
 
     def _traverse(self, container: BodyParameterContainer) -> typing.Dict[str, typing.Any]:
         query = {}
@@ -181,7 +184,7 @@ class Request(metaclass=RequestMeta):
                         query[key] = value
         return query
 
-    def body_parameters(self) -> typing.Dict[str, typing.Any]:
+    def body_parameters(self, apply: typing.Callable = None) -> typing.Dict[str, typing.Any]:
         query = {}
         for name, attribute in self._containers.items():
             if isinstance(attribute, BodyParameterContainer):
@@ -196,4 +199,6 @@ class Request(metaclass=RequestMeta):
                     if value is not None:
                         query[attribute.key] = value
 
-        return query
+        if apply is None:
+            return query
+        return {key: apply(value) for key, value in query.items()}

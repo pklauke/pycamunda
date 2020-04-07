@@ -89,7 +89,7 @@ class Delete(pycamunda.base.Request):
 
     def send(self):
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.delete(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -285,7 +285,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ProcessInstance]:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -311,7 +311,7 @@ class Get(pycamunda.base.Request):
 
     def send(self) -> ProcessInstance:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -549,7 +549,7 @@ class Modify(pycamunda.base.Request):
 
     def send(self) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -579,7 +579,7 @@ class _ActivateSuspend(pycamunda.base.Request):
 
     def send(self):
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
