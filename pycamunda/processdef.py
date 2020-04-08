@@ -10,7 +10,7 @@ import dataclasses
 import requests
 
 import pycamunda.variable
-import pycamunda.process_instance
+import pycamunda.processinst
 import pycamunda.batch
 import pycamunda.incident
 import pycamunda.instruction
@@ -89,14 +89,14 @@ class _ProcessDefinitionPathParameter(PathParameter):
 
 
 @dataclasses.dataclass
-class ActivityStatistics:
+class ActivityStats:
     id_: str
     instances: int
     failed_jobs: int
     incidents: typing.Iterable[pycamunda.incident.IncidentTypeCount]
 
     @classmethod
-    def load(cls, data: typing.Mapping[str, typing.Any]) -> ActivityStatistics:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> ActivityStats:
         return cls(
             id_=data['id'],
             instances=data['instances'],
@@ -109,7 +109,7 @@ class ActivityStatistics:
 
 
 @dataclasses.dataclass
-class ProcessInstanceStatistics:
+class ProcessInstanceStats:
     id_: str
     instances: int
     failed_jobs: int
@@ -117,7 +117,7 @@ class ProcessInstanceStatistics:
     incidents: typing.Iterable[pycamunda.incident.IncidentTypeCount]
 
     @classmethod
-    def load(cls, data: typing.Mapping[str, typing.Any]) -> ProcessInstanceStatistics:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> ProcessInstanceStats:
         return cls(
             id_=data['id'],
             instances=data['instances'],
@@ -130,7 +130,7 @@ class ProcessInstanceStatistics:
         )
 
 
-class GetActivityInstanceStatistics(pycamunda.base.Request):
+class GetActivityInstanceStats(pycamunda.base.Request):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -173,7 +173,7 @@ class GetActivityInstanceStatistics(pycamunda.base.Request):
         self.incidents = incidents
         self.incidents_for_type = incidents_for_type
 
-    def send(self) -> typing.Tuple[ActivityStatistics]:
+    def send(self) -> typing.Tuple[ActivityStats]:
         """Send the request."""
         params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
@@ -183,7 +183,7 @@ class GetActivityInstanceStatistics(pycamunda.base.Request):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return tuple(ActivityStatistics.load(activity_json) for activity_json in response.json())
+        return tuple(ActivityStats.load(activity_json) for activity_json in response.json())
 
 
 class GetProcessDiagram(pycamunda.base.Request):
@@ -552,7 +552,7 @@ class GetList(pycamunda.base.Request):
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
 
 
-class GetProcessInstanceStatistics(pycamunda.base.Request):
+class GetProcessInstanceStats(pycamunda.base.Request):
 
     failed_jobs = QueryParameter('failedJobs')
     incidents = QueryParameter('incidents', provide=pycamunda.base.value_is_true)
@@ -587,7 +587,7 @@ class GetProcessInstanceStatistics(pycamunda.base.Request):
         self.root_incidents = root_incidents
         self.incidents_for_type = incidents_for_type
 
-    def send(self) -> typing.Tuple[ProcessInstanceStatistics]:
+    def send(self) -> typing.Tuple[ProcessInstanceStats]:
         """Send the request."""
         params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
@@ -597,8 +597,7 @@ class GetProcessInstanceStatistics(pycamunda.base.Request):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return tuple(ProcessInstanceStatistics.load(statistics_json)
-                     for statistics_json in response.json())
+        return tuple(ProcessInstanceStats.load(stats_json) for stats_json in response.json())
 
 
 class GetXML(pycamunda.base.Request):
@@ -828,7 +827,7 @@ class StartInstance(pycamunda.base.Request):
 
         return self
 
-    def send(self) -> pycamunda.process_instance.ProcessInstance:
+    def send(self) -> pycamunda.processinst.ProcessInstance:
         """Send the request."""
         params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
@@ -838,7 +837,7 @@ class StartInstance(pycamunda.base.Request):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return pycamunda.process_instance.ProcessInstance.load(response.json())
+        return pycamunda.processinst.ProcessInstance.load(response.json())
 
 
 class _ActivateSuspend(pycamunda.base.Request):

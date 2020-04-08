@@ -9,7 +9,7 @@ import typing
 
 import requests
 
-import pycamunda.process_instance
+import pycamunda.processinst
 import pycamunda.execution
 import pycamunda.variable
 import pycamunda.base
@@ -26,7 +26,7 @@ class ResultType(enum.Enum):
 @dataclasses.dataclass
 class MessageCorrelationResult:
     result_type: ResultType
-    process_instance: pycamunda.process_instance.ProcessInstance = None
+    process_instance: pycamunda.processinst.ProcessInstance = None
     execution: pycamunda.execution.Execution = None
     variables: typing.Tuple[pycamunda.variable.Variable] = None
 
@@ -36,7 +36,7 @@ class MessageCorrelationResult:
         message_result = cls(result_type=ResultType(data['resultType']))
 
         if message_result.result_type == ResultType.process_definition:
-            message_result.process_instance = pycamunda.process_instance.ProcessInstance.load(
+            message_result.process_instance = pycamunda.processinst.ProcessInstance.load(
                 data['processInstance']
             )
         elif message_result.result_type == ResultType.execution:

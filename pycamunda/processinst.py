@@ -10,7 +10,7 @@ import requests
 
 import pycamunda.resource
 import pycamunda.variable
-import pycamunda.activity_instance
+import pycamunda.activityinst
 import pycamunda.instruction
 import pycamunda.batch
 import pycamunda.base
@@ -111,7 +111,7 @@ class GetActivityInstance(pycamunda.base.Request):
         super().__init__(url=url + URL_SUFFIX + '/{id}/activity-instances')
         self.id_ = id_
 
-    def send(self) -> pycamunda.activity_instance.ActivityInstance:
+    def send(self) -> pycamunda.activityinst.ActivityInstance:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -120,7 +120,7 @@ class GetActivityInstance(pycamunda.base.Request):
         if not response:
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
-        return pycamunda.activity_instance.ActivityInstance.load(response.json())
+        return pycamunda.activityinst.ActivityInstance.load(response.json())
 
 
 class GetList(pycamunda.base.Request):
