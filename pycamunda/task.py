@@ -3,7 +3,7 @@
 """This module provides access to the task REST api of Camunda."""
 
 from __future__ import annotations
-import datetime
+import datetime as dt
 import dataclasses
 import typing
 
@@ -22,12 +22,9 @@ class Task:
     case_definition_id: str
     case_execution_id: str
     case_instance_id: str
-    created: str
     delegation_state: str
     description: str
-    due: str
     execution_id: str
-    follow_up: str
     form_key: str
     id_: str
     name: str
@@ -38,31 +35,39 @@ class Task:
     process_instance_id: str
     suspended: bool
     task_definition_key: str
+    created: str = None
+    due: str = None
+    follow_up: str = None
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> Task:
-        return cls(
-            assignee=data["assignee"],
-            case_definition_id=data["caseDefinitionId"],
-            case_execution_id=data["caseExecutionId"],
-            case_instance_id=data["caseInstanceId"],
-            created=data["created"],  # TODO convert to datetime
-            delegation_state=data["delegationState"],
-            description=data["description"],
-            due=data["due"],  # TODO convert to datetime
-            execution_id=data["executionId"],
-            follow_up=data["followUp"],  # TODO convert to datetime
-            form_key=data["formKey"],
-            id_=data["id"],
-            name=data["name"],
-            owner=data["owner"],
-            parent_task_id=data["parentTaskId"],
-            priority=data["priority"],
-            process_definition_id=data["processDefinitionId"],
-            process_instance_id=data["processInstanceId"],
-            suspended=data["suspended"],
-            task_definition_key=data["taskDefinitionKey"],
+        task = cls(
+            assignee=data['assignee'],
+            case_definition_id=data['caseDefinitionId'],
+            case_execution_id=data['caseExecutionId'],
+            case_instance_id=data['caseInstanceId'],
+            delegation_state=data['delegationState'],
+            description=data['description'],
+            execution_id=data['executionId'],
+            form_key=data['formKey'],
+            id_=data['id'],
+            name=data['name'],
+            owner=data['owner'],
+            parent_task_id=data['parentTaskId'],
+            priority=data['priority'],
+            process_definition_id=data['processDefinitionId'],
+            process_instance_id=data['processInstanceId'],
+            suspended=data['suspended'],
+            task_definition_key=data['taskDefinitionKey'],
         )
+        if data['created'] is not None:
+            task.created = pycamunda.variable.from_isoformat(data['created'])
+        if data['due'] is not None:
+            task.due = pycamunda.variable.from_isoformat(data['due'])
+        if data['followUp'] is not None:
+            task.follow_up = pycamunda.variable.from_isoformat(data['followUp'])
+
+        return task
 
 
 class Get(pycamunda.base.Request):
@@ -75,7 +80,7 @@ class Get(pycamunda.base.Request):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user task.
         """
-        super().__init__(url=url + URL_SUFFIX + "/{id}")
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
     def send(self):
@@ -233,16 +238,16 @@ class GetList(pycamunda.base.Request):
         priority: int = None,
         max_priority: int = None,
         min_priority: int = None,
-        due_date: datetime.datetime = None,
-        due_after: datetime.datetime = None,
-        due_before: datetime.datetime = None,
-        follow_up_date: datetime.datetime = None,
-        follow_up_after: datetime.datetime = None,
-        follow_up_before: datetime.datetime = None,
-        follow_up_before_or_not_existent: datetime.datetime = None,
-        created_on: datetime.datetime = None,
-        created_after: datetime.datetime = None,
-        created_before: datetime.datetime = None,
+        due_date: dt.datetime = None,
+        due_after: dt.datetime = None,
+        due_before: dt.datetime = None,
+        follow_up_date: dt.datetime = None,
+        follow_up_after: dt.datetime = None,
+        follow_up_before: dt.datetime = None,
+        follow_up_before_or_not_existent: dt.datetime = None,
+        created_on: dt.datetime = None,
+        created_after: dt.datetime = None,
+        created_before: dt.datetime = None,
         delegation_state: str = None,  # TODO add an enum?
         candidate_groups: typing.Iterable['str'] = None,
         with_candidate_groups: bool = False,
@@ -416,7 +421,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[Task]:
         """Send the request."""
-        params = self.query_parameters()
+        params = self.query_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -512,7 +517,7 @@ class Complete(pycamunda.base.Request):
 
     def send(self) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
         """Send the request."""
-        params = self.body_parameters()
+        params = self.body_parameters(apply=pycamunda.variable.prepare)
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -646,8 +651,8 @@ class Create(pycamunda.base.Request):
         assignee: str = None,
         owner: str = None,
         delegation_state: str = None,  # TODO consider enum
-        due: str = None,  # TODO datetime
-        follow_up: str = None,  # TODO datetime
+        due: dt.datetime = None,
+        follow_up: dt.datetime = None,
         priority: int = None,
         parent_task_id: str = None,
         case_instance_id: str = None,
@@ -718,8 +723,8 @@ class Update(pycamunda.base.Request):
         assignee: str,
         owner: str,
         delegation_state: str,  # TODO consider enum
-        due: str,  # TODO datetime
-        follow_up: str,  # TODO datetime
+        due: dt.datetime,
+        follow_up: dt.datetime,
         priority: int,
         parent_task_id: str,
         case_instance_id: str,
