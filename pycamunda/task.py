@@ -11,7 +11,8 @@ import requests
 
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter, BodyParameter
+from pycamunda.base import PathParameter, QueryParameter
+from pycamunda.request import BodyParameter
 
 URL_SUFFIX = '/task'
 
@@ -61,16 +62,16 @@ class Task:
             task_definition_key=data['taskDefinitionKey'],
         )
         if data['created'] is not None:
-            task.created = pycamunda.variable.from_isoformat(data['created'])
+            task.created = pycamunda.base.from_isoformat(data['created'])
         if data['due'] is not None:
-            task.due = pycamunda.variable.from_isoformat(data['due'])
+            task.due = pycamunda.base.from_isoformat(data['due'])
         if data['followUp'] is not None:
-            task.follow_up = pycamunda.variable.from_isoformat(data['followUp'])
+            task.follow_up = pycamunda.base.from_isoformat(data['followUp'])
 
         return task
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter("id")
 
@@ -95,7 +96,7 @@ class Get(pycamunda.base.Request):
         return Task.load(response.json())
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     process_instance_id = QueryParameter('processInstanceId')
     process_instance_id_in = QueryParameter('processInstanceIdIn')
@@ -421,7 +422,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[Task]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -432,7 +433,7 @@ class GetList(pycamunda.base.Request):
         return tuple(Task.load(task_json) for task_json in response.json())
 
 
-class Claim(pycamunda.base.Request):
+class Claim(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
@@ -452,7 +453,7 @@ class Claim(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -461,7 +462,7 @@ class Claim(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Unclaim(pycamunda.base.Request):
+class Unclaim(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -476,7 +477,7 @@ class Unclaim(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -485,7 +486,7 @@ class Unclaim(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Complete(pycamunda.base.Request):
+class Complete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     variables = BodyParameter('variables')
@@ -517,7 +518,7 @@ class Complete(pycamunda.base.Request):
 
     def send(self) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -532,7 +533,7 @@ class Complete(pycamunda.base.Request):
             }
 
 
-class Resolve(pycamunda.base.Request):
+class Resolve(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     variables = BodyParameter('variables')
@@ -564,7 +565,7 @@ class Resolve(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -573,7 +574,7 @@ class Resolve(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetAssignee(pycamunda.base.Request):
+class SetAssignee(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
@@ -591,7 +592,7 @@ class SetAssignee(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -600,7 +601,7 @@ class SetAssignee(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Delegate(pycamunda.base.Request):
+class Delegate(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
@@ -618,7 +619,7 @@ class Delegate(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -627,7 +628,7 @@ class Delegate(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Create(pycamunda.base.Request):
+class Create(pycamunda.base.CamundaRequest):
 
     id_ = BodyParameter('id')
     name = BodyParameter('name')
@@ -690,7 +691,7 @@ class Create(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -699,7 +700,7 @@ class Create(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Update(pycamunda.base.Request):
+class Update(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     name = BodyParameter('name')
@@ -763,7 +764,7 @@ class Update(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:

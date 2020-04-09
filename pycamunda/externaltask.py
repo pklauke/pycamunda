@@ -13,7 +13,7 @@ import pycamunda
 import pycamunda.base
 import pycamunda.variable
 import pycamunda.batch
-from pycamunda.base import PathParameter, QueryParameter, BodyParameter
+from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 URL_SUFFIX = '/external-task'
 
@@ -58,7 +58,7 @@ class ExternalTask:
             topic_name=data['topicName']
         )
         if data['lockExpirationTime'] is not None:
-            external_task.lock_expiration_time = pycamunda.variable.from_isoformat(
+            external_task.lock_expiration_time = pycamunda.base.from_isoformat(
                 data['lockExpirationTime']
             )
         try:
@@ -83,7 +83,7 @@ class ExternalTask:
         return external_task
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -122,7 +122,7 @@ class Get(pycamunda.base.Request):
         return external_task
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     id_ = QueryParameter('externalTaskId')
     topic_name = QueryParameter('topicName')
@@ -254,7 +254,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ExternalTask]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -369,10 +369,10 @@ class Count(GetList):
 
     def send(self) -> int:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         for key, value in params.items():
             if isinstance(value, dt.datetime):
-                params[key] = pycamunda.variable.isoformat(datetime_=value)
+                params[key] = pycamunda.base.isoformat(datetime_=value)
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -383,7 +383,7 @@ class Count(GetList):
         return int(response.json()['count'])
 
 
-class FetchAndLock(pycamunda.base.Request):
+class FetchAndLock(pycamunda.base.CamundaRequest):
 
     worker_id = BodyParameter('workerId')
     max_tasks = BodyParameter('maxTasks')
@@ -434,7 +434,7 @@ class FetchAndLock(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ExternalTask]:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -445,7 +445,7 @@ class FetchAndLock(pycamunda.base.Request):
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
 
 
-class Complete(pycamunda.base.Request):
+class Complete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -492,7 +492,7 @@ class Complete(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -501,7 +501,7 @@ class Complete(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class HandleBPMNError(pycamunda.base.Request):
+class HandleBPMNError(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -546,7 +546,7 @@ class HandleBPMNError(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -555,7 +555,7 @@ class HandleBPMNError(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class HandleFailure(pycamunda.base.Request):
+class HandleFailure(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     worker_id = BodyParameter('workerId')
@@ -599,7 +599,7 @@ class HandleFailure(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -608,7 +608,7 @@ class HandleFailure(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Unlock(pycamunda.base.Request):
+class Unlock(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -631,7 +631,7 @@ class Unlock(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class ExtendLock(pycamunda.base.Request):
+class ExtendLock(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     new_duration = BodyParameter('newDuration')
@@ -652,7 +652,7 @@ class ExtendLock(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -661,7 +661,7 @@ class ExtendLock(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetPriority(pycamunda.base.Request):
+class SetPriority(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     priority = BodyParameter('priority')
@@ -679,7 +679,7 @@ class SetPriority(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -688,7 +688,7 @@ class SetPriority(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetRetries(pycamunda.base.Request):
+class SetRetries(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
@@ -706,7 +706,7 @@ class SetRetries(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -715,7 +715,7 @@ class SetRetries(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class SetRetriesAsync(pycamunda.base.Request):
+class SetRetriesAsync(pycamunda.base.CamundaRequest):
 
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
     external_task_ids = BodyParameter('externalTaskIds')
@@ -741,7 +741,7 @@ class SetRetriesAsync(pycamunda.base.Request):
 
     def send(self) -> pycamunda.batch.Batch:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -752,7 +752,7 @@ class SetRetriesAsync(pycamunda.base.Request):
         return pycamunda.batch.Batch.load(response.json())
 
 
-class SetRetriesSync(pycamunda.base.Request):
+class SetRetriesSync(pycamunda.base.CamundaRequest):
 
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
     external_task_ids = BodyParameter('externalTaskIds')
@@ -778,7 +778,7 @@ class SetRetriesSync(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:

@@ -12,7 +12,7 @@ import requests
 
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter
+from pycamunda.request import QueryParameter, PathParameter
 
 URL_SUFFIX = '/incident'
 
@@ -68,14 +68,14 @@ class Incident:
             job_definition_id=data['jobDefinitionId']
         )
         if data['incidentTimestamp'] is not None:
-            incident.incident_timestamp = pycamunda.variable.from_isoformat(
+            incident.incident_timestamp = pycamunda.base.from_isoformat(
                 data['incidentTimestamp']
             )
 
         return incident
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -100,7 +100,7 @@ class Get(pycamunda.base.Request):
         return Incident.load(response.json())
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     incident_id = QueryParameter('incidentId')
     incident_type = QueryParameter('incidentType')
@@ -207,7 +207,7 @@ class GetList(pycamunda.base.Request):
         return tuple(Incident.load(incident_json) for incident_json in response.json())
 
 
-class Resolve(pycamunda.base.Request):
+class Resolve(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 

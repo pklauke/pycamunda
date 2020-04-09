@@ -14,7 +14,7 @@ import pycamunda.activityinst
 import pycamunda.instruction
 import pycamunda.batch
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter, BodyParameter
+from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 URL_SUFFIX = '/process-instance'
 
@@ -54,7 +54,7 @@ class ProcessInstance:
         return process_instance
 
 
-class Delete(pycamunda.base.Request):
+class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     skip_custom_listeners = QueryParameter('skipCustomListeners')
@@ -89,7 +89,7 @@ class Delete(pycamunda.base.Request):
 
     def send(self):
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.delete(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -98,7 +98,7 @@ class Delete(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class GetActivityInstance(pycamunda.base.Request):
+class GetActivityInstance(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -123,7 +123,7 @@ class GetActivityInstance(pycamunda.base.Request):
         return pycamunda.activityinst.ActivityInstance.load(response.json())
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     process_instance_ids = QueryParameter('processInstanceIds')
     business_key = QueryParameter('businessKey')
@@ -285,7 +285,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ProcessInstance]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -296,7 +296,7 @@ class GetList(pycamunda.base.Request):
         return tuple(ProcessInstance.load(instance_json) for instance_json in response.json())
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -311,7 +311,7 @@ class Get(pycamunda.base.Request):
 
     def send(self) -> ProcessInstance:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -322,7 +322,7 @@ class Get(pycamunda.base.Request):
         return ProcessInstance.load(response.json())
 
 
-class Modify(pycamunda.base.Request):
+class Modify(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     skip_custom_listeners = BodyParameter('skipCustomListeners')
@@ -549,7 +549,7 @@ class Modify(pycamunda.base.Request):
 
     def send(self) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -561,7 +561,7 @@ class Modify(pycamunda.base.Request):
             return pycamunda.batch.Batch.load(response.json())
 
 
-class _ActivateSuspend(pycamunda.base.Request):
+class _ActivateSuspend(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     suspended = BodyParameter('suspended')
@@ -579,7 +579,7 @@ class _ActivateSuspend(pycamunda.base.Request):
 
     def send(self):
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:

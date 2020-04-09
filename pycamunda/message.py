@@ -13,7 +13,7 @@ import pycamunda.processinst
 import pycamunda.execution
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import BodyParameter
+from pycamunda.request import BodyParameter
 
 URL_SUFFIX = '/message'
 
@@ -54,7 +54,7 @@ class MessageCorrelationResult:
         return message_result
 
 
-class _Correlate(pycamunda.base.Request):
+class _Correlate(pycamunda.base.CamundaRequest):
 
     message_name = BodyParameter('messageName')
     business_key = BodyParameter('businessKey')
@@ -175,7 +175,7 @@ class _Correlate(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:

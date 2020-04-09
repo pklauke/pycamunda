@@ -9,12 +9,12 @@ import requests
 
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import BodyParameter
+from pycamunda.request import BodyParameter
 
 URL_SUFFIX = '/signal'
 
 
-class _Event(pycamunda.base.Request):
+class _Event(pycamunda.base.CamundaRequest):
 
     name = BodyParameter('name')
     execution_id = BodyParameter('executionId')
@@ -69,7 +69,7 @@ class _Event(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:

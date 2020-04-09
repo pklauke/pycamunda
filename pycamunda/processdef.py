@@ -15,7 +15,7 @@ import pycamunda.batch
 import pycamunda.incident
 import pycamunda.instruction
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
+from pycamunda.request import QueryParameter, PathParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/process-definition'
 
@@ -130,7 +130,7 @@ class ProcessInstanceStats:
         )
 
 
-class GetActivityInstanceStats(pycamunda.base.Request):
+class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -175,7 +175,7 @@ class GetActivityInstanceStats(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ActivityStats]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -186,7 +186,7 @@ class GetActivityInstanceStats(pycamunda.base.Request):
         return tuple(ActivityStats.load(activity_json) for activity_json in response.json())
 
 
-class GetProcessDiagram(pycamunda.base.Request):
+class GetProcessDiagram(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -217,7 +217,7 @@ class GetProcessDiagram(pycamunda.base.Request):
         return response.content
 
 
-class Count(pycamunda.base.Request):
+class Count(pycamunda.base.CamundaRequest):
 
     id_ = QueryParameter('processDefinitionId')
     id_in = QueryParameter('processDefinitionIdIn')
@@ -361,7 +361,7 @@ class Count(pycamunda.base.Request):
 
     def send(self) -> int:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -372,7 +372,7 @@ class Count(pycamunda.base.Request):
         return response.json()['count']
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     id_ = QueryParameter('processDefinitionId')
     id_in = QueryParameter('processDefinitionIdIn')
@@ -541,7 +541,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ProcessDefinition]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -552,7 +552,7 @@ class GetList(pycamunda.base.Request):
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
 
 
-class GetProcessInstanceStats(pycamunda.base.Request):
+class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
 
     failed_jobs = QueryParameter('failedJobs')
     incidents = QueryParameter('incidents', provide=pycamunda.base.value_is_true)
@@ -589,7 +589,7 @@ class GetProcessInstanceStats(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[ProcessInstanceStats]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -600,7 +600,7 @@ class GetProcessInstanceStats(pycamunda.base.Request):
         return tuple(ProcessInstanceStats.load(stats_json) for stats_json in response.json())
 
 
-class GetXML(pycamunda.base.Request):
+class GetXML(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -632,7 +632,7 @@ class GetXML(pycamunda.base.Request):
         return response.json()['bpmn20Xml']
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -665,7 +665,7 @@ class Get(pycamunda.base.Request):
         return ProcessDefinition.load(response.json())
 
 
-class StartInstance(pycamunda.base.Request):
+class StartInstance(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -829,7 +829,7 @@ class StartInstance(pycamunda.base.Request):
 
     def send(self) -> pycamunda.processinst.ProcessInstance:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -840,7 +840,7 @@ class StartInstance(pycamunda.base.Request):
         return pycamunda.processinst.ProcessInstance.load(response.json())
 
 
-class _ActivateSuspend(pycamunda.base.Request):
+class _ActivateSuspend(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -877,11 +877,11 @@ class _ActivateSuspend(pycamunda.base.Request):
         self.key = key
         self.tenant_id = tenant_id
         self.include_process_instances = include_process_instances
-        self.execution_datetime = pycamunda.variable.isoformat(execution_datetime)
+        self.execution_datetime = pycamunda.base.isoformat(execution_datetime)
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -952,7 +952,7 @@ class Suspend(_ActivateSuspend):
         )
 
 
-class UpdateHistoryTimeToLive(pycamunda.base.Request):
+class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -985,7 +985,7 @@ class UpdateHistoryTimeToLive(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException:
@@ -1025,7 +1025,7 @@ class _ProcessDefinitionDeletePathParameter(PathParameter):
         )
 
 
-class Delete(pycamunda.base.Request):
+class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -1066,7 +1066,7 @@ class Delete(pycamunda.base.Request):
 
     def send(self) -> None:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.delete(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -1075,7 +1075,7 @@ class Delete(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class RestartProcessInstance(pycamunda.base.Request):
+class RestartProcessInstance(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     process_instance_ids = BodyParameter('processInstanceIds')
@@ -1187,7 +1187,7 @@ class RestartProcessInstance(pycamunda.base.Request):
 
     def send(self) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException:

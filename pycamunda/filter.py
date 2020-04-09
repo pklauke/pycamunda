@@ -13,7 +13,7 @@ import pycamunda
 import pycamunda.task
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter, BodyParameter, BodyParameterContainer
+from pycamunda.request import QueryParameter, PathParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/filter'
 
@@ -63,7 +63,7 @@ class Filter:
         )
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     id_ = QueryParameter('filterId')
     resource_type = QueryParameter('resourceType')
@@ -120,7 +120,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[Filter]:
         """Send the request"""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -131,7 +131,7 @@ class GetList(pycamunda.base.Request):
         return tuple(Filter.load(filter_json) for filter_json in response.json())
 
 
-class Count(pycamunda.base.Request):
+class Count(pycamunda.base.CamundaRequest):
 
     id_ = QueryParameter('filterId')
     resource_type = QueryParameter('resourceType')
@@ -164,7 +164,7 @@ class Count(pycamunda.base.Request):
 
     def send(self) -> int:
         """Send the request"""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -175,7 +175,7 @@ class Count(pycamunda.base.Request):
         return response.json()['count']
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('filterId')
     item_count = QueryParameter('itemCount')
@@ -193,7 +193,7 @@ class Get(pycamunda.base.Request):
 
     def send(self) -> Filter:
         """Send the request"""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -477,7 +477,7 @@ class CriteriaMixin:
         return self
 
 
-class Create(pycamunda.base.Request, CriteriaMixin):
+class Create(pycamunda.base.CamundaRequest, CriteriaMixin):
 
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
@@ -511,7 +511,7 @@ class Create(pycamunda.base.Request, CriteriaMixin):
 
     def send(self) -> Filter:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(self.url, json=params)
         except requests.exceptions.RequestException as exc:
@@ -522,7 +522,7 @@ class Create(pycamunda.base.Request, CriteriaMixin):
         return Filter.load(response.json())
 
 
-class Update(pycamunda.base.Request, CriteriaMixin):
+class Update(pycamunda.base.CamundaRequest, CriteriaMixin):
 
     id_ = PathParameter('id')
     resource_type = BodyParameter('resourceType')
@@ -553,7 +553,7 @@ class Update(pycamunda.base.Request, CriteriaMixin):
 
     def send(self) -> None:
         """Send the request"""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.put(self.url, json=params)
         except requests.exceptions.RequestException as exc:
@@ -562,7 +562,7 @@ class Update(pycamunda.base.Request, CriteriaMixin):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Delete(pycamunda.base.Request):
+class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -585,7 +585,7 @@ class Delete(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class Execute(pycamunda.base.Request, CriteriaMixin):
+class Execute(pycamunda.base.CamundaRequest, CriteriaMixin):
 
     id_ = PathParameter('id')
     query = BodyParameterContainer('query')  # TODO test if this can be removed
@@ -602,7 +602,7 @@ class Execute(pycamunda.base.Request, CriteriaMixin):
 
     def send(self) -> typing.Union[pycamunda.task.Task, typing.Tuple[pycamunda.task.Task]]:
         """Send the request."""
-        params = self.body_parameters(apply=pycamunda.variable.prepare)['query']
+        params = self.body_parameters()['query']
         url = self.url + ('/singleResult' if self.single_result else '/list')
         try:
             if params:
@@ -619,7 +619,7 @@ class Execute(pycamunda.base.Request, CriteriaMixin):
         return tuple(pycamunda.task.Task.load(task_json) for task_json in response.json())
 
 
-class ExecuteCount(pycamunda.base.Request):
+class ExecuteCount(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 

@@ -3,14 +3,13 @@
 """This module provides utilities for the variable formats Camunda uses."""
 
 from __future__ import annotations
-import datetime as dt
 import dataclasses
 import typing
 
 import requests
 
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter
+from pycamunda.request import QueryParameter, PathParameter
 
 URL_SUFFIX = '/variable-instance'
 
@@ -71,43 +70,7 @@ class VariableInstance:
         )
 
 
-def isoformat(datetime_: typing.Union[dt.date, dt.datetime]) -> str:
-    """Convert a datetime object to the isoformat string Camunda expects. Datetime objects are
-    expected to contain timezoneinformation.
-
-    :param datetime_: Datetime or date object to convert.
-    :return: Isoformat datetime or date string.
-    """
-    if isinstance(datetime_, dt.datetime):
-        dt_str = datetime_.strftime('%Y-%m-%dT%H:%M:%S.{ms}%z')
-        ms = datetime_.microsecond // 1000
-        dt_str = dt_str.format(ms=str(ms).zfill(3))
-    else:
-        dt_str = datetime_.strftime('%Y-%m-%d')
-
-    return dt_str
-
-
-def from_isoformat(datetime_str: str) -> dt.datetime:
-    """Convert an isoformat string to a datetime object.
-
-    :param datetime_str: String to convert.
-    :return: Converted datetime.
-    """
-    return dt.datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%f%z')
-
-
-def prepare(value: typing.Any) -> typing.Any:
-    """Prepare parameter values for Camunda.
-
-    :param value: Value to prepare.
-    """
-    if isinstance(value, dt.datetime):
-        return isoformat(datetime_=value)
-    return value
-
-
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     name = QueryParameter('variableName')
     name_like = QueryParameter('variableNameLike')
@@ -272,7 +235,7 @@ class GetList(pycamunda.base.Request):
         return tuple(VariableInstance.load(variable_json) for variable_json in response.json())
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     deserialize_value = QueryParameter('deserializeValue')

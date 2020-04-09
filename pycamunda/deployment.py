@@ -11,7 +11,7 @@ import requests
 
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter, BodyParameter
+from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 URL_SUFFIX = '/deployment'
 
@@ -22,7 +22,7 @@ class Deployment:
     name: str
     source: str
     tenant_id: str
-    deployment_time: dt.datetime
+    deployment_time: dt.datetime = None
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> Deployment:
@@ -33,7 +33,7 @@ class Deployment:
             tenant_id=data['tenantId'],
         )
         if data['deploymentTime'] is not None:
-            deployment.deployment_time = pycamunda.variable.from_isoformat(data['deploymentTime'])
+            deployment.deployment_time = pycamunda.base.from_isoformat(data['deploymentTime'])
 
         return deployment
 
@@ -53,7 +53,7 @@ class Resource:
         )
 
 
-class GetList(pycamunda.base.Request):
+class GetList(pycamunda.base.CamundaRequest):
 
     id_ = QueryParameter('id')
     name = QueryParameter('name')
@@ -139,7 +139,7 @@ class GetList(pycamunda.base.Request):
 
     def send(self) -> typing.Tuple[Deployment]:
         """Send the request."""
-        params = self.query_parameters(apply=pycamunda.variable.prepare)
+        params = self.query_parameters()
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
@@ -150,7 +150,7 @@ class GetList(pycamunda.base.Request):
         return tuple(Deployment.load(deployment_json) for deployment_json in response.json())
 
 
-class Get(pycamunda.base.Request):
+class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -175,7 +175,7 @@ class Get(pycamunda.base.Request):
         return Deployment.load(response.json())
 
 
-class Create(pycamunda.base.Request):
+class Create(pycamunda.base.CamundaRequest):
 
     name = BodyParameter('deployment-name')
     enable_duplicate_filtering = BodyParameter('enable-duplicate-filtering')
@@ -223,7 +223,7 @@ class Create(pycamunda.base.Request):
     def send(self):
         """Send the request."""
         assert bool(self.files), 'Cannot create deployment without resources.'
-        params = self.body_parameters(apply=pycamunda.variable.prepare)
+        params = self.body_parameters()
         try:
             response = requests.post(
                 self.url,
@@ -236,7 +236,7 @@ class Create(pycamunda.base.Request):
             raise pycamunda.PyCamundaNoSuccess(response.text)
 
 
-class GetResources(pycamunda.base.Request):
+class GetResources(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
@@ -261,7 +261,7 @@ class GetResources(pycamunda.base.Request):
         return tuple(Resource.load(resource_json) for resource_json in response.json())
 
 
-class GetResource(pycamunda.base.Request):
+class GetResource(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     resource_id = PathParameter('resourceId')
@@ -297,7 +297,7 @@ class GetResource(pycamunda.base.Request):
         return Resource.load(response.json())
 
 
-class Delete(pycamunda.base.Request):
+class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     cascade = QueryParameter('cascade')
