@@ -157,12 +157,19 @@ class GetList(pycamunda.base.CamundaRequest):
     variable_values_ignore_case = QueryParameter('variableValuesIgnoreCase')
     sort_by = QueryParameter(
         'sortBy',
-        mapping={'instance_id': 'instanceId', 'definition_key': 'definitionKey',
-                 'definition_id': 'definitionId', 'tenant_id': 'tenantId',
-                 'business_key': 'businessKey'}
+        mapping={
+            'instance_id': 'instanceId',
+            'definition_key': 'definitionKey',
+            'definition_id': 'definitionId',
+            'tenant_id': 'tenantId',
+            'business_key': 'businessKey'
+        }
     )
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 

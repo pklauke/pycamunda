@@ -191,8 +191,11 @@ class GetList(pycamunda.base.CamundaRequest):
             'priority': 'priority'
         }
     )
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
     # TODO add expression parameters, consider explicit addition of each possible expression function

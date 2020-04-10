@@ -68,8 +68,11 @@ class GetList(pycamunda.base.CamundaRequest):
     member = QueryParameter('member')
     member_of_tenant = QueryParameter('memberOfTenant')
     sort_by = QueryParameter('sortBy', mapping={'id_': 'id', 'name': 'name', 'type_': 'type'})
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 

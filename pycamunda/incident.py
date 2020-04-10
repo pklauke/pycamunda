@@ -132,8 +132,11 @@ class GetList(pycamunda.base.CamundaRequest):
             'tenant_id': 'tenantId'
         }
     )
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
 
     def __init__(
         self,

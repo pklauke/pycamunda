@@ -71,11 +71,20 @@ class GetList(pycamunda.base.CamundaRequest):
     name_like = QueryParameter('nameLike')
     owner = QueryParameter('owner')
     item_count = QueryParameter('itemCount')
-    sort_by = QueryParameter('sortBy',
-                             mapping={'id_': 'filterId', 'first_name': 'firstName',
-                                      'last_name': 'lastName', 'email': 'email'})
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    sort_by = QueryParameter(
+        'sortBy',
+        mapping={
+            'id_': 'filterId',
+            'first_name': 'firstName',
+            'last_name': 'lastName',
+            'email': 'email'
+        }
+    )
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 

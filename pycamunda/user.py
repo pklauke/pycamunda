@@ -69,14 +69,42 @@ class Count(pycamunda.base.CamundaRequest):
     member_of_group = QueryParameter('memberOfGroup')
     member_of_tenant = QueryParameter('memberOfTenant')
 
-    def __init__(self, url: str, id_: str = None):
+    def __init__(
+        self,
+        url: str,
+        id_: str = None,
+        first_name: str = None,
+        first_name_like: str = None,
+        last_name: str = None,
+        last_name_like: str = None,
+        email: str = None,
+        email_like: str = None,
+        member_of_group: str = None,
+        member_of_tenant: str = None
+    ):
         """Count users.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user.
+        :param first_name: Filter by the first name of the user.
+        :param first_name_like: Filter by a substring of the first name.
+        :param last_name: Filter by the last name of the user.
+        :param last_name_like: Filter by a substring of the last name.
+        :param email: Filter by the email of the user.
+        :param email_like: Filter by a substring of the email.
+        :param member_of_group: Filter for users which are a member of a group.
+        :param member_of_tenant: Filter for users which are a member of a tenant.
         """
         super().__init__(url=url + URL_SUFFIX + '/count')
         self.id_ = id_
+        self.first_name = first_name
+        self.first_name_like = first_name_like
+        self.last_name = last_name
+        self.last_name_like = last_name_like
+        self.email = email
+        self.email_like = email_like
+        self.member_of_group = member_of_group
+        self.member_of_tenant = member_of_tenant
 
     def send(self) -> int:
         """Send the request"""
@@ -102,11 +130,20 @@ class GetList(pycamunda.base.CamundaRequest):
     email_like = QueryParameter('emailLike')
     member_of_group = QueryParameter('memberOfGroup')
     member_of_tenant = QueryParameter('memberOfTenant')
-    sort_by = QueryParameter('sortBy',
-                             mapping={'id_': 'userId', 'first_name': 'firstName',
-                                      'last_name': 'lastName', 'email': 'email'})
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    sort_by = QueryParameter(
+        'sortBy',
+        mapping={
+            'id_': 'userId', 
+            'first_name': 'firstName',
+            'last_name': 'lastName',
+            'email': 'email'
+        }
+    )
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 

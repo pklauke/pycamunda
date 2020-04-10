@@ -419,12 +419,21 @@ class GetList(pycamunda.base.CamundaRequest):
     )
     sort_by = QueryParameter(
         'sortBy',
-        mapping={'category': 'category', 'key': 'key', 'id_': 'id', 'name': 'name',
-                 'version': 'version', 'deployment_id': 'deploymentId', 'tenant_id': 'tenantId',
-                 'version_tag': 'versionTag'}
+        mapping={
+            'category': 'category',
+            'key': 'key', 'id_': 'id',
+            'name': 'name',
+            'version': 'version',
+            'deployment_id': 'deploymentId',
+            'tenant_id': 'tenantId',
+            'version_tag': 'versionTag'
+        }
     )
-    ascending = QueryParameter('sortOrder', mapping={True: 'asc', False: 'desc'},
-                               provide=lambda self, obj, obj_type: 'sort_by' in vars(self))
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+    )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
 
