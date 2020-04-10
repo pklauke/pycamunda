@@ -5,14 +5,14 @@
 from __future__ import annotations
 import datetime as dt
 import dataclasses
+import enum
 import typing
 
 import requests
 
 import pycamunda.variable
 import pycamunda.base
-from pycamunda.base import PathParameter, QueryParameter
-from pycamunda.request import BodyParameter
+from pycamunda.request import BodyParameter, PathParameter, QueryParameter
 
 URL_SUFFIX = '/task'
 
@@ -69,6 +69,11 @@ class Task:
             task.follow_up = pycamunda.base.from_isoformat(data['followUp'])
 
         return task
+
+
+class DelegationState(enum.Enum):
+    pending = 'PENDING'
+    resolved = 'RESOLVED'
 
 
 class Get(pycamunda.base.CamundaRequest):
@@ -249,7 +254,7 @@ class GetList(pycamunda.base.CamundaRequest):
         created_on: dt.datetime = None,
         created_after: dt.datetime = None,
         created_before: dt.datetime = None,
-        delegation_state: str = None,  # TODO add an enum?
+        delegation_state: typing.Union[str, DelegationState] = None,
         candidate_groups: typing.Iterable['str'] = None,
         with_candidate_groups: bool = False,
         without_candidate_groups: bool = False,
@@ -406,7 +411,9 @@ class GetList(pycamunda.base.CamundaRequest):
         self.created_on = created_on
         self.created_after = created_after
         self.created_before = created_before
-        self.delegation_state = delegation_state
+        self.delegation_state = None
+        if delegation_state is not None:
+            self.delegation_state = DelegationState(delegation_state)
         self.candidate_groups = candidate_groups
         self.with_candidate_groups = with_candidate_groups
         self.without_candidate_groups = without_candidate_groups
@@ -651,7 +658,7 @@ class Create(pycamunda.base.CamundaRequest):
         description: str = None,
         assignee: str = None,
         owner: str = None,
-        delegation_state: str = None,  # TODO consider enum
+        delegation_state: typing.Union[str, DelegationState] = None,
         due: dt.datetime = None,
         follow_up: dt.datetime = None,
         priority: int = None,
@@ -681,7 +688,9 @@ class Create(pycamunda.base.CamundaRequest):
         self.description = description
         self.assignee = assignee
         self.owner = owner
-        self.delegation_state = delegation_state
+        self.delegation_state = None
+        if delegation_state is not None:
+            self.delegation_state = DelegationState(delegation_state)
         self.due = due
         self.follow_up = follow_up
         self.priority = priority
@@ -723,7 +732,7 @@ class Update(pycamunda.base.CamundaRequest):
         description: str,
         assignee: str,
         owner: str,
-        delegation_state: str,  # TODO consider enum
+        delegation_state: typing.Union[str, DelegationState],
         due: dt.datetime,
         follow_up: dt.datetime,
         priority: int,
@@ -754,7 +763,9 @@ class Update(pycamunda.base.CamundaRequest):
         self.description = description
         self.assignee = assignee
         self.owner = owner
-        self.delegation_state = delegation_state
+        self.delegation_state = None
+        if delegation_state is not None:
+            self.delegation_state = DelegationState(delegation_state)
         self.due = due
         self.follow_up = follow_up
         self.priority = priority

@@ -12,6 +12,7 @@ import pycamunda.resource
 import pycamunda.variable
 import pycamunda.activityinst
 import pycamunda.instruction
+import pycamunda.incident
 import pycamunda.batch
 import pycamunda.base
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
@@ -185,7 +186,7 @@ class GetList(pycamunda.base.CamundaRequest):
             suspended: bool = False,
             with_incident: bool = None,
             incident_id: str = None,
-            incident_type: str = None,  # TODO allow inputting IncidentType
+            incident_type: typing.Union[str, pycamunda.incident.IncidentType] = None,
             incident_message: str = None,
             incident_message_like: str = None,
             tenant_id_in: typing.Iterable[str] = None,
@@ -266,7 +267,9 @@ class GetList(pycamunda.base.CamundaRequest):
         self.suspended = suspended
         self.with_incident = with_incident
         self.incident_id = incident_id
-        self.incident_type = incident_type
+        self.incident_type = None
+        if incident_type is not None:
+            self.incident_type = pycamunda.incident.IncidentType(incident_type)
         self.incident_message = incident_message
         self.incident_message_like = incident_message_like
         self.tenant_id_in = tenant_id_in

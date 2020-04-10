@@ -332,7 +332,7 @@ class CriteriaMixin:
         candidate_user: str = ...,
         involved_user: str = ...,
         unassigned: bool = ...,
-        delegation_state: str = ...  # TODO add enum?
+        delegation_state: typing.Union[str, pycamunda.task.DelegationState] = ...
     ):
         """Add criteria that filter by user.
 
@@ -371,12 +371,12 @@ class CriteriaMixin:
             self.query.parameters['involvedUser'] = involved_user
         if unassigned is not Ellipsis:
             self.query.parameters['unassigned'] = unassigned
-        if delegation_state is None:
+        if delegation_state is not Ellipsis:
             self.query.parameters['delegationState'] = None
-        elif delegation_state is not Ellipsis:
-            self.query.parameters['delegationState'] = \
-                'RESOLVED' if delegation_state else 'PENDING'
-
+            if delegation_state is not None:
+                self.query.parameters['delegationState'] = pycamunda.task.DelegationState(
+                    delegation_state
+                )
         return self
 
     def add_task_criteria(

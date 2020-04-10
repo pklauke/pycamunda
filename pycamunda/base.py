@@ -61,4 +61,8 @@ def prepare(value: typing.Any) -> typing.Any:
     """
     if isinstance(value, dt.datetime):
         return isoformat(datetime_=value)
+    try:  # support for enums
+        value = value.value
+    except AttributeError:
+        pass
     return value

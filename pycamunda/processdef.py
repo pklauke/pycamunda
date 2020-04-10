@@ -149,7 +149,7 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
         tenant_id: str = None,
         failed_jobs: bool = None,
         incidents: bool = False,
-        incidents_for_type: str = None  # TODO add enum?
+        incidents_for_type: typing.Union[str, pycamunda.incident.IncidentType] = None
     ):
         """Get runtime statistics for a process definition. Does not include historic data.
 
@@ -171,7 +171,9 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
         self.tenant_id = tenant_id
         self.failed_jobs = failed_jobs
         self.incidents = incidents
-        self.incidents_for_type = incidents_for_type
+        self.incident_type = None
+        if incidents_for_type is not None:
+            self.incidents_for_type = pycamunda.incident.IncidentType(incidents_for_type)
 
     def send(self) -> typing.Tuple[ActivityStats]:
         """Send the request."""
@@ -251,7 +253,10 @@ class Count(pycamunda.base.CamundaRequest):
     without_version_tag = QueryParameter('withoutVersionTag')
     startable_in_tasklist = QueryParameter('startableInTasklist')
     not_startable_in_tasklist = QueryParameter('notStartableInTasklist')
-    startable_permission_check = QueryParameter('startablePermissionCheck')
+    startable_permission_check = QueryParameter(
+        'startablePermissionCheck',
+        mapping={True: 'true', False: 'false'}
+    )
 
     def __init__(
         self,
@@ -274,7 +279,7 @@ class Count(pycamunda.base.CamundaRequest):
         active: bool = False,
         suspended: bool = False,
         incident_id: str = None,
-        incident_type: str = None,
+        incident_type: typing.Union[str, pycamunda.incident.IncidentType] = None,
         incident_message: str = None,
         incident_message_like: str = None,
         tenant_id_in: typing.Iterable[str] = None,
@@ -284,7 +289,7 @@ class Count(pycamunda.base.CamundaRequest):
         version_tag_like: str = None,
         without_version_tag: bool = None,
         startable_in_tasklist: bool = None,
-        startable_permission_check: str = None,  # TODO add enum?
+        startable_permission_check: bool = None,
         not_startable_in_tasklist: bool = None,
     ):
         """Count process definitions.
@@ -346,7 +351,9 @@ class Count(pycamunda.base.CamundaRequest):
         self.active = active
         self.suspended = suspended
         self.incident_id = incident_id
-        self.incident_type = incident_type  # TODO handle in case IncidentType is given
+        self.incident_type = None
+        if incident_type is not None:
+            self.incident_type = pycamunda.incident.IncidentType(incident_type)
         self.incident_message = incident_message
         self.incident_message_like = incident_message_like
         self.tenant_id_in = tenant_id_in
@@ -406,7 +413,10 @@ class GetList(pycamunda.base.CamundaRequest):
     without_version_tag = QueryParameter('withoutVersionTag')
     startable_in_tasklist = QueryParameter('startableInTasklist')
     not_startable_in_tasklist = QueryParameter('notStartableInTasklist')
-    startable_permission_check = QueryParameter('startablePermissionCheck')
+    startable_permission_check = QueryParameter(
+        'startablePermissionCheck',
+        mapping={True: 'true', False: 'false'}
+    )
     sort_by = QueryParameter(
         'sortBy',
         mapping={'category': 'category', 'key': 'key', 'id_': 'id', 'name': 'name',
@@ -439,7 +449,7 @@ class GetList(pycamunda.base.CamundaRequest):
         active: bool = False,
         suspended: bool = False,
         incident_id: str = None,
-        incident_type: str = None,
+        incident_type: typing.Union[str, pycamunda.incident.IncidentType] = None,
         incident_message: str = None,
         incident_message_like: str = None,
         tenant_id_in: typing.Iterable[str] = None,
@@ -449,7 +459,7 @@ class GetList(pycamunda.base.CamundaRequest):
         version_tag_like: str = None,
         without_version_tag: bool = None,
         startable_in_tasklist: bool = None,
-        startable_permission_check: str = None,  # TODO add enum?
+        startable_permission_check: bool = None,
         not_startable_in_tasklist: bool = None,
         sort_by: str = None,
         ascending: bool = True,
@@ -522,7 +532,9 @@ class GetList(pycamunda.base.CamundaRequest):
         self.active = active
         self.suspended = suspended
         self.incident_id = incident_id
-        self.incident_type = incident_type  # TODO handle in case IncidentType is given
+        self.incident_type = None
+        if incident_type is not None:
+            self.incident_type = pycamunda.incident.IncidentType(incident_type)
         self.incident_message = incident_message
         self.incident_message_like = incident_message_like
         self.tenant_id_in = tenant_id_in
@@ -565,7 +577,7 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         failed_jobs: bool = False,
         incidents: bool = False,
         root_incidents: bool = False,
-        incidents_for_type: str = None  # TODO add enum?
+        incidents_for_type: typing.Union[str, pycamunda.incident.IncidentType] = None
     ):
         """Get runtime statistics grouped by process definition. Does not include historic data.
 
@@ -585,7 +597,9 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         self.failed_jobs = failed_jobs
         self.incidents = incidents
         self.root_incidents = root_incidents
-        self.incidents_for_type = incidents_for_type
+        self.incidents_for_type = None
+        if incidents_for_type is not None:
+            self.incidents_for_type = pycamunda.incident.IncidentType(incidents_for_type)
 
     def send(self) -> typing.Tuple[ProcessInstanceStats]:
         """Send the request."""
@@ -899,7 +913,7 @@ class Activate(_ActivateSuspend):
         key: str = None,
         tenant_id: str = None,
         include_process_instances: bool = None,
-        execution_datetime: str = None  # TODO datetime
+        execution_datetime: dt.datetime = None
     ):
         """Activate a process definition.
 
@@ -930,7 +944,7 @@ class Suspend(_ActivateSuspend):
             key: str = None,
             tenant_id: str = None,
             include_process_instances: bool = None,
-            execution_datetime: str = None  # TODO datetime
+            execution_datetime: dt.datetime = None
     ):
         """Suspend a process definition.
 
@@ -959,7 +973,10 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
     tenant_id = PathParameter('tenant-id')
     path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
-    history_time_to_live = BodyParameter('historyTimeToLive', validate=lambda val: val is None or val >= 0)
+    history_time_to_live = BodyParameter(
+        'historyTimeToLive',
+        validate=lambda val: val is None or val >= 0
+    )
 
     def __init__(
         self,
