@@ -95,7 +95,7 @@ class Get(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return Incident.load(response.json())
 
@@ -205,7 +205,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(Incident.load(incident_json) for incident_json in response.json())
 
@@ -230,4 +230,4 @@ class Resolve(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)

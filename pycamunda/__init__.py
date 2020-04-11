@@ -6,13 +6,26 @@ class PyCamundaException(Exception):
     """Base class for all PyCamunda exceptions."""
 
 
-class PyCamundaNoSuccess(PyCamundaException):
-    """Exception that is raised when a request is not successful."""
+class NoSuccess(PyCamundaException):
+    """Exception that is raised when the tried is not successful."""
+    http_code = None
 
 
-class PyCamundaInvalidInput(PyCamundaException):
-    """Exception that is raised when invalid input is provided."""
+class BadRequest(NoSuccess):
+    """Exception that is raised when the tried action was invalid."""
+    http_code = 400
 
 
-class PyCamundaUserAlreadyExists(PyCamundaNoSuccess):
-    """Exception that is raised when it is tried to create a user that already exists."""
+class Forbidden(NoSuccess):
+    """Exception that is raised when the tried action was valid but not permitted."""
+    http_code = 403
+
+
+class NotFound(NoSuccess):
+    """Exception that is raised when the requested resource was not found."""
+    http_code = 404
+
+
+class InternalServerError(PyCamundaException):
+    """Exception that is raised when there occurred an error on Camunda server side."""
+    http_code = 500

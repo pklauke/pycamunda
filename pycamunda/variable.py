@@ -233,7 +233,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(VariableInstance.load(variable_json) for variable_json in response.json())
 
@@ -263,6 +263,6 @@ class Get(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return VariableInstance.load(response.json())

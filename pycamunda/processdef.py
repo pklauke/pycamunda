@@ -162,7 +162,7 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
         :param incidents_for_type: Include only incidents of a specific type.
         """
         if incidents and incidents_for_type is not None:
-            raise pycamunda.PyCamundaInvalidInput(
+            raise pycamunda.PyCamundaException(
                 'Either \'incidents\' or \'incidents_for_type\' can be provided, not both.'
             )
         super().__init__(url=url + URL_SUFFIX + '/{path}/statistics')
@@ -183,7 +183,7 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(ActivityStats.load(activity_json) for activity_json in response.json())
 
@@ -214,7 +214,7 @@ class GetProcessDiagram(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return response.content
 
@@ -374,7 +374,7 @@ class Count(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return response.json()['count']
 
@@ -568,7 +568,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
 
@@ -598,7 +598,7 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         :param incidents_for_type: Include only incidents of a specific type.
         """
         if sum((incidents, root_incidents, incidents_for_type is not None)) > 1:
-            raise pycamunda.PyCamundaInvalidInput(
+            raise pycamunda.PyCamundaException(
                 'Either \'incidents\', \'root_incidents\' or \'incidents_for_type\' can be '
                 'provided, not multiple of them.'
             )
@@ -618,7 +618,7 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(ProcessInstanceStats.load(stats_json) for stats_json in response.json())
 
@@ -650,7 +650,7 @@ class GetXML(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return response.json()['bpmn20Xml']
 
@@ -683,7 +683,7 @@ class Get(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return ProcessDefinition.load(response.json())
 
@@ -733,9 +733,9 @@ class StartInstance(pycamunda.base.CamundaRequest):
                                          during execution should be returned.
         """
         if id_ is not None and key is not None:
-            raise pycamunda.PyCamundaInvalidInput('Either `id_ or `key` can be provided, not both.')
+            raise pycamunda.PyCamundaException('Either `id_ or `key` can be provided, not both.')
         if tenant_id is not None and key is None:
-            raise pycamunda.PyCamundaInvalidInput(
+            raise pycamunda.PyCamundaException(
                 'If `tenant_id is provided `key also has to be provided.'
             )
         super().__init__(url=url + URL_SUFFIX + '/{path}/start')
@@ -858,7 +858,7 @@ class StartInstance(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return pycamunda.processinst.ProcessInstance.load(response.json())
 
@@ -910,7 +910,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class Activate(_ActivateSuspend):
@@ -1017,7 +1017,7 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class _ProcessDefinitionDeletePathParameter(PathParameter):
@@ -1098,7 +1098,7 @@ class Delete(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class RestartProcessInstance(pycamunda.base.CamundaRequest):
@@ -1219,7 +1219,7 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())

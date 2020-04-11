@@ -145,7 +145,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(Deployment.load(deployment_json) for deployment_json in response.json())
 
@@ -170,7 +170,7 @@ class Get(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return Deployment.load(response.json())
 
@@ -233,7 +233,7 @@ class Create(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class GetResources(pycamunda.base.CamundaRequest):
@@ -256,7 +256,7 @@ class GetResources(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(Resource.load(resource_json) for resource_json in response.json())
 
@@ -290,7 +290,7 @@ class GetResource(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         if self.binary:
             return response.content
@@ -333,4 +333,4 @@ class Delete(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)

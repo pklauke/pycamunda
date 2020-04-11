@@ -53,7 +53,7 @@ class Get(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return Group.load(response.json())
 
@@ -127,7 +127,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(Group.load(group_json) for group_json in response.json())
 
@@ -159,7 +159,7 @@ class Create(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class Update(pycamunda.base.CamundaRequest):
@@ -190,7 +190,7 @@ class Update(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class Options(pycamunda.base.CamundaRequest):
@@ -213,7 +213,7 @@ class Options(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -238,7 +238,7 @@ class Delete(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class MemberCreate(pycamunda.base.CamundaRequest):
@@ -264,7 +264,7 @@ class MemberCreate(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class MemberDelete(pycamunda.base.CamundaRequest):
@@ -290,7 +290,7 @@ class MemberDelete(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class MemberOptions(pycamunda.base.CamundaRequest):
@@ -314,6 +314,6 @@ class MemberOptions(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return pycamunda.resource.ResourceOptions.load(response.json())

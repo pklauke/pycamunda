@@ -4,6 +4,8 @@ import abc
 import datetime as dt
 import typing
 
+import requests
+
 import pycamunda.request
 
 
@@ -66,3 +68,25 @@ def prepare(value: typing.Any) -> typing.Any:
     except AttributeError:
         pass
     return value
+
+
+def _raise_for_status(response: requests.Response) -> None:
+    """Handle http errors regarding Camunda.
+
+    :param response: Response coming from Camunda.
+    """
+    try:
+        message = response.json()['message']
+    except KeyError:
+        message = ''
+    except TypeError:
+        message = ''
+
+    if response.status_code == 400:
+        raise pycamunda.BadRequest(message)
+    elif response.status_code == 403:
+        raise pycamunda.Forbidden(message)
+    elif response.status_code == 404:
+        raise pycamunda.NotFound(message)
+
+    raise pycamunda.NoSuccess(response.text)

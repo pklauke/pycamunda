@@ -106,7 +106,7 @@ class Get(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
         external_task = ExternalTask.load(response.json())
 
         if self.request_error_details:
@@ -116,7 +116,7 @@ class Get(pycamunda.base.CamundaRequest):
                 except requests.exceptions.RequestException:
                     raise pycamunda.PyCamundaException()
                 if not response:
-                    raise pycamunda.PyCamundaNoSuccess(response.text)
+                    pycamunda.base._raise_for_status(response)
                 external_task.error_details = response.text
 
         return external_task
@@ -260,7 +260,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
         external_tasks = tuple(ExternalTask.load(task_json) for task_json in response.json())
 
         if self.request_error_details:
@@ -271,7 +271,7 @@ class GetList(pycamunda.base.CamundaRequest):
                     except requests.exceptions.RequestException:
                         raise pycamunda.PyCamundaException()
                     if not response:
-                        raise pycamunda.PyCamundaNoSuccess(response.text)
+                        pycamunda.base._raise_for_status(response)
                     external_task.error_details = response.text
 
         return external_tasks
@@ -378,7 +378,7 @@ class Count(GetList):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return int(response.json()['count'])
 
@@ -440,7 +440,7 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
 
@@ -498,7 +498,7 @@ class Complete(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class HandleBPMNError(pycamunda.base.CamundaRequest):
@@ -552,7 +552,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class HandleFailure(pycamunda.base.CamundaRequest):
@@ -605,7 +605,7 @@ class HandleFailure(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class Unlock(pycamunda.base.CamundaRequest):
@@ -628,7 +628,7 @@ class Unlock(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class ExtendLock(pycamunda.base.CamundaRequest):
@@ -658,7 +658,7 @@ class ExtendLock(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class SetPriority(pycamunda.base.CamundaRequest):
@@ -685,7 +685,7 @@ class SetPriority(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class SetRetries(pycamunda.base.CamundaRequest):
@@ -712,7 +712,7 @@ class SetRetries(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class SetRetriesAsync(pycamunda.base.CamundaRequest):
@@ -747,7 +747,7 @@ class SetRetriesAsync(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return pycamunda.batch.Batch.load(response.json())
 
@@ -784,4 +784,4 @@ class SetRetriesSync(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)

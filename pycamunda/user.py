@@ -54,7 +54,7 @@ class Delete(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class Count(pycamunda.base.CamundaRequest):
@@ -114,7 +114,7 @@ class Count(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return response.json()['count']
 
@@ -133,7 +133,7 @@ class GetList(pycamunda.base.CamundaRequest):
     sort_by = QueryParameter(
         'sortBy',
         mapping={
-            'id_': 'userId', 
+            'id_': 'userId',
             'first_name': 'firstName',
             'last_name': 'lastName',
             'email': 'email'
@@ -205,7 +205,7 @@ class GetList(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return tuple(User.load(user_json) for user_json in response.json())
 
@@ -230,7 +230,7 @@ class GetProfile(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return User.load(response.json())
 
@@ -255,7 +255,7 @@ class Options(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -304,12 +304,7 @@ class Create(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException as exc:
             raise pycamunda.PyCamundaException(exc)
         if not response:
-            try:
-                if response.json()['message'] == "The user already exists":
-                    raise pycamunda.PyCamundaUserAlreadyExists(response.text)
-            except KeyError:
-                pass
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class UpdateCredentials(pycamunda.base.CamundaRequest):
@@ -340,7 +335,7 @@ class UpdateCredentials(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
 
 
 class UpdateProfile(pycamunda.base.CamundaRequest):
@@ -384,4 +379,31 @@ class UpdateProfile(pycamunda.base.CamundaRequest):
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
-            raise pycamunda.PyCamundaNoSuccess(response.text)
+            pycamunda.base._raise_for_status(response)
+
+
+class Unlock(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(
+        self,
+        url: str,
+        id_: str = None
+    ):
+        """Unlock an user.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/unlock')
+        self.id_ = id_
+
+    def send(self) -> None:
+        """Send the request"""
+        try:
+            response = requests.post(self.url)
+        except requests.exceptions.RequestException as exc:
+            raise pycamunda.PyCamundaException(exc)
+        if not response:
+            pycamunda.base._raise_for_status(response)
