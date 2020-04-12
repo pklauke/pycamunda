@@ -27,7 +27,6 @@ class ProcessInstance:
     business_key: str
     case_instance_id: str
     tenant_id: str
-    ended: bool
     suspended: bool
     links: typing.Tuple[pycamunda.resource.Link]
     variables: typing.Dict[str, pycamunda.variable.Variable] = None
@@ -40,7 +39,6 @@ class ProcessInstance:
             business_key=data['businessKey'],
             case_instance_id=data['caseInstanceId'],
             tenant_id=data['tenantId'],
-            ended=data['ended'],
             suspended=data['suspended'],
             links=tuple(pycamunda.resource.Link.load(link_json) for link_json in data['links']),
         )
@@ -168,7 +166,7 @@ class GetList(pycamunda.base.CamundaRequest):
     ascending = QueryParameter(
         'sortOrder',
         mapping={True: 'asc', False: 'desc'},
-        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+        provide=lambda self, obj, obj_type: vars(obj).get('sort_by', None) is not None
     )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')

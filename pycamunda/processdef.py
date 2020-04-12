@@ -432,7 +432,7 @@ class GetList(pycamunda.base.CamundaRequest):
     ascending = QueryParameter(
         'sortOrder',
         mapping={True: 'asc', False: 'desc'},
-        provide=lambda self, obj, obj_type: 'sort_by' in vars(obj)
+        provide=lambda self, obj, obj_type: vars(obj).get('sort_by', None) is not None
     )
     first_result = QueryParameter('firstResult')
     max_results = QueryParameter('maxResults')
