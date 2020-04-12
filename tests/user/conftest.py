@@ -43,11 +43,6 @@ def jane_doe():
 
 
 @pytest.fixture
-def engine_url():
-    return 'http://localhost/engine-rest'
-
-
-@pytest.fixture
 def count_input():
     return {
         'first_name': 'jane',
