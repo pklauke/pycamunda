@@ -133,8 +133,8 @@ class GetList(pycamunda.base.CamundaRequest):
     process_definition_key_in = QueryParameter('processDefinitionKeyIn')
     process_definition_key_not_in = QueryParameter('processDefinitionKeyNotIn')
     deployment_id = QueryParameter('deploymentId')
-    super_process_instance_id = QueryParameter('superProcessInstance')
-    sub_process_instance_id = QueryParameter('subProcessInstance')
+    super_process_instance = QueryParameter('superProcessInstance')
+    sub_process_instance = QueryParameter('subProcessInstance')
     super_case_instance_id = QueryParameter('superCaseInstance')
     sub_case_instance_id = QueryParameter('subCaseInstance')
     active = QueryParameter('active', provide=pycamunda.base.value_is_true)
@@ -183,8 +183,8 @@ class GetList(pycamunda.base.CamundaRequest):
             process_definition_key_in: typing.Iterable[str] = None,
             process_definition_key_not_in: typing.Iterable[str] = None,
             deployment_id: str = None,
-            super_process_instance_id: str = None,
-            sub_process_instance_id: str = None,
+            super_process_instance: str = None,
+            sub_process_instance: str = None,
             super_case_instance_id: str = None,
             sub_case_instance_id: str = None,
             active: bool = False,
@@ -199,7 +199,7 @@ class GetList(pycamunda.base.CamundaRequest):
             activity_id_in: typing.Iterable[str] = None,
             root_process_instances: bool = None,
             leaf_process_instances: bool = None,
-            process_definition_without_tenant_id: bool = None,
+            process_definition_without_tenant_id_in: bool = None,
             variables = None,  # TODO add annotation
             variable_names_ignore_case: bool = None,
             variable_values_ignore_case: bool = None,
@@ -222,9 +222,9 @@ class GetList(pycamunda.base.CamundaRequest):
         :param process_definition_key_not_in: Filter whether the process definition key is not one
                                               of multiple ones.
         :param deployment_id: Filter by deployment id.
-        :param super_process_instance_id: Filter process instances that are a sub process of the
+        :param super_process_instance: Filter process instances that are a sub process of the
                                           provided id.
-        :param sub_process_instance_id: Filter process instances that are a super process of the
+        :param sub_process_instance: Filter process instances that are a super process of the
                                         provided id.
         :param super_case_instance_id: Filter process instances that are a sub process of the
                                        provided case instance id.
@@ -243,7 +243,7 @@ class GetList(pycamunda.base.CamundaRequest):
         :param activity_id_in: Filter whether the activity id is one of multiple ones.
         :param root_process_instances: Include only top level process instances.
         :param leaf_process_instances: Include only bottom level process instances.
-        :param process_definition_without_tenant_id: Include only process instance where the
+        :param process_definition_without_tenant_id_in: Include only process instance where the
                                                      process definition has no tenant id.
         :param variables: # TODO (add via its own method?)
         :param variable_names_ignore_case: Whether to ignore case sensitivity for variables names.
@@ -264,8 +264,8 @@ class GetList(pycamunda.base.CamundaRequest):
         self.process_definition_key_in = process_definition_key_in
         self.process_definition_key_not_in = process_definition_key_not_in
         self.deployment_id = deployment_id
-        self.super_process_instance_id = super_process_instance_id
-        self.sub_process_instance_id = sub_process_instance_id
+        self.super_process_instance = super_process_instance
+        self.sub_process_instance = sub_process_instance
         self.super_case_instance_id = super_case_instance_id
         self.sub_case_instance_id = sub_case_instance_id
         self.active = active
@@ -282,7 +282,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.activity_id_in = activity_id_in
         self.root_process_instances = root_process_instances
         self.leaf_process_instances = leaf_process_instances
-        self.process_definition_without_tenant_id_in = process_definition_without_tenant_id
+        self.process_definition_without_tenant_id_in = process_definition_without_tenant_id_in
         self.variables = variables
         self.variable_names_ignore_case = variable_names_ignore_case
         self.variable_values_ignore_case = variable_values_ignore_case
