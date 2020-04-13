@@ -10,7 +10,7 @@ import pycamunda.request
 
 
 def value_is_true(self, obj: typing.Any, obj_type: typing.Any) -> bool:
-    return obj.__dict__[self.key]
+    return bool(obj.__dict__[self.name])
 
 
 class CamundaRequest(pycamunda.request.Request):
