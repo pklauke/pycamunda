@@ -46,6 +46,6 @@ def test_getlist_raises_for_status(mock, engine_url):
 @unittest.mock.patch('pycamunda.processinst.ProcessInstance', unittest.mock.MagicMock())
 def test_getlist_returns_none(engine_url):
     get_instances = pycamunda.processinst.GetList(url=engine_url)
-    users = get_instances()
+    instances = get_instances()
 
-    assert isinstance(users, tuple)
+    assert isinstance(instances, tuple)
