@@ -50,6 +50,116 @@ def test_modify_params_async(engine_url):
     }
 
 
+def test_modify_params_before_activity_instruction(engine_url, variables):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_before_activity_instruction(id_='anInstructionId', variables=variables)
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'startBeforeActivity', 'activityId': 'anInstructionId', 'variables': variables
+    }]
+
+
+def test_modify_params_after_activity_instruction(engine_url, variables):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_after_activity_instruction(id_='anInstructionId', variables=variables)
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'startAfterActivity', 'activityId': 'anInstructionId', 'variables': variables
+    }]
+
+
+def test_modify_params_cancel_instruction(engine_url):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_cancel_activity_instruction(id_='anInstructionId')
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'cancel', 'activityId': 'anInstructionId'
+    }]
+
+
+def test_modify_params_transition_instruction(engine_url, variables):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_transition_instruction(id_='anInstructionId', variables=variables)
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'startTransition', 'transitionId': 'anInstructionId', 'variables': variables
+    }]
+
+
+def test_modify_params_cancel_activity_instance_instruction(engine_url):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_cancel_activity_instance_instruction(id_='anInstructionId')
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'cancel', 'activityInstanceId': 'anInstructionId'
+    }]
+
+
+def test_modify_params_cancel_transition_instance_instruction(engine_url):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_cancel_transition_instance_instruction(id_='anInstructionId')
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'cancel', 'transitionInstanceId': 'anInstructionId'
+    }]
+
+
+def test_modify_params_start_before_ancestor_instance_instruction(engine_url, variables):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_start_before_ancestor_activity_instance_instruction(
+        id_='anInstructionId',
+        variables=variables
+    )
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'startBeforeActivity',
+        'ancestorActivityInstanceId': 'anInstructionId',
+        'variables': variables
+    }]
+
+
+def test_modify_params_start_after_ancestor_instance_instruction(engine_url, variables):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_start_after_ancestor_activity_instance_instruction(
+        id_='anInstructionId',
+        variables=variables
+    )
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'startAfterActivity',
+        'ancestorActivityInstanceId': 'anInstructionId',
+        'variables': variables
+    }]
+
+
+def test_modify_params_cancel_ancestor_instance_instruction(engine_url):
+    modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
+    modify_instance.add_cancel_ancestor_activity_instance_instruction(id_='anInstructionId')
+
+    assert modify_instance.url == engine_url + '/process-instance/anInstanceId/modification'
+    assert modify_instance.query_parameters() == {}
+    assert modify_instance.body_parameters()['instructions'] == [{
+        'type': 'cancel',
+        'ancestorActivityInstanceId': 'anInstructionId'
+    }]
+
+
 @unittest.mock.patch('requests.post')
 def test_modify_calls_requests(mock, engine_url):
     modify_instance = pycamunda.processinst.Modify(url=engine_url, id_='anInstanceId')
@@ -88,6 +198,3 @@ def test_modify_async_returns_batch(engine_url):
     batch = modify_instance()
 
     assert isinstance(batch, pycamunda.batch.Batch)
-
-
-# TODO add tests for instructions

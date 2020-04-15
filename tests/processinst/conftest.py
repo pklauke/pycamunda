@@ -3,6 +3,7 @@
 import pytest
 
 import pycamunda.incident
+import pycamunda.variable
 
 
 @pytest.fixture
@@ -112,3 +113,13 @@ def getlist_output():
         'maxResults': 10
     }
 
+
+@pytest.fixture
+def variables():
+    return {
+        'anVariable': pycamunda.variable.Variable(
+            value='anValue',
+            type_='String',
+            value_info={}
+        )
+    }
