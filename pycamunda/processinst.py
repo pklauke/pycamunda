@@ -392,7 +392,7 @@ class Modify(pycamunda.base.CamundaRequest):
         :param transition_id: Id of the sequence flow to start in case 'type_' is 'startTransition'.
         :param activity_instance_id: Id of the activity instance in case 'type_' is 'cancel'.
         :param transition_instance_id: Id of the transition instance in case 'type_' is 'cancel'.
-        :param ancestor_activity_instance_id: Id of the ancestor instance id in case 'type'
+        :param ancestor_activity_instance_id: Id of the ancestor instance id in case 'type' is
                                               'startBeforeActivity', 'startAfterActivity' or
                                               'startTransition'.
         :param variables: Mapping from names to the corresponding variables.
