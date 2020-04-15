@@ -9,11 +9,11 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 
 
 def test_delete_params(engine_url, delete_input, delete_output):
-    delete_user = pycamunda.processinst.Delete(url=engine_url, **delete_input)
+    delete_instance = pycamunda.processinst.Delete(url=engine_url, **delete_input)
 
-    assert delete_user.url == engine_url + '/process-instance/anId'
-    assert delete_user.query_parameters() == delete_output
-    assert delete_user.body_parameters() == {}
+    assert delete_instance.url == engine_url + '/process-instance/anId'
+    assert delete_instance.query_parameters() == delete_output
+    assert delete_instance.body_parameters() == {}
 
 
 @unittest.mock.patch('requests.delete')
