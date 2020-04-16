@@ -23,3 +23,13 @@ def my_process_definition_json():
         'historyTimeToLive': 10,
         'startableInTasklist': True
     }
+
+
+@pytest.fixture
+def my_activity_stats_json():
+    return {
+        'id': 'anId',
+        'instances': 2,
+        'failedJobs': 1,
+        'incidents': []
+    }
