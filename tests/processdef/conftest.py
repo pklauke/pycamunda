@@ -2,8 +2,6 @@
 
 import pytest
 
-import pycamunda.variable
-
 
 @pytest.fixture
 def my_process_definition_json():
