@@ -55,14 +55,7 @@ class QueryParameter(RequestParameter):
 
 
 class PathParameter(RequestParameter):
-
-    def __init__(self, *args, **kwargs):
-        """Parameter that is attached to the request URL by adding it to the endpoint name."""
-        super().__init__(*args, **kwargs)
-        self.instance = None
-
-    def __call__(self, *args, **kwargs) -> str:
-        return getattr(self.instance, self.name)
+    """Parameter that is attached to the request URL by adding it to the endpoint name."""
 
 
 class BodyParameter(RequestParameter):
@@ -125,10 +118,6 @@ class Request(metaclass=RequestMeta):
         super().__init__()
         self._url = url
 
-        for name, attribute in self._parameters.items():
-            if isinstance(attribute, PathParameter):
-                attribute.instance = self  # TODO Fix incorrect instance assignment when Pathparameter is overwritten in child class
-
     @property
     def url(self) -> str:
         params = {}
@@ -136,7 +125,7 @@ class Request(metaclass=RequestMeta):
         for name, attribute in self._parameters.items():
             if isinstance(attribute, PathParameter):
                 try:
-                    params[attribute.key] = attribute()
+                    params[attribute.key] = getattr(self, attribute.name)
                 except AttributeError:
                     missing_params[attribute.key] = ''
         return self._url.format(**{**params, **missing_params}).rstrip('/')

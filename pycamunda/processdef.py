@@ -57,37 +57,6 @@ class ProcessDefinition:
         )
 
 
-class _ProcessDefinitionPathParameter(PathParameter):
-
-    def __init__(
-        self,
-        key: str,
-        id_parameter: PathParameter,
-        key_parameter: PathParameter,
-        tenant_id_parameter: PathParameter
-    ):
-        super().__init__(key=key)
-        self.id_parameter = id_parameter
-        self.key_parameter = key_parameter
-        self.tenant_id_parameter = tenant_id_parameter
-
-    def __call__(self, *args, **kwargs) -> str:
-        if self.id_parameter() is not None:
-            return self.id_parameter()
-        if self.tenant_id_parameter() is not None:
-            return f'key/{self.key_parameter()}/tenant-id/{self.tenant_id_parameter()}'
-        return f'key/{self.key_parameter()}'
-
-    def __repr__(self) -> str:
-        return (
-            f'{self.__class__.__qualname__}'
-            f'(key=\'{self.key}\', '
-            f'id_parameter={self.id_parameter}, '
-            f'key_parameter={self.key_parameter}, '
-            f'tenant_id_parameter={self.tenant_id_parameter})'
-        )
-
-
 @dataclasses.dataclass
 class ActivityStats:
     id_: str
@@ -135,7 +104,6 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     failed_jobs = QueryParameter('failedJobs')
     incidents = QueryParameter('incidents', provide=pycamunda.base.value_is_true)
@@ -175,6 +143,14 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
         if incidents_for_type is not None:
             self.incidents_for_type = pycamunda.incident.IncidentType(incidents_for_type)
 
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
+
     def send(self) -> typing.Tuple[ActivityStats]:
         """Send the request."""
         params = self.query_parameters()
@@ -193,7 +169,6 @@ class GetProcessDiagram(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
         """Get the diagram of a process definition.
@@ -206,6 +181,14 @@ class GetProcessDiagram(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
 
     def send(self):
         """Send the request."""
@@ -628,7 +611,6 @@ class GetXML(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
         """Get the BPMN xml diagram of a process definition.
@@ -642,6 +624,14 @@ class GetXML(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
 
     def send(self) -> str:
         """Send the request."""
@@ -660,7 +650,6 @@ class Get(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
         """Get a process definition.
@@ -675,6 +664,14 @@ class Get(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
 
     def send(self) -> ProcessDefinition:
         """Send the request."""
@@ -693,7 +690,6 @@ class StartInstance(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     variables = BodyParameter('variables')
     business_key = BodyParameter('businessKey')
@@ -750,6 +746,14 @@ class StartInstance(pycamunda.base.CamundaRequest):
 
         self.variables = {}
         self.start_instructions = []
+
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
 
     def add_variable(self, name: str, value: typing.Any, type_: str = None, value_info: str = None):
         """Add a variable to initialize the process instance with.
@@ -868,7 +872,6 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     suspended = BodyParameter('suspended')
     include_process_instances = BodyParameter('include_process_instances')
@@ -901,6 +904,14 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         self.tenant_id = tenant_id
         self.include_process_instances = include_process_instances
         self.execution_datetime = pycamunda.base.isoformat(execution_datetime)
+
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
 
     def send(self) -> None:
         """Send the request."""
@@ -980,7 +991,6 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionPathParameter('path', id_, key, tenant_id)
 
     history_time_to_live = BodyParameter(
         'historyTimeToLive',
@@ -1009,6 +1019,14 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
         self.key = key
         self.tenant_id = tenant_id
 
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
+
     def send(self) -> None:
         """Send the request."""
         params = self.body_parameters()
@@ -1020,43 +1038,11 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
 
-class _ProcessDefinitionDeletePathParameter(PathParameter):
-
-    def __init__(
-        self,
-        key: str,
-        id_parameter: PathParameter,
-        key_parameter: PathParameter,
-        tenant_id_parameter: PathParameter
-    ):
-        super().__init__(key=key)
-        self.id_parameter = id_parameter
-        self.key_parameter = key_parameter
-        self.tenant_id_parameter = tenant_id_parameter
-
-    def __call__(self, *args, **kwargs) -> str:
-        if self.id_parameter() is not None:
-            return self.id_parameter()
-        if self.tenant_id_parameter() is not None:
-            return f'key/{self.key_parameter()}/tenant-id/{self.tenant_id_parameter()}/delete'
-        return f'key/{self.key_parameter()}/delete'
-
-    def __repr__(self) -> str:
-        return (
-            f'{self.__class__.__qualname__}'
-            f'(key=\'{self.key}\', '
-            f'id_parameter={self.id_parameter}, '
-            f'key_parameter={self.key_parameter}, '
-            f'tenant_id_parameter={self.tenant_id_parameter})'
-        )
-
-
 class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
-    path = _ProcessDefinitionDeletePathParameter('path', id_, key, tenant_id)
 
     cascade = QueryParameter('cascade')
     skip_custom_listeners = QueryParameter('skipCustomListeners')
@@ -1089,6 +1075,14 @@ class Delete(pycamunda.base.CamundaRequest):
         self.cascade = cascade
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
+
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}/delete')
+        return self._url.format(path=f'key/{self.key}/delete')
 
     def send(self) -> None:
         """Send the request."""
