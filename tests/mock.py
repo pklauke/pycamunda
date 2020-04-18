@@ -9,7 +9,23 @@ def raise_requests_exception_mock(*args, **kwargs):
 def not_ok_response_mock(*args, **kwargs):
     class Response:
         ok = False
-        text = ''
+        text = 'text'
+        content = 'content'
+
+        def __bool__(self):
+            return bool(self.ok)
+
+        def json(self):
+            return {'message': 'an error message'}
+
+    return Response()
+
+
+def response_mock(*args, **kwargs):
+    class Response:
+        ok = True
+        text = 'text'
+        content = 'content'
 
         def __bool__(self):
             return bool(self.ok)
