@@ -254,7 +254,7 @@ class Count(pycamunda.base.CamundaRequest):
         key_like: str = None,
         category: str = None,
         category_like: str = None,
-        version: str = None,
+        version: int = None,
         latest_version: bool = False,
         resource_name: str = None,
         resource_name_like: str = None,
