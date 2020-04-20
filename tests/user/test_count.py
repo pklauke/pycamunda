@@ -37,8 +37,7 @@ def test_count_raises_pycamunda_exception(engine_url):
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_count_raises_for_status(mock, engine_url):
     count_users = pycamunda.user.Count(url=engine_url)
-    with pytest.raises(KeyError):
-        count_users()
+    count_users()
 
     assert mock.called
 

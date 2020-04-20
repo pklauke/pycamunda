@@ -32,7 +32,6 @@ def test_count_raises_pycamunda_exception(engine_url):
 
 
 @unittest.mock.patch('requests.get', not_ok_response_mock)
-@unittest.mock.patch('pycamunda.processdef.ActivityStats', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_count_raises_for_status(mock, engine_url):
     count_definitions = pycamunda.processdef.Count(url=engine_url, id_='anId')

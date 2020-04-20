@@ -16,7 +16,7 @@ def not_ok_response_mock(*args, **kwargs):
             return bool(self.ok)
 
         def json(self):
-            return {'message': 'an error message'}
+            return {'message': 'an error message', 'count': 1}
 
     return Response()
 
