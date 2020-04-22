@@ -42,6 +42,32 @@ def test_getprocessdiagram_path(engine_url):
     }
 
 
+def test_getprocessdiagramm_raises_exception_on_invalid_inputs(engine_url):
+    with pytest.raises(pycamunda.PyCamundaException):
+        pycamunda.processdef.GetProcessInstanceStats(
+            url=engine_url, incidents=True, root_incidents=True
+        )
+    with pytest.raises(pycamunda.PyCamundaException):
+        pycamunda.processdef.GetProcessInstanceStats(
+            url=engine_url,
+            incidents=True,
+            incidents_for_type=pycamunda.incident.IncidentType.failed_external_task
+        )
+    with pytest.raises(pycamunda.PyCamundaException):
+        pycamunda.processdef.GetProcessInstanceStats(
+            url=engine_url,
+            root_incidents=True,
+            incidents_for_type=pycamunda.incident.IncidentType.failed_external_task
+        )
+    with pytest.raises(pycamunda.PyCamundaException):
+        pycamunda.processdef.GetProcessInstanceStats(
+            url=engine_url,
+            incidents=True,
+            root_incidents=True,
+            incidents_for_type=pycamunda.incident.IncidentType.failed_external_task
+        )
+
+
 @unittest.mock.patch('requests.get')
 def test_getprocessdiagram_calls_requests(mock, engine_url):
     get_process_instance_stats = pycamunda.processdef.GetProcessInstanceStats(url=engine_url)
