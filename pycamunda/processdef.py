@@ -874,7 +874,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
     tenant_id = PathParameter('tenant-id')
 
     suspended = BodyParameter('suspended')
-    include_process_instances = BodyParameter('include_process_instances')
+    include_process_instances = BodyParameter('includeProcessInstances')
     execution_datetime = BodyParameter('executionDate')
 
     def __init__(
@@ -903,7 +903,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         self.key = key
         self.tenant_id = tenant_id
         self.include_process_instances = include_process_instances
-        self.execution_datetime = pycamunda.base.isoformat(execution_datetime)
+        self.execution_datetime = execution_datetime
 
     @property
     def url(self):
