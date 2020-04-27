@@ -1081,8 +1081,8 @@ class Delete(pycamunda.base.CamundaRequest):
         if self.id_ is not None:
             return self._url.format(path=self.id_)
         if self.tenant_id is not None:
-            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}/delete')
-        return self._url.format(path=f'key/{self.key}/delete')
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
 
     def send(self) -> None:
         """Send the request."""
