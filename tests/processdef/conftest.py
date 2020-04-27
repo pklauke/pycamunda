@@ -203,3 +203,28 @@ def getlist_output():
         'firstResult': 1,
         'maxResults': 10
     }
+
+
+@pytest.fixture
+def restartprocessinstance_input():
+    return {
+        'id_': 'anId',
+        'process_instance_ids': [],
+        'async_': False,
+        'skip_custom_listeners': True,
+        'skip_io_mappings': True,
+        'initial_variables': True,
+        'without_business_key': True
+    }
+
+
+@pytest.fixture
+def restartprocessinstance_output():
+    return {
+        'processInstanceIds': [],
+        'skipCustomListeners': True,
+        'skipIoMappings': True,
+        'initialVariables': True,
+        'withoutBusinessKey': True,
+        'historicProcessInstanceQuery': {}
+    }

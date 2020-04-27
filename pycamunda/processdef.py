@@ -1102,7 +1102,7 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
     historic_process_instance_query = BodyParameterContainer('historicProcessInstanceQuery')  # TODO create method to add this parameter
     skip_custom_listeners = BodyParameter('skipCustomListeners')
     skip_io_mappings = BodyParameter('skipIoMappings')
-    initial_variales = BodyParameter('initialVariables')
+    initial_variables = BodyParameter('initialVariables')
     without_business_key = BodyParameter('withoutBusinessKey')
     instructions = BodyParameter('instructions')
 
