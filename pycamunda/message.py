@@ -173,7 +173,7 @@ class _Correlate(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> None:
+    def send(self) -> MessageCorrelationResult:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -182,6 +182,8 @@ class _Correlate(pycamunda.base.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             pycamunda.base._raise_for_status(response)
+
+        return MessageCorrelationResult.load(data=response.json())
 
 
 class CorrelateSingle(_Correlate):
