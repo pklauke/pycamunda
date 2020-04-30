@@ -4,6 +4,29 @@ import pytest
 
 
 @pytest.fixture
+def my_process_instance_json():
+    return {
+        'id': 'anId',
+        'definitionId': 'anDefinitionId',
+        'businessKey': 'aBusinessKey',
+        'caseInstanceId': 'aCaseInstanceId',
+        'suspended': False,
+        'tenantId': 'aTenantId',
+        'links': []
+    }
+
+
+@pytest.fixture
+def my_execution_json():
+    return {
+        'id': 'anId',
+        'processInstanceId': 'aProcessInstanceId',
+        'ended': False,
+        'tenantId': 'aTenantId'
+    }
+
+
+@pytest.fixture
 def correlate_input():
     return {
         'business_key': 'aKey',
