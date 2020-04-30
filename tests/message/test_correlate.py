@@ -76,9 +76,10 @@ def test_correlatesingle_raises_for_status(mock, engine_url):
 @unittest.mock.patch('pycamunda.message.ResultType', unittest.mock.MagicMock())
 def test_correlatesingle_returns_messagecorrelationresult(engine_url):
     correlate = pycamunda.message.CorrelateSingle(url=engine_url, message_name='aMessageName')
-    result = correlate()
+    results = correlate()
 
-    assert isinstance(result, pycamunda.message.MessageCorrelationResult)
+    assert isinstance(results, tuple)
+    assert all(isinstance(result, pycamunda.message.MessageCorrelationResult) for result in results)
 
 
 def test_correlateall_params(engine_url, correlate_input, correlate_output):
@@ -149,6 +150,7 @@ def test_correlateall_raises_for_status(mock, engine_url):
 @unittest.mock.patch('pycamunda.message.ResultType', unittest.mock.MagicMock())
 def test_correlateall_returns_messagecorrelationresult(engine_url):
     correlate = pycamunda.message.CorrelateAll(url=engine_url, message_name='aMessageName')
-    result = correlate()
+    results = correlate()
 
-    assert isinstance(result, pycamunda.message.MessageCorrelationResult)
+    assert isinstance(results, tuple)
+    assert all(isinstance(result, pycamunda.message.MessageCorrelationResult) for result in results)

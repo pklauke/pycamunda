@@ -19,8 +19,8 @@ URL_SUFFIX = '/message'
 
 
 class ResultType(enum.Enum):
-    process_definition = 'processDefinition'
-    execution = 'execution'
+    process_definition = 'ProcessDefinition'
+    execution = 'Execution'
 
 
 @dataclasses.dataclass
@@ -173,7 +173,7 @@ class _Correlate(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> MessageCorrelationResult:
+    def send(self) -> typing.Tuple[MessageCorrelationResult]:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -183,7 +183,9 @@ class _Correlate(pycamunda.base.CamundaRequest):
         if not response:
             pycamunda.base._raise_for_status(response)
 
-        return MessageCorrelationResult.load(data=response.json())
+        return tuple(
+            MessageCorrelationResult.load(data=result_json) for result_json in response.json()
+        )
 
 
 class CorrelateSingle(_Correlate):
