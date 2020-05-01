@@ -37,7 +37,7 @@ class ExternalTask:
     lock_expiration_time: dt.datetime = None
     suspended: bool = None
     business_key: str = None
-    variables: typing.Dict[str, pycamunda.variable.Variable] = None
+    variables: typing.Dict[str, typing.Dict[str, typing.Any]] = None
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> ExternalTask:
