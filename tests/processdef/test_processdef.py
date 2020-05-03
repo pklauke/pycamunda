@@ -27,7 +27,7 @@ def test_processdefinition_load(my_process_definition_json):
 
 def test_processdefinition_load_raises_keyerror(my_process_definition_json):
     for key in my_process_definition_json:
-        json = dict(my_process_definition_json)
-        del json[key]
+        json_ = dict(my_process_definition_json)
+        del json_[key]
         with pytest.raises(KeyError):
-            pycamunda.processdef.ProcessDefinition.load(data=json)
+            pycamunda.processdef.ProcessDefinition.load(data=json_)

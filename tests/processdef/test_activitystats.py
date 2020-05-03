@@ -15,7 +15,7 @@ def test_activitystats_load(my_activity_stats_json):
 
 def test_activitystats_load_raises_keyerror(my_activity_stats_json):
     for key in my_activity_stats_json:
-        json = dict(my_activity_stats_json)
-        del json[key]
+        json_ = dict(my_activity_stats_json)
+        del json_[key]
         with pytest.raises(KeyError):
-            pycamunda.processdef.ActivityStats.load(data=json)
+            pycamunda.processdef.ActivityStats.load(data=json_)

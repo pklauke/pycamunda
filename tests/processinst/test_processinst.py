@@ -19,7 +19,7 @@ def test_processinstance_load(my_process_instance_json):
 
 def test_processinstance_load_raises_keyerror(my_process_instance_json):
     for key in my_process_instance_json:
-        json = dict(my_process_instance_json)
-        del json[key]
+        json_ = dict(my_process_instance_json)
+        del json_[key]
         with pytest.raises(KeyError):
-            pycamunda.processinst.ProcessInstance.load(data=json)
+            pycamunda.processinst.ProcessInstance.load(data=json_)
