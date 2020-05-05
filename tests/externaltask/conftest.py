@@ -58,8 +58,7 @@ def getlist_input():
         'sort_by': 'id_',
         'ascending': True,
         'first_result': 1,
-        'max_results': 100,
-        'request_error_details': True
+        'max_results': 100
     }
 
 

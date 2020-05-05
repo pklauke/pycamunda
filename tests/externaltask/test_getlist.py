@@ -9,7 +9,9 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 
 
 def test_getlist_params(engine_url, getlist_input, getlist_output):
-    get_tasks = pycamunda.externaltask.GetList(url=engine_url, **getlist_input)
+    get_tasks = pycamunda.externaltask.GetList(
+        url=engine_url, **getlist_input, request_error_details=True
+    )
 
     assert get_tasks.url == engine_url + '/external-task'
     assert get_tasks.query_parameters() == getlist_output
