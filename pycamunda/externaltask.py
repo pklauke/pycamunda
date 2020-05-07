@@ -465,7 +465,9 @@ class Complete(pycamunda.base.CamundaRequest):
         self.variables = {}
         self.local_variables = {}
 
-    def add_variable(self, name: str, value: str, type_: str = None, value_info: str = None):
+    def add_variable(
+        self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
+    ):
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
@@ -477,7 +479,9 @@ class Complete(pycamunda.base.CamundaRequest):
 
         return self
 
-    def add_local_variable(self, name: str, value: str, type_: str=None, value_info: str=None):
+    def add_local_variable(
+        self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
+    ):
         """Add a local variable to send to Camunda. Local variables are set only in the scope of an
         external task.
 
@@ -532,7 +536,9 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
         self.error_message = error_message
         self.variables = {}
 
-    def add_variable(self, name: str, value: str, type_: str = None, value_info: str = None):
+    def add_variable(
+        self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
+    ):
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
