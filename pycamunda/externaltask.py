@@ -648,7 +648,8 @@ class ExtendLock(pycamunda.base.CamundaRequest):
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the external task.
-        :param new_duration: New duration how long the external task wants to be locked.
+        :param new_duration: New duration in milliseconds how long the external task wants to be
+                             locked.
         :param worker_id: Id of the worker that locked this external task.
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/extendLock')
