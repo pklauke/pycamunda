@@ -34,8 +34,8 @@ def test_setretries_raises_pycamunda_exception(engine_url):
 @unittest.mock.patch('requests.put', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_setretries_raises_for_status(mock, engine_url):
-    set_priority = pycamunda.externaltask.SetRetries(url=engine_url, id_='anId', retries=10)
-    set_priority()
+    set_retries = pycamunda.externaltask.SetRetries(url=engine_url, id_='anId', retries=10)
+    set_retries()
 
     assert mock.called
 
