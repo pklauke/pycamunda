@@ -63,8 +63,13 @@ def test_activity_instance_load(my_activity_instance_json):
     'pycamunda.activityinst.TransitionInstance.load', lambda _: TRANSITION_INSTANCE
 )
 def test_activity_instance_load_raises_keyerror(my_activity_instance_json):
-    for key in (k for k in my_activity_instance_json if k not in {'incidentIds', 'incidents'}):
+    optional_keys = {'incidentIds', 'incidents'}
+    for key in (k for k in my_activity_instance_json if k not in optional_keys):
         json_ = dict(my_activity_instance_json)
         del json_[key]
         with pytest.raises(KeyError):
             pycamunda.activityinst.ActivityInstance.load(json_)
+    for key in optional_keys:
+        json_ = dict(my_activity_instance_json)
+        del json_[key]
+        pycamunda.activityinst.ActivityInstance.load(json_)
