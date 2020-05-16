@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime as dt
+
 import pytest
 
 
@@ -11,4 +13,46 @@ def my_deployment_json():
         'source': 'aSource',
         'tenantId': 'aTenantId',
         'deploymentTime': '2000-01-01T00:00:00.000+0000'
+    }
+
+
+@pytest.fixture
+def getlist_input():
+    return {
+        'id_': 'anId',
+        'name': 'aName',
+        'name_like': 'aNam',
+        'source': 'aSource',
+        'without_source': True,
+        'tenant_id_in': [],
+        'without_tenant_id': True,
+        'include_deployments_without_tenant_id': True,
+        'after': dt.datetime(year=2000, month=1, day=1, hour=0, minute=0, second=0,
+                             tzinfo=dt.timezone.utc),
+        'before': dt.datetime(year=2000, month=1, day=1, hour=0, minute=0, second=0,
+                              tzinfo=dt.timezone.utc),
+        'sort_by': 'id_',
+        'ascending': True,
+        'first_result': 1,
+        'max_results': 10
+    }
+
+
+@pytest.fixture
+def getlist_output():
+    return {
+        'id': 'anId',
+        'name': 'aName',
+        'nameLike': 'aNam',
+        'source': 'aSource',
+        'withoutSource': True,
+        'tenantIdIn': [],
+        'withoutTenantId': True,
+        'includeDeploymentsWithoutTenantId': True,
+        'after': '2000-01-01T00:00:00.000+0000',
+        'before': '2000-01-01T00:00:00.000+0000',
+        'sortBy': 'id',
+        'sortOrder': 'asc',
+        'firstResult': 1,
+        'maxResults': 10
     }
