@@ -56,3 +56,25 @@ def getlist_output():
         'firstResult': 1,
         'maxResults': 10
     }
+
+
+@pytest.fixture
+def create_input():
+    return {
+        'name': 'aName',
+        'source': 'aSource',
+        'enable_duplicate_filtering': True,
+        'deploy_changed_only': True,
+        'tenant_id': 'aTenantId'
+    }
+
+
+@pytest.fixture
+def create_output():
+    return {
+        'deployment-name': 'aName',
+        'deployment-source': 'aSource',
+        'enable-duplicate-filtering': True,
+        'deploy-changed-only': True,
+        'tenant-id': 'aTenantId'
+    }
