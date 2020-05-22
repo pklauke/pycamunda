@@ -58,7 +58,7 @@ class Incident:
             process_definition_id=data['processDefinitionId'],
             process_instance_id=data['processInstanceId'],
             execution_id=data['executionId'],
-            incident_type=data['incidentType'],
+            incident_type=IncidentType(data['incidentType']),
             activity_id=data['activityId'],
             cause_incident_id=data['causeIncidentId'],
             root_cause_incident_id=data['rootCauseIncidentId'],
