@@ -16,8 +16,8 @@ def test_get_params(engine_url):
     assert get_deployment.body_parameters() == {}
 
 
+@unittest.mock.patch('pycamunda.base.from_isoformat', unittest.mock.MagicMock())
 @unittest.mock.patch('requests.get')
-@unittest.mock.patch('pycamunda.base.from_isoformat')
 def test_get_calls_requests(mock, engine_url):
     get_deployment = pycamunda.deployment.Get(url=engine_url, id_='anId')
     get_deployment()
