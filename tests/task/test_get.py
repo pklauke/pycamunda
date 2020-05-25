@@ -44,7 +44,7 @@ def test_get_raises_for_status(mock, engine_url):
 
 @unittest.mock.patch('requests.get', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base.from_isoformat')
-def test_get_returns_group(engine_url):
+def test_get_returns_task(engine_url):
     get_task = pycamunda.task.Get(url=engine_url, id_='anId')
     task = get_task()
 
