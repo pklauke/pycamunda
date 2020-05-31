@@ -154,3 +154,37 @@ def getlist_output():
         'firstResult': 1,
         'maxResults': 10
     }
+
+
+@pytest.fixture
+def update_input():
+    return {
+        'name': 'aName',
+        'description': 'aDescription',
+        'assignee': 'anAssignee',
+        'owner': 'anOwner',
+        'delegation_state': 'PENDING',
+        'due': SOME_DAY,
+        'follow_up': SOME_DAY,
+        'priority': 10,
+        'parent_task_id': 'aTaskId',
+        'case_instance_id': 'anInstanceId',
+        'tenant_id': 'aTenantId'
+    }
+
+
+@pytest.fixture
+def update_output():
+    return {
+        'name': 'aName',
+        'description': 'aDescription',
+        'assignee': 'anAssignee',
+        'owner': 'anOwner',
+        'delegationState': 'PENDING',
+        'due': '2000-01-01T01:01:01.000+0000',
+        'followUp': '2000-01-01T01:01:01.000+0000',
+        'priority': 10,
+        'parentTaskId': 'aTaskId',
+        'caseInstanceId': 'anInstanceId',
+        'tenantId': 'aTenantId'
+    }
