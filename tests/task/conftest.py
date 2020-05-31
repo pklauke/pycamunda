@@ -157,7 +157,7 @@ def getlist_output():
 
 
 @pytest.fixture
-def update_input():
+def task_input():
     return {
         'name': 'aName',
         'description': 'aDescription',
@@ -174,7 +174,7 @@ def update_input():
 
 
 @pytest.fixture
-def update_output():
+def task_output():
     return {
         'name': 'aName',
         'description': 'aDescription',
