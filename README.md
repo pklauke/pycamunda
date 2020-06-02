@@ -20,7 +20,7 @@ PyCamunda supports following Camunda REST api resources:
 ## Usage 
 For each Camunda REST api endpoint PyCamunda offers classes for sending requests. Responses are serialized and returned in dataclasses. Each PyCamunda module represents one Camunda REST api resource. 
 
-### Starting a process instance
+### Example 1: Starting a process instance
 
 The `processdef` module provides classes to interact with process definitions. To start an instance of a definition the class `StartInstance` is used. The process definition is specified by the `key` argument using the process definition key. Alternatively the `id_` argument could be used for the process definition id. To start the process instance with initial variables they are added using the respective method. Finally, the process instance is started by calling the object. 
 
@@ -36,7 +36,7 @@ process_instance = start_instance()
 ```
 
 
-### Fetching and completing external service tasks
+### Example 2: Fetching and completing external service tasks
 
 The `externaltask` module provides classes to interact with external service tasks. Those can be fetched using the class `FetchAndLock`. Service task topics that want to be fetched are added to the object. If variables of the process instance are needed to complete the task, those can be requested from the process instance when adding the topic.
 
