@@ -43,7 +43,7 @@ def test_getlist_raises_for_status(mock, engine_url):
 
 @unittest.mock.patch('requests.get', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.filter.Filter', unittest.mock.MagicMock())
-def test_getlist_returns_incidents_tuple(engine_url):
+def test_getlist_returns_filter_tuple(engine_url):
     get_incidents = pycamunda.filter.GetList(url=engine_url)
     filters = get_incidents()
 
