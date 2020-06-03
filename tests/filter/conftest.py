@@ -45,3 +45,24 @@ def getlist_output():
         'maxResults': 10,
         'resourceType': 'Task'
     }
+
+
+@pytest.fixture
+def count_input():
+    return {
+        'id_': 'anId',
+        'name': 'aName',
+        'name_like': 'aNam',
+        'owner': 'anOwner',
+    }
+
+
+@pytest.fixture
+def count_output():
+    return {
+        'filterId': 'anId',
+        'name': 'aName',
+        'nameLike': 'aNam',
+        'owner': 'anOwner',
+        'resourceType': 'Task'
+    }
