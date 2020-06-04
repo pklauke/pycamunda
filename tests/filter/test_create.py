@@ -14,25 +14,7 @@ def test_create_params(engine_url):
     assert create_filter.url == engine_url + '/filter/create'
     assert create_filter.query_parameters() == {}
     assert create_filter.body_parameters() == {
-        'name': 'aName', 'owner': 'anOwner', 'properties': {}, 'query': {}, 'resourceType': 'Task'
-    }
-
-
-def test_create_params_query(engine_url):
-    create_filter = pycamunda.filter.Create(url=engine_url, name='aName', owner='anOwner')
-    create_filter.add_query(aVar='aVal')
-
-    assert create_filter.body_parameters()['query'] == {
-        'aVar': 'aVal'
-    }
-
-
-def test_create_params_properties(engine_url):
-    create_filter = pycamunda.filter.Create(url=engine_url, name='aName', owner='anOwner')
-    create_filter.add_properties(aVar='aVal')
-
-    assert create_filter.body_parameters()['properties'] == {
-        'aVar': 'aVal'
+        'name': 'aName', 'owner': 'anOwner', 'query': {}, 'resourceType': 'Task'
     }
 
 
