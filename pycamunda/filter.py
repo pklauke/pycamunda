@@ -213,9 +213,105 @@ class Get(pycamunda.base.CamundaRequest):
         return Filter.load(response.json())
 
 
-class CriteriaMixin:
+class _Criteria(pycamunda.request.Request):
 
-    query = BodyParameterContainer('query')
+    process_instance_id = BodyParameter('processInstanceId')
+    process_instance_business_key = BodyParameter('processInstanceBusinessKey')
+    process_instance_business_key_like = BodyParameter('processInstanceBusinessKeyLike')
+    process_definition_id = BodyParameter('processDefinitionId')
+    process_definition_key = BodyParameter('processDefinitionKey')
+    process_definition_key_in = BodyParameter('processDefinitionKeyIn')
+    process_definition_name = BodyParameter('processDefinitionName')
+    process_definition_name_like = BodyParameter('processDefinitionNameLike')
+    case_instance_id = BodyParameter('caseInstanceId')
+    case_instance_business_key = BodyParameter('caseInstanceBusinessKey')
+    case_instance_business_key_like = BodyParameter('caseInstanceBusinessKeyLike')
+    case_definition_id = BodyParameter('caseDefinitionId')
+    case_definition_key = BodyParameter('caseDefinitionKey')
+    case_definition_name = BodyParameter('caseDefinitionName')
+    case_definition_name_like = BodyParameter('caseDefinitionNameLike')
+    active = BodyParameter('active')
+    activity_instance_id_in = BodyParameter('activityInstanceIdIn')
+    execution_id = BodyParameter('executionId')
+    assignee = BodyParameter('assignee')
+    assignee_in = BodyParameter('assigneeIn')
+    assignee_like = BodyParameter('assigneeLike')
+    task_owner = BodyParameter('owner')
+    candidate_group = BodyParameter('candidateGroup')
+    candidate_groups = BodyParameter('candidateGroups')
+    candidate_user = BodyParameter('candidateUser')
+    involved_user = BodyParameter('involvedUser')
+    unassigned = BodyParameter('unassigned')
+    delegation_state = BodyParameter('delegationState')
+    task_definition_key = BodyParameter('taskDefinitionKey')
+    task_definition_key_in = BodyParameter('taskDefinitionKeyIn')
+    task_definition_key_like = BodyParameter('taskDefinitionKeyLike')
+    task_name = BodyParameter('name')
+    task_name_like = BodyParameter('nameLike')
+    description = BodyParameter('description')
+    description_like = BodyParameter('descriptionLike')
+    priority = BodyParameter('priority')
+    max_priority = BodyParameter('maxPriority')
+    min_priority = BodyParameter('minPriority')
+    tenant_id_in = BodyParameter('tenantIdIn')
+    without_tenant_id = BodyParameter('withoutTenantId')
+    created_before = BodyParameter('createdBefore')
+    created_after = BodyParameter('createdAfter')
+    due_before = BodyParameter('dueBefore')
+    due_after = BodyParameter('dueAfter')
+    follow_up_after = BodyParameter('followUpAfter')
+    follow_up_before = BodyParameter('followUpBefore')
+    follow_up_before_or_not_existent = BodyParameter('followUpBeforeOrNotExistent')
+    query = BodyParameterContainer(
+        'query',
+        process_instance_id,
+        process_instance_business_key,
+        process_instance_business_key_like,
+        process_definition_id,
+        process_definition_key,
+        process_definition_key_in,
+        process_definition_name,
+        process_definition_name_like,
+        case_instance_id,
+        case_instance_business_key,
+        case_instance_business_key_like,
+        case_definition_id,
+        case_definition_key,
+        case_definition_name,
+        case_definition_name_like,
+        active,
+        activity_instance_id_in,
+        execution_id,
+        assignee,
+        assignee_in,
+        assignee_like,
+        task_owner,
+        candidate_group,
+        candidate_groups,
+        candidate_user,
+        involved_user,
+        unassigned,
+        delegation_state,
+        task_definition_key,
+        task_definition_key_in,
+        task_definition_key_like,
+        task_name,
+        task_name_like,
+        description,
+        description_like,
+        priority,
+        max_priority,
+        min_priority,
+        tenant_id_in,
+        without_tenant_id,
+        created_before,
+        created_after,
+        due_before,
+        due_after,
+        follow_up_after,
+        follow_up_before,
+        follow_up_before_or_not_existent
+    )
 
     def add_process_instance_criteria(
         self,
@@ -230,11 +326,11 @@ class CriteriaMixin:
         :param business_key_like: Filter by a substring of the business key of the filter.
         """
         if id_ is not Ellipsis:
-            self.query.parameters['processInstanceId'] = id_
+            self.process_instance_id = id_
         if business_key is not Ellipsis:
-            self.query.parameters['processInstanceBusinessKey'] = business_key
+            self.process_instance_business_key = business_key
         if business_key_like is not Ellipsis:
-            self.query.parameters['processInstanceBusinessKeyLike'] = business_key_like
+            self.process_instance_business_key_like = business_key_like
 
         return self
 
@@ -255,15 +351,15 @@ class CriteriaMixin:
         :param name_like: Filter by a substring of the name of the process definition.
         """
         if id_ is not Ellipsis:
-            self.query.parameters['processDefinitionId'] = id_
+            self.process_definition_id = id_
         if key is not Ellipsis:
-            self.query.parameters['processDefinitionKey'] = key
+            self.process_definition_key = key
         if key_in is not Ellipsis:
-            self.query.parameters['processDefinitionKeyIn'] = key_in
+            self.process_definition_key_in = key_in
         if name is not Ellipsis:
-            self.query.parameters['processDefinitionName'] = name
+            self.process_definition_name = name
         if name_like is not Ellipsis:
-            self.query.parameters['processDefinitionNameLike'] = name_like
+            self.process_definition_name_like = name_like
 
         return self
 
@@ -280,11 +376,11 @@ class CriteriaMixin:
         :param business_key_like: Filter by a substring of the business key of the case instance.
         """
         if id_ is not Ellipsis:
-            self.query.parameters['caseInstanceId'] = id_
+            self.case_instance_id = id_
         if business_key is not Ellipsis:
-            self.query.parameters['caseInstanceBusinessKey'] = business_key
+            self.case_instance_business_key = business_key
         if business_key_like is not Ellipsis:
-            self.query.parameters['caseInstanceBusinessKeyLike'] = business_key_like
+            self.case_instance_business_key_like = business_key_like
 
         return self
 
@@ -303,13 +399,13 @@ class CriteriaMixin:
         :param name_like: Filter by a substring of the name of the case definition.
         """
         if id_ is not Ellipsis:
-            self.query.parameters['caseDefinitionId'] = id_
+            self.case_definition_id = id_
         if key is not Ellipsis:
-            self.query.parameters['caseDefinitionKey'] = key
+            self.case_definition_key = key
         if name is not Ellipsis:
-            self.query.parameters['caseDefinitionName'] = name
+            self.case_definition_name = name
         if name_like is not Ellipsis:
-            self.query.parameters['caseDefinitionNameLike'] = name_like
+            self.case_definition_name_like = name_like
 
     def add_other_criteria(
         self,
@@ -324,18 +420,18 @@ class CriteriaMixin:
         :param execution_id: Filter by the execution id.
         """
         if active is not Ellipsis:
-            self.query.parameters['active'] = active or None
+            self.active = active or None
         if activity_instance_id_in is not Ellipsis:
-            self.query.parameters['activityInstanceIdIn'] = activity_instance_id_in
+            self.activity_instance_id_in = activity_instance_id_in
         if execution_id is not Ellipsis:
-            self.query.parameters['executionId'] = execution_id
+            self.execution_id = execution_id
 
     def add_user_criteria(
         self,
         assignee: str = ...,
         assignee_in: typing.Iterable[str] = ...,
         assignee_like: str = ...,
-        owner: str = ...,
+        task_owner: str = ...,
         candidate_group: str = ...,
         candidate_groups: typing.Iterable[str] = ...,
         candidate_user: str = ...,
@@ -348,7 +444,7 @@ class CriteriaMixin:
         :param assignee: Filter by the assignee of the task.
         :param assignee_in: Filter whether assignee of the task is one of multiple ones.
         :param assignee_like: Filter by a substring of the assignee of the task.
-        :param owner: Filter by the owner of the task.
+        :param task_owner: Filter by the owner of the task.
         :param candidate_group: Filter by the candidate group of the task.
         :param candidate_groups: Filter whether the candidate group of the task is one of multiple
                                  ones.
@@ -364,29 +460,27 @@ class CriteriaMixin:
             )
 
         if assignee is not Ellipsis:
-            self.query.parameters['assignee'] = assignee
+            self.assignee = assignee
         if assignee_in is not Ellipsis:
-            self.query.parameters['assigneeIn'] = assignee_in
+            self.assignee_in = assignee_in
         if assignee_like is not Ellipsis:
-            self.query.parameters['assigneeLike'] = assignee_like
-        if owner is not Ellipsis:
-            self.query.parameters['owner'] = owner
+            self.assignee_like = assignee_like
+        if task_owner is not Ellipsis:
+            self.task_owner = task_owner
         if candidate_group is not Ellipsis:
-            self.query.parameters['candidateGroup'] = candidate_group
+            self.candidate_group = candidate_group
         if candidate_groups is not Ellipsis:
-            self.query.parameters['candidateGroups'] = candidate_groups
+            self.candidate_groups = candidate_groups
         if candidate_user is not Ellipsis:
-            self.query.parameters['candidateUser'] = candidate_user
+            self.candidate_user = candidate_user
         if involved_user is not Ellipsis:
-            self.query.parameters['involvedUser'] = involved_user
+            self.involved_user = involved_user
         if unassigned is not Ellipsis:
-            self.query.parameters['unassigned'] = unassigned
+            self.unassigned = unassigned
         if delegation_state is not Ellipsis:
-            self.query.parameters['delegationState'] = None
+            self.delegation_state = None
             if delegation_state is not None:
-                self.query.parameters['delegationState'] = pycamunda.task.DelegationState(
-                    delegation_state
-                )
+                self.delegation_state = pycamunda.task.DelegationState(delegation_state)
         return self
 
     def add_task_criteria(
@@ -394,8 +488,8 @@ class CriteriaMixin:
         definition_key: str = ...,
         definition_key_in: typing.Iterable[str] = ...,
         definition_key_like: str = ...,
-        name: str = ...,
-        name_like: str = ...,
+        task_name: str = ...,
+        task_name_like: str = ...,
         description: str = ...,
         description_like: str = ...,
         priority: int = ...,
@@ -409,8 +503,8 @@ class CriteriaMixin:
         :param definition_key: Filter by the definition key of the task.
         :param definition_key_in: Filter whether definition key of the task is one of multiple ones.
         :param definition_key_like: Filter by a substring of the definition key of the task.
-        :param name: Filter by the name of the task.
-        :param name_like:  Filter by a substring of the name of the task.
+        :param task_name: Filter by the name of the task.
+        :param task_name_like:  Filter by a substring of the name of the task.
         :param description: Filter by the description of the task.
         :param description_like: Filter by a substring of the description of the task.
         :param priority: Filter by the priority of the task.
@@ -420,28 +514,28 @@ class CriteriaMixin:
         :param without_tenant_id: Filter only tasks without tenant id.
         """
         if definition_key is not Ellipsis:
-            self.query.parameters['taskDefinitionKey'] = definition_key
+            self.task_definition_key = definition_key
         if definition_key_in is not Ellipsis:
-            self.query.parameters['taskDefinitionKeyIn'] = definition_key_in
+            self.task_definition_key_in = definition_key_in
         if definition_key_like is not Ellipsis:
-            self.query.parameters['taskDefinitionKeyLike'] = definition_key_like
-        if name is not Ellipsis:
-            self.query.parameters['name'] = name
-        if name_like is not Ellipsis:
-            self.query.parameters['nameLike'] = name_like
+            self.task_definition_key_like = definition_key_like
+        if task_name is not Ellipsis:
+            self.task_name = task_name
+        if task_name_like is not Ellipsis:
+            self.task_name_like = task_name_like
         if description is not Ellipsis:
-            self.query.parameters['description'] = description
+            self.description = description
         if description_like is not Ellipsis:
-            self.query.parameters['descriptionLike'] = description_like
+            self.description_like = description_like
         if priority is not Ellipsis:
-            self.query.parameters['priority'] = priority
+            self.priority = priority
         if max_priority is not Ellipsis:
-            self.query.parameters['maxPriority'] = max_priority
+            self.max_priority = max_priority
         if min_priority is not Ellipsis:
-            self.query.parameters['minPriority'] = min_priority
+            self.min_priority = min_priority
         if tenant_id_in is not Ellipsis:
-            self.query.parameters['tenantIdIn'] = tenant_id_in
-        self.query.parameters['withoutTenantId'] = without_tenant_id
+            self.tenant_id_in = tenant_id_in
+        self.without_tenant_id = without_tenant_id
 
         return self
 
@@ -470,30 +564,31 @@ class CriteriaMixin:
                                                  or one that has already passed.
         """
         if created_before is not Ellipsis:
-            self.query.parameters['createdBefore'] = created_before
+            self.created_before = created_before
         if created_after is not Ellipsis:
-            self.query.parameters['createdAfter'] = created_after
+            self.created_after = created_after
         if due_before is not Ellipsis:
-            self.query.parameters['dueBefore'] = due_before
+            self.due_before = due_before
         if due_after is not Ellipsis:
-            self.query.parameters['dueAfter'] = due_after
+            self.due_after = due_after
         if follow_up_after is not Ellipsis:
-            self.query.parameters['followUpAfter'] = follow_up_after
+            self.follow_up_after = follow_up_after
         if follow_up_before is not Ellipsis:
-            self.query.parameters['followUpBefore'] = follow_up_before
+            self.follow_up_before = follow_up_before
         if follow_up_before_or_not_existent is not Ellipsis:
-            self.query.parameters['followUpBeforeOrNotExistent'] = follow_up_before_or_not_existent
+            self.follow_up_before_or_not_existent = follow_up_before_or_not_existent
 
         return self
 
+    def send(self):
+        return NotImplementedError
 
-class Create(pycamunda.base.CamundaRequest, CriteriaMixin):
+
+class Create(_Criteria):
 
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
     owner = BodyParameter('owner')
-    query = BodyParameterContainer('query')  # TODO test if this can be removed
-    properties = BodyParameterContainer('properties')
 
     def __init__(self, url: str, name: str, owner: str = None):
         """Create a new filter.
@@ -506,18 +601,6 @@ class Create(pycamunda.base.CamundaRequest, CriteriaMixin):
         self.resource_type = 'Task'
         self.name = name
         self.owner = owner
-
-    def add_query(self, **kwargs):
-        for key, value in kwargs.items():
-            self.query.parameters[key] = value
-
-        return self
-
-    def add_properties(self, **kwargs):
-        for key, value in kwargs.items():
-            self.properties.parameters[key] = value
-
-        return self
 
     def send(self) -> Filter:
         """Send the request"""
@@ -532,14 +615,12 @@ class Create(pycamunda.base.CamundaRequest, CriteriaMixin):
         return Filter.load(response.json())
 
 
-class Update(pycamunda.base.CamundaRequest, CriteriaMixin):
+class Update(_Criteria):
 
     id_ = PathParameter('id')
     resource_type = BodyParameter('resourceType')
     name = BodyParameter('name')
     owner = BodyParameter('owner')
-    query = BodyParameterContainer('query')  # TODO test if this can be removed
-    properties = BodyParameterContainer('properties')
 
     def __init__(self, url: str, id_: str, name: str = None, owner: str = None):
         """Update a filter.
@@ -554,12 +635,6 @@ class Update(pycamunda.base.CamundaRequest, CriteriaMixin):
         self.resource_type = 'Task'
         self.name = name
         self.owner = owner
-
-    def add_properties(self, **kwargs):
-        for key, value in kwargs.items():
-            self.properties.parameters[key] = value
-
-        return self
 
     def send(self) -> None:
         """Send the request"""
@@ -595,10 +670,9 @@ class Delete(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
 
-class Execute(pycamunda.base.CamundaRequest, CriteriaMixin):
+class Execute(_Criteria):
 
     id_ = PathParameter('id')
-    query = BodyParameterContainer('query')  # TODO test if this can be removed
 
     def __init__(self, url: str, id_: str, single_result: bool = False):
         """Execute a filter.
