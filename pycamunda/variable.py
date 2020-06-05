@@ -163,9 +163,9 @@ class GetList(pycamunda.base.CamundaRequest):
                          than, 'lteq' for less than or equal and 'like'.
         :param value: Value to filter for.
         """
-        self.variable_values.append((name, criteria, value))
+        self.variable_values.append((name, criteria, str(value)))
 
-    def add_equal_value_filter(self, name: str, value: str) -> None:
+    def add_equal_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values equal a provided value.
 
         :param name: Name of the variable.
@@ -173,7 +173,7 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='eq', value=value)
 
-    def add_not_equal_value_filter(self, name: str, value: str) -> None:
+    def add_not_equal_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values not equal a provided value.
 
         :param name: Name of the variable.
@@ -181,7 +181,7 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='neq', value=value)
 
-    def add_greater_than_value_filter(self, name: str, value: str) -> None:
+    def add_greater_than_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values greater than a provided value.
 
         :param name: Name of the variable.
@@ -189,7 +189,7 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='gt', value=value)
 
-    def add_greater_than_equal_value_filter(self, name: str, value: str) -> None:
+    def add_greater_than_equal_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values greater than or equal a provided
         value.
 
@@ -198,7 +198,7 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='gteq', value=value)
 
-    def add_less_than_value_filter(self, name: str, value: str) -> None:
+    def add_less_than_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values less than a provided value.
 
         :param name: Name of the variable.
@@ -206,7 +206,7 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='lt', value=value)
 
-    def add_less_than_equal_value_filter(self, name: str, value: str) -> None:
+    def add_less_than_equal_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values less than or equal a provided value.
 
         :param name: Name of the variable.
@@ -214,7 +214,7 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='lteq', value=value)
 
-    def add_like_value_filter(self, name: str, value: str) -> None:
+    def add_like_value_filter(self, name: str, value: typing.Any) -> None:
         """Add a filter to include only variables with values like a provided value.
 
         :param name: Name of the variable.
@@ -222,12 +222,19 @@ class GetList(pycamunda.base.CamundaRequest):
         """
         self._add_value_filter(name=name, criteria='like', value=value)
 
+    def query_parameters(self, apply: typing.Callable = ...):
+        params = super().query_parameters(apply=apply)
+        if params['variableValues']:
+            params['variableValues'] = ','.join(
+                ('_'.join(var_val)) for var_val in params['variableValues']
+            )
+        else:
+            del params['variableValues']
+        return params
+
     def send(self) -> typing.Tuple[VariableInstance]:
         """Send the request."""
         params = self.query_parameters()
-        params['variableValues'] = ','.join(
-            ('_'.join(var_val)) for var_val in params['variableValues']
-        )
         try:
             response = requests.get(self.url, params=params)
         except requests.exceptions.RequestException:
