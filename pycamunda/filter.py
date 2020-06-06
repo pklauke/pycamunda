@@ -127,7 +127,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[Filter]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Filter]:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -171,7 +171,7 @@ class Count(pycamunda.base.CamundaRequest):
         self.name_like = name_like
         self.owner = owner
 
-    def send(self) -> int:
+    def __call__(self, *args, **kwargs) -> int:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -200,7 +200,7 @@ class Get(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.item_count = item_count
 
-    def send(self) -> Filter:
+    def __call__(self, *args, **kwargs) -> Filter:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -580,7 +580,7 @@ class _Criteria(pycamunda.request.Request):
 
         return self
 
-    def send(self):
+    def __call__(self, *args, **kwargs):
         return NotImplementedError
 
 
@@ -602,7 +602,7 @@ class Create(_Criteria):
         self.name = name
         self.owner = owner
 
-    def send(self) -> Filter:
+    def __call__(self, *args, **kwargs) -> Filter:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -636,7 +636,7 @@ class Update(_Criteria):
         self.name = name
         self.owner = owner
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -660,7 +660,7 @@ class Delete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self):
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         try:
             response = requests.delete(self.url)
@@ -684,7 +684,9 @@ class Execute(_Criteria):
         self.id_ = id_
         self.single_result = single_result
 
-    def send(self) -> typing.Union[pycamunda.task.Task, typing.Tuple[pycamunda.task.Task]]:
+    def __call__(
+        self, *args, **kwargs
+    ) -> typing.Union[pycamunda.task.Task, typing.Tuple[pycamunda.task.Task]]:
         """Send the request."""
         params = self.body_parameters()['query']
         url = self.url + ('/singleResult' if self.single_result else '/list')
@@ -716,7 +718,7 @@ class ExecuteCount(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/count')
         self.id_ = id_
 
-    def send(self) -> int:
+    def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
         try:
             response = requests.get(self.url)

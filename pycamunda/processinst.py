@@ -86,7 +86,7 @@ class Delete(pycamunda.base.CamundaRequest):
         self.skip_subprocesses = skip_subprocesses
         self.fail_if_not_exists = fail_if_not_exists
 
-    def send(self):
+    def __call__(self, *args, **kwargs):
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -110,7 +110,7 @@ class GetActivityInstance(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/activity-instances')
         self.id_ = id_
 
-    def send(self) -> pycamunda.activityinst.ActivityInstance:
+    def __call__(self, *args, **kwargs) -> pycamunda.activityinst.ActivityInstance:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -291,7 +291,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[ProcessInstance]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessInstance]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -317,7 +317,7 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> ProcessInstance:
+    def __call__(self, *args, **kwargs) -> ProcessInstance:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -555,7 +555,7 @@ class Modify(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> typing.Optional[pycamunda.batch.Batch]:
+    def __call__(self, *args, **kwargs) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -585,7 +585,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.suspended = suspended
 
-    def send(self):
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:

@@ -130,11 +130,8 @@ class Request(metaclass=RequestMeta):
                     missing_params[attribute.key] = ''
         return self._url.format(**{**params, **missing_params}).rstrip('/')
 
-    def __call__(self, *args, **kwargs):
-        return self.send(*args, **kwargs)
-
     @abc.abstractmethod
-    def send(self):
+    def __call__(self, *args, **kwargs):
         return NotImplementedError
 
     def query_parameters(self, apply: typing.Callable = None) -> typing.Dict[str, typing.Any]:

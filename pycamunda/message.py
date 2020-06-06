@@ -173,7 +173,7 @@ class _Correlate(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> typing.Tuple[MessageCorrelationResult]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[MessageCorrelationResult]:
         """Send the request."""
         params = self.body_parameters()
         try:

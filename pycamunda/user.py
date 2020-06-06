@@ -47,7 +47,7 @@ class Delete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         try:
             response = requests.delete(self.url)
@@ -106,7 +106,7 @@ class Count(pycamunda.base.CamundaRequest):
         self.member_of_group = member_of_group
         self.member_of_tenant = member_of_tenant
 
-    def send(self) -> int:
+    def __call__(self, *args, **kwargs) -> int:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -197,7 +197,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[User]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[User]:
         """Send the request"""
         params = self.query_parameters()
         try:
@@ -223,7 +223,7 @@ class GetProfile(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/profile')
         self.id_ = id_
 
-    def send(self) -> User:
+    def __call__(self, *args, **kwargs) -> User:
         """Send the request"""
         try:
             response = requests.get(self.url)
@@ -248,7 +248,7 @@ class Options(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> pycamunda.resource.ResourceOptions:
+    def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request"""
         try:
             response = requests.options(self.url)
@@ -296,7 +296,7 @@ class Create(pycamunda.base.CamundaRequest):
         self.email = email
         self.password = password
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -327,7 +327,7 @@ class UpdateCredentials(pycamunda.base.CamundaRequest):
         self.password = password
         self.authenticated_user_password = authenticated_user_password
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -371,7 +371,7 @@ class UpdateProfile(pycamunda.base.CamundaRequest):
         self.last_name = last_name
         self.email = email
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -399,7 +399,7 @@ class Unlock(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/unlock')
         self.id_ = id_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         try:
             response = requests.post(self.url)

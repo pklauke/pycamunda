@@ -232,7 +232,7 @@ class GetList(pycamunda.base.CamundaRequest):
             del params['variableValues']
         return params
 
-    def send(self) -> typing.Tuple[VariableInstance]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[VariableInstance]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -262,7 +262,7 @@ class Get(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.deserialize_value = deserialize_value
 
-    def send(self) -> VariableInstance:
+    def __call__(self, *args, **kwargs) -> VariableInstance:
         """Send the request."""
         params = self.query_parameters()
         try:

@@ -137,7 +137,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[Deployment]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Deployment]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -163,7 +163,7 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self):
+    def __call__(self, *args, **kwargs) -> Deployment:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -220,7 +220,7 @@ class Create(pycamunda.base.CamundaRequest):
         """
         self.files.append(file)
 
-    def send(self):
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         assert bool(self.files), 'Cannot create deployment without resources.'
         params = self.body_parameters()
@@ -249,7 +249,7 @@ class GetResources(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/resources')
         self.id_ = id_
 
-    def send(self) -> typing.Tuple[Resource]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Resource]:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -283,7 +283,7 @@ class GetResource(pycamunda.base.CamundaRequest):
     def url(self):
         return super().url + ('/data' if self.binary else '')
 
-    def send(self) -> typing.Union[Resource, typing.ByteString]:
+    def __call__(self, *args, **kwargs) -> typing.Union[Resource, typing.ByteString]:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -326,7 +326,7 @@ class Delete(pycamunda.base.CamundaRequest):
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         try:
             response = requests.delete(self.url)

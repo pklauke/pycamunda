@@ -99,7 +99,7 @@ class Get(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.request_error_details = request_error_details
 
-    def send(self) -> ExternalTask:
+    def __call__(self, *args, **kwargs) -> ExternalTask:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -252,7 +252,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.max_results = max_results
         self.request_error_details = request_error_details
 
-    def send(self) -> typing.Tuple[ExternalTask]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -367,7 +367,7 @@ class Count(GetList):
         )
         self._url += '/count'
 
-    def send(self) -> int:
+    def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
         params = self.query_parameters()
         for key, value in params.items():
@@ -432,7 +432,7 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> typing.Tuple[ExternalTask]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -494,7 +494,7 @@ class Complete(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -550,7 +550,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -603,7 +603,7 @@ class HandleFailure(pycamunda.base.CamundaRequest):
         self.retries = retries
         self.retry_timeout = retry_timeout
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -627,7 +627,7 @@ class Unlock(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/unlock')
         self.id_ = id_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         try:
             response = requests.post(self.url)
@@ -657,7 +657,7 @@ class ExtendLock(pycamunda.base.CamundaRequest):
         self.new_duration = new_duration
         self.worker_id = worker_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -684,7 +684,7 @@ class SetPriority(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.priority = priority
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -711,7 +711,7 @@ class SetRetries(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.retries = retries
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -746,7 +746,7 @@ class SetRetriesAsync(pycamunda.base.CamundaRequest):
         self.process_instance_query = None  # TODO
         self.historic_process_instance_query = None  # TODO
 
-    def send(self) -> pycamunda.batch.Batch:
+    def __call__(self, *args, **kwargs) -> pycamunda.batch.Batch:
         """Send the request"""
         params = self.body_parameters()
         try:
@@ -783,7 +783,7 @@ class SetRetriesSync(pycamunda.base.CamundaRequest):
         self.process_instance_query = None  # TODO
         self.historic_process_instance_query = None  # TODO
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         params = self.body_parameters()
         try:

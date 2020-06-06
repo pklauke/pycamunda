@@ -46,7 +46,7 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> Group:
+    def __call__(self, *args, **kwargs) -> Group:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -119,7 +119,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[Group]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Group]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -151,7 +151,7 @@ class Create(pycamunda.base.CamundaRequest):
         self.name = name
         self.type_ = type_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -181,7 +181,7 @@ class Update(pycamunda.base.CamundaRequest):
         self.name = name
         self.type_ = type_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         params['id'] = self.id_
@@ -206,7 +206,7 @@ class Options(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self):
+    def __call__(self, *args, **kwargs):
         """Send the request"""
         try:
             response = requests.options(self.url)
@@ -231,7 +231,7 @@ class Delete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         try:
             response = requests.delete(self.url)
@@ -257,7 +257,7 @@ class MemberCreate(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.user_id = user_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         try:
             response = requests.put(self.url)
@@ -283,7 +283,7 @@ class MemberDelete(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.user_id = user_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         try:
             response = requests.delete(self.url)
@@ -307,7 +307,7 @@ class MemberOptions(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS)
         self.id_ = id_
 
-    def send(self) -> pycamunda.resource.ResourceOptions:
+    def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request."""
         try:
             response = requests.options(self.url)

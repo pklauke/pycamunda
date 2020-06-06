@@ -89,7 +89,7 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self):
+    def __call__(self, *args, **kwargs) -> Task:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -430,7 +430,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[Task]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Task]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -461,7 +461,7 @@ class Claim(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.user_id = user_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -485,7 +485,7 @@ class Unclaim(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/unclaim')
         self.id_ = id_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -526,7 +526,9 @@ class Complete(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
+    def __call__(
+        self, *args, **kwargs
+    ) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -573,7 +575,7 @@ class Resolve(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -600,7 +602,7 @@ class SetAssignee(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.user_id = user_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -627,7 +629,7 @@ class Delegate(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.user_id = user_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -701,7 +703,7 @@ class Create(pycamunda.base.CamundaRequest):
         self.case_instance_id = case_instance_id
         self.tenant_id = tenant_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -776,7 +778,7 @@ class Update(pycamunda.base.CamundaRequest):
         self.case_instance_id = case_instance_id
         self.tenant_id = tenant_id
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:

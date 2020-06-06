@@ -16,7 +16,7 @@ def value_is_true(self, obj: typing.Any, obj_type: typing.Any) -> bool:
 class CamundaRequest(pycamunda.request.Request):
 
     @abc.abstractmethod
-    def send(self):
+    def __call__(self, *args, **kwargs):
         return NotImplementedError
 
     def body_parameters(self, apply: typing.Callable = ...):

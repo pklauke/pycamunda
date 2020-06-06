@@ -151,7 +151,7 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self) -> typing.Tuple[ActivityStats]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[ActivityStats]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -190,7 +190,7 @@ class GetProcessDiagram(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self):
+    def __call__(self, *args, **kwargs):
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -349,7 +349,7 @@ class Count(pycamunda.base.CamundaRequest):
         self.not_startable_in_tasklist = not_startable_in_tasklist
         self.startable_permission_check = startable_permission_check
 
-    def send(self) -> int:
+    def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -543,7 +543,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
 
-    def send(self) -> typing.Tuple[ProcessDefinition]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessDefinition]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -593,7 +593,7 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         if incidents_for_type is not None:
             self.incidents_for_type = pycamunda.incident.IncidentType(incidents_for_type)
 
-    def send(self) -> typing.Tuple[ProcessInstanceStats]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessInstanceStats]:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -633,7 +633,7 @@ class GetXML(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self) -> str:
+    def __call__(self, *args, **kwargs) -> str:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -673,7 +673,7 @@ class Get(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self) -> ProcessDefinition:
+    def __call__(self, *args, **kwargs) -> ProcessDefinition:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -854,7 +854,7 @@ class StartInstance(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> pycamunda.processinst.ProcessInstance:
+    def __call__(self, *args, **kwargs) -> pycamunda.processinst.ProcessInstance:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -913,7 +913,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -1027,7 +1027,7 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
         try:
@@ -1084,7 +1084,7 @@ class Delete(pycamunda.base.CamundaRequest):
             return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
         return self._url.format(path=f'key/{self.key}')
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.query_parameters()
         try:
@@ -1205,7 +1205,7 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
 
         return self
 
-    def send(self) -> typing.Optional[pycamunda.batch.Batch]:
+    def __call__(self, *args, **kwargs) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
         params = self.body_parameters()
         try:

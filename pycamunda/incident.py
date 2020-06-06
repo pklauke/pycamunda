@@ -88,7 +88,7 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> Incident:
+    def __call__(self, *args, **kwargs) -> Incident:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -198,7 +198,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.sort_by = sort_by
         self.ascending = ascending
 
-    def send(self) -> typing.Tuple[Incident]:
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Incident]:
         """Send the request."""
         try:
             response = requests.get(self.url)
@@ -223,7 +223,7 @@ class Resolve(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
 
-    def send(self) -> None:
+    def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         try:
             response = requests.delete(self.url)
