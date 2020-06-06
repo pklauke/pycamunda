@@ -16,6 +16,7 @@ PyCamunda supports following Camunda REST api resources:
   * Signal 
   * Task (excluding subresources)
   * User
+  * Variable Instance
 
 ## Usage 
 For each Camunda REST api endpoint PyCamunda offers classes for sending requests. Responses are serialized and returned in dataclasses. Each PyCamunda module represents one Camunda REST api resource. 
