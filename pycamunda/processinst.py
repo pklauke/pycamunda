@@ -200,7 +200,7 @@ class GetList(pycamunda.base.CamundaRequest):
             root_process_instances: bool = None,
             leaf_process_instances: bool = None,
             process_definition_without_tenant_id_in: bool = None,
-            variables = None,  # TODO add annotation
+            variables=None,  # TODO add annotation
             variable_names_ignore_case: bool = None,
             variable_values_ignore_case: bool = None,
             sort_by: str = None,

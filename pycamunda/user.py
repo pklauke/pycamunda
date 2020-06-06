@@ -314,7 +314,7 @@ class UpdateCredentials(pycamunda.base.CamundaRequest):
     authenticated_user_password = BodyParameter('authenticatedUserPassword')
 
     def __init__(self, url: str, id_: str, password: str, authenticated_user_password: str):
-        """Updates a user's credentials (password).
+        """Update a user's credentials (password).
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user.
@@ -355,7 +355,7 @@ class UpdateProfile(pycamunda.base.CamundaRequest):
         last_name: str = None,
         email: str = None
     ):
-        """Updates the profile information of an already existing user.
+        """Update the profile information of an already existing user.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user.

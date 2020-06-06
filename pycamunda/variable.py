@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This module provides utilities for the variable formats Camunda uses."""
+"""This module provides access to the variable instance REST api of Camunda"""
 
 from __future__ import annotations
 import dataclasses
