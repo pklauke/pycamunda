@@ -233,7 +233,7 @@ class GetList(pycamunda.base.CamundaRequest):
         candidate_user: str = None,
         include_assigned_tasks: bool = None,
         involved_user: str = None,
-        assigned: bool = None,  # TODO check if both assigned and unassigned are needed
+        assigned: bool = None,
         unassigned: bool = None,
         task_definition_key: str = None,
         task_definition_key_in: typing.Iterable[str] = None,

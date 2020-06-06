@@ -7,7 +7,7 @@ class PyCamundaException(Exception):
 
 
 class NoSuccess(PyCamundaException):
-    """Exception that is raised when the tried is not successful."""
+    """Exception that is raised when the tried action is not successful."""
     http_code = None
 
 
