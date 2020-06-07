@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.com/pklauke/pycamunda.svg?branch=master)](https://travis-ci.com/pklauke/pycamunda)
 [![codecov](https://codecov.io/gh/pklauke/pycamunda/branch/master/graph/badge.svg)](https://codecov.io/gh/pklauke/pycamunda)
+[![Documentation Status](https://readthedocs.org/projects/pycamunda/badge/?version=latest)](https://pycamunda.readthedocs.io/en/latest/?badge=latest)
 
 # PyCamunda
 A high-level framework for communicating with the workflow and decision automation engine Camunda. 
@@ -18,45 +19,14 @@ PyCamunda supports following Camunda REST api resources:
   * User
   * Variable Instance
 
-## Usage 
-For each Camunda REST api endpoint PyCamunda offers classes for sending requests. Responses are serialized and returned in dataclasses. Each PyCamunda module represents one Camunda REST api resource. 
+## Installation
 
-### Example 1: Starting a process instance
+PyCamunda can be installed from the offical <a href="https://pypi.org">Python Package Index</a>.
 
-The `processdef` module provides classes to interact with process definitions. To start an instance of a definition the class `StartInstance` is used. The process definition is specified by the `key` argument using the process definition key. Alternatively the `id_` argument could be used for the process definition id. To start the process instance with initial variables they are added using the respective method. Finally, the process instance is started by calling the object. 
-
-```python
-import pycamunda.processdef
-
-
-url = 'http://localhost/engine-rest'
-
-start_instance = pycamunda.processdef.StartInstance(url=url, key='MyProcessDefinition')
-start_instance.add_variable(name='InitVariable', value=1)
-process_instance = start_instance()
+```
+$ pip install pycamunda
 ```
 
+## Documentation
 
-### Example 2: Fetching and completing external service tasks
-
-The `externaltask` module provides classes to interact with external service tasks. Those can be fetched using the class `FetchAndLock`. Service task topics that want to be fetched are added to the object. If variables of the process instance are needed to complete the task, those can be requested from the process instance when adding the topic.
-
-To complete a task the class `Complete` is used. Variables that want to be added to the process instance are added to that class.
-
-```python
-import pycamunda.externaltask
-
-url = 'http://localhost/engine-rest'
-worker_id = 'my-worker'
-variables = ['InitVariable']  # variables of the process instance
-
-
-fetch_and_lock = pycamunda.externaltask.FetchAndLock(url=url, worker_id=worker_id, max_tasks=10)
-fetch_and_lock.add_topic(name='MyServiceTaskTopic', lock_duration=10000, variables=variables)
-tasks = fetch_and_lock()
-
-for task in tasks:
-    complete = pycamunda.externaltask.Complete(url=url, id_=task.id_, worker_id=worker_id)
-    complete.add_variable(name='ServiceTaskVariable', value=2)  # Send this variable to the instance
-    complete()
-```
+The latest documentation can be found <a href="https://pycamunda.readthedocs.io/en/latest/index.html">here</a>.
