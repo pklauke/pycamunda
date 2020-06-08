@@ -411,7 +411,7 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
         lock_duration: int,
         variables: typing.Iterable[str] = None,
         deserialize_values: bool = False
-    ):
+    ) -> None:
         """Add a topic to this request.
 
         :param name: Name of the topic.
@@ -429,8 +429,6 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
         if variables is not None:
             topic['variables'] = variables
         self.topics.append(topic)
-
-        return self
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request"""
@@ -467,7 +465,7 @@ class Complete(pycamunda.base.CamundaRequest):
 
     def add_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
-    ):
+    ) -> None:
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
@@ -477,11 +475,9 @@ class Complete(pycamunda.base.CamundaRequest):
         """
         self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
 
-        return self
-
     def add_local_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
-    ):
+    ) -> None:
         """Add a local variable to send to Camunda. Local variables are set only in the scope of an
         external task.
 
@@ -491,8 +487,6 @@ class Complete(pycamunda.base.CamundaRequest):
         :param value_info: Additional information regarding the value type.
         """
         self.local_variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
-
-        return self
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
@@ -538,7 +532,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
 
     def add_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
-    ):
+    ) -> None:
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
@@ -547,8 +541,6 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
         :param value_info: Additional information regarding the value type.
         """
         self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
-
-        return self
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""

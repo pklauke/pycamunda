@@ -514,7 +514,9 @@ class Complete(pycamunda.base.CamundaRequest):
 
         self.variables = {}
 
-    def add_variable(self, name: str, value: typing.Any, type_: str = None, value_info: str = None):
+    def add_variable(
+        self, name: str, value: typing.Any, type_: str = None, value_info: str = None
+    ) -> None:
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
@@ -523,8 +525,6 @@ class Complete(pycamunda.base.CamundaRequest):
         :param value_info: Additional information regarding the value type.
         """
         self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
-
-        return self
 
     def __call__(
         self, *args, **kwargs
@@ -563,7 +563,9 @@ class Resolve(pycamunda.base.CamundaRequest):
 
         self.variables = {}
 
-    def add_variable(self, name: str, value: typing.Any, type_: str=None, value_info: str=None):
+    def add_variable(
+        self, name: str, value: typing.Any, type_: str=None, value_info: str=None
+    ) -> None:
         """Add a variable to send to the Camunda process instance.
 
         :param name: Name of the variable.
@@ -572,8 +574,6 @@ class Resolve(pycamunda.base.CamundaRequest):
         :param value_info: Additional information regarding the value type.
         """
         self.variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
-
-        return self
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""

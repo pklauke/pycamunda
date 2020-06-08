@@ -318,7 +318,7 @@ class _Criteria(pycamunda.request.Request):
         id_: str = ...,
         business_key: str = ...,
         business_key_like: str = ...
-    ):
+    ) -> None:
         """Add criteria that filter by process instance.
 
         :param id_: Filter by the id of the process instance.
@@ -332,8 +332,6 @@ class _Criteria(pycamunda.request.Request):
         if business_key_like is not Ellipsis:
             self.process_instance_business_key_like = business_key_like
 
-        return self
-
     def add_process_definition_criteria(
         self,
         id_: str = ...,
@@ -341,7 +339,7 @@ class _Criteria(pycamunda.request.Request):
         key_in: typing.Iterable[str] = ...,
         name: str = ...,
         name_like: str = ...
-    ):
+    ) -> None:
         """Add criteria that filter by the process definition.
 
         :param id_: Filter by the id of the process definition.
@@ -360,8 +358,6 @@ class _Criteria(pycamunda.request.Request):
             self.process_definition_name = name
         if name_like is not Ellipsis:
             self.process_definition_name_like = name_like
-
-        return self
 
     def add_case_instance_criteria(
         self,
@@ -390,7 +386,7 @@ class _Criteria(pycamunda.request.Request):
         key: str = ...,
         name: str = ...,
         name_like: str = ...
-    ):
+    ) -> None:
         """Add criteria that filter by the case definition.
 
         :param id_: Filter by the id of the case definition.
@@ -412,7 +408,7 @@ class _Criteria(pycamunda.request.Request):
         active: bool = ...,
         activity_instance_id_in: typing.Iterable[str] = ...,
         execution_id: str = ...
-    ):
+    ) -> None:
         """Add criteria that filter by active status, activity instance or execution id.
 
         :param active: Filter only active tasks.
@@ -438,7 +434,7 @@ class _Criteria(pycamunda.request.Request):
         involved_user: str = ...,
         unassigned: bool = ...,
         delegation_state: typing.Union[str, pycamunda.task.DelegationState] = ...
-    ):
+    ) -> None:
         """Add criteria that filter by user.
 
         :param assignee: Filter by the assignee of the task.
@@ -481,7 +477,6 @@ class _Criteria(pycamunda.request.Request):
             self.delegation_state = None
             if delegation_state is not None:
                 self.delegation_state = pycamunda.task.DelegationState(delegation_state)
-        return self
 
     def add_task_criteria(
         self,
@@ -497,7 +492,7 @@ class _Criteria(pycamunda.request.Request):
         min_priority: int = ...,
         tenant_id_in: typing.Iterable[str] = ...,
         without_tenant_id: bool = False
-    ):
+    ) -> None:
         """Add criteria that filter by task.
 
         :param definition_key: Filter by the definition key of the task.
@@ -537,8 +532,6 @@ class _Criteria(pycamunda.request.Request):
             self.tenant_id_in = tenant_id_in
         self.without_tenant_id = without_tenant_id
 
-        return self
-
     def add_datetime_criteria(
         self,
         created_before: dt.datetime = ...,
@@ -548,7 +541,7 @@ class _Criteria(pycamunda.request.Request):
         follow_up_after: dt.datetime = ...,
         follow_up_before: dt.datetime = ...,
         follow_up_before_or_not_existent: dt.datetime = ...
-    ):
+    ) -> None:
         """Add criteria that filter by datetime. Datetime objects are expected to contain timezone
         information.
 
@@ -577,8 +570,6 @@ class _Criteria(pycamunda.request.Request):
             self.follow_up_before = follow_up_before
         if follow_up_before_or_not_existent is not Ellipsis:
             self.follow_up_before_or_not_existent = follow_up_before_or_not_existent
-
-        return self
 
     def __call__(self, *args, **kwargs):
         return NotImplementedError

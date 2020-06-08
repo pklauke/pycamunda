@@ -111,7 +111,7 @@ class _Correlate(pycamunda.base.CamundaRequest):
         self.process_variables = {}
         self.process_variables_local = {}
 
-    def add_correlation_key(self, name: str, value: typing.Any, type_: str = None):
+    def add_correlation_key(self, name: str, value: typing.Any, type_: str = None) -> None:
         """Add a correlation key. Used for correlation of process instances that wait for incoming
         messages. Only global process instance variables are considered.
 
@@ -121,9 +121,7 @@ class _Correlate(pycamunda.base.CamundaRequest):
         """
         self.correlation_keys[name] = {'value': value, 'type': type_}
 
-        return self
-
-    def add_local_correlation_key(self, name: str, value: typing.Any, type_: str = None):
+    def add_local_correlation_key(self, name: str, value: typing.Any, type_: str = None) -> None:
         """Add a correlation key. Used for correlation of process instances that wait for incoming
         messages. Only variables in the execution scope are considered.
 
@@ -133,15 +131,13 @@ class _Correlate(pycamunda.base.CamundaRequest):
         """
         self.local_correlation_keys[name] = {'value': value, 'type': type_}
 
-        return self
-
     def add_process_variable(
         self,
         name: str,
         value: typing.Any,
         type_: str = None,
         value_info: typing.Mapping = None
-    ):
+    ) -> None:
         """Add variables to the process after correlating the message.
 
         :param name: Name of the variable.
@@ -151,15 +147,13 @@ class _Correlate(pycamunda.base.CamundaRequest):
         """
         self.process_variables[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
 
-        return self
-
     def add_local_process_variable(
         self,
         name: str,
         value: typing.Any,
         type_: str = None,
         value_info: typing.Mapping = None
-    ):
+    ) -> None:
         """Add local variables to the process after correlating the message.
 
         :param name: Name of the variable.
@@ -170,8 +164,6 @@ class _Correlate(pycamunda.base.CamundaRequest):
         self.process_variables_local[name] = {
             'value': value, 'type': type_, 'valueInfo': value_info
         }
-
-        return self
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[MessageCorrelationResult]:
         """Send the request."""
