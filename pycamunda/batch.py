@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides access to the batch REST api of Camunda"""
+
 from __future__ import annotations
 import dataclasses
 import typing
