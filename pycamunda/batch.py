@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides access to the batch REST api of Camunda"""
+
 from __future__ import annotations
 import dataclasses
 import typing
@@ -7,6 +9,7 @@ import typing
 
 @dataclasses.dataclass
 class Batch:
+    """Data class of batch as returned by the REST api of Camunda."""
     id_: str
     type_: str
     total_jobs: int

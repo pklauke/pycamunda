@@ -18,6 +18,7 @@ URL_SUFFIX = '/deployment'
 
 @dataclasses.dataclass
 class Deployment:
+    """Data class of deployment as returned by the REST api of Camunda."""
     id_: str
     name: str
     source: str
@@ -40,6 +41,7 @@ class Deployment:
 
 @dataclasses.dataclass
 class Resource:
+    """Data class of resource as returned by the REST api of Camunda."""
     id_: str
     name: str
     deployment_id: str

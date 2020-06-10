@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides instruction enumerations as returned by the REST api of Camunda."""
+
 import enum
 
 

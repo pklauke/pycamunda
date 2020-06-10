@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides activity instance data classes as returned by the REST api of Camunda."""
+
 from __future__ import annotations
 import dataclasses
 import typing
@@ -9,6 +11,7 @@ import pycamunda.incident
 
 @dataclasses.dataclass
 class TransitionInstance:
+    """Data class of transition instance as returned by the REST api of Camunda."""
     id_: str
     activity_id: str
     activity_name: str
@@ -38,6 +41,7 @@ class TransitionInstance:
 
 @dataclasses.dataclass
 class ActivityInstance:
+    """Data class of activity instance as returned by the REST api of Camunda."""
     id_: str
     parent_activity_instance_id: str
     activity_id: str

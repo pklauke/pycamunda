@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""This module provides access to the resource REST api of Camunda."""
+
 from __future__ import annotations
 import dataclasses
 import typing
@@ -7,6 +9,7 @@ import typing
 
 @dataclasses.dataclass
 class Link:
+    """Data class of link as returned by the REST api of Camunda."""
     method: str
     href: str
     rel: str
@@ -22,6 +25,7 @@ class Link:
 
 @dataclasses.dataclass
 class ResourceOptions:
+    """Data class of resource options as returned by the REST api of Camunda."""
     links: typing.Tuple[Link]
 
     def __iter__(self):

@@ -9,6 +9,7 @@ import typing
 
 @dataclasses.dataclass
 class Execution:
+    """Data class of execution as returned by the REST api of Camunda."""
     id_: str
     process_instance_id: str
     ended: bool
