@@ -24,6 +24,7 @@ class IncidentType(enum.Enum):
 
 @dataclasses.dataclass
 class IncidentTypeCount:
+    """Data class of incident type count as returned by the REST api of Camunda."""
     incident_type: IncidentType
     incident_count: int
 
@@ -37,6 +38,7 @@ class IncidentTypeCount:
 
 @dataclasses.dataclass
 class Incident:
+    """Data class of incident as returned by the REST api of Camunda."""
     id_: str
     process_definition_id: str
     process_instance_id: str

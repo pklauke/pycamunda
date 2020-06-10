@@ -19,6 +19,7 @@ URL_SUFFIX = '/user'
 
 @dataclasses.dataclass
 class User:
+    """Data class of user as returned by the REST api of Camunda."""
     id_: str
     first_name: str
     last_name: str

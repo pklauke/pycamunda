@@ -22,6 +22,7 @@ URL_SUFFIX = '/process-definition'
 
 @dataclasses.dataclass
 class ProcessDefinition:
+    """Data class of process definition as returned by the REST api of Camunda."""
     id_: str
     key: str
     category: str
@@ -59,6 +60,7 @@ class ProcessDefinition:
 
 @dataclasses.dataclass
 class ActivityStats:
+    """Data class of activity statistics as returned by the REST api of Camunda."""
     id_: str
     instances: int
     failed_jobs: int
@@ -79,6 +81,7 @@ class ActivityStats:
 
 @dataclasses.dataclass
 class ProcessInstanceStats:
+    """Data class of process instance statistics as returned by the REST api of Camunda."""
     id_: str
     instances: int
     failed_jobs: int

@@ -20,6 +20,7 @@ URL_SUFFIX = '/external-task'
 
 @dataclasses.dataclass
 class ExternalTask:
+    """Data class of external task as returned by the REST api of Camunda."""
     activity_id: str
     activity_instance_id: str
     error_message: str

@@ -19,6 +19,7 @@ URL_SUFFIX = '/task'
 
 @dataclasses.dataclass
 class Task:
+    """Data class of task as returned by the REST api of Camunda."""
     assignee: str
     case_definition_id: str
     case_execution_id: str

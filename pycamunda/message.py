@@ -25,6 +25,7 @@ class ResultType(enum.Enum):
 
 @dataclasses.dataclass
 class MessageCorrelationResult:
+    """Data class of message correlation result as returned by the REST api of Camunda."""
     result_type: ResultType
     process_instance: pycamunda.processinst.ProcessInstance = None
     execution: pycamunda.execution.Execution = None

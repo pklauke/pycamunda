@@ -22,6 +22,7 @@ URL_SUFFIX = '/process-instance'
 
 @dataclasses.dataclass
 class ProcessInstance:
+    """Data class of process instance as returned by the REST api of Camunda."""
     id_: str
     definition_id: str
     business_key: str

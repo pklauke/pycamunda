@@ -20,6 +20,7 @@ URL_SUFFIX = '/filter'
 
 @dataclasses.dataclass
 class Query:
+    """Data class of query."""
 
     @classmethod
     def load(cls, **kwargs) -> Query:
@@ -31,6 +32,7 @@ class Query:
 
 @dataclasses.dataclass
 class Properties:
+    """Data class of properties."""
 
     @classmethod
     def load(cls, **kwargs) -> Properties:
@@ -42,6 +44,7 @@ class Properties:
 
 @dataclasses.dataclass
 class Filter:
+    """Data class of filter as returned by the REST api of Camunda."""
     id_: str
     resource_type: str
     name: str

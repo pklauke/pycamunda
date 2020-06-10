@@ -9,6 +9,7 @@ import typing
 
 @dataclasses.dataclass
 class Batch:
+    """Data class of batch as returned by the REST api of Camunda."""
     id_: str
     type_: str
     total_jobs: int

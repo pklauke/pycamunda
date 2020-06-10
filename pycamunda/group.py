@@ -20,6 +20,7 @@ URL_SUFFIX_MEMBERS = '/members'
 
 @dataclasses.dataclass
 class Group:
+    """Data class of group as returned by the REST api of Camunda."""
     id_: str
     name: str
     type_: str

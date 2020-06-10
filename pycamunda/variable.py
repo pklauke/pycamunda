@@ -16,6 +16,7 @@ URL_SUFFIX = '/variable-instance'
 
 @dataclasses.dataclass
 class Variable:
+    """Data class of variable as returned by the REST api of Camunda."""
     value: typing.Any
     type_: str
     value_info: typing.Dict
@@ -37,6 +38,7 @@ class Variable:
 
 @dataclasses.dataclass
 class VariableInstance:
+    """Data class of variable instance as returned by the REST api of Camunda."""
     id_: str
     name: str
     type_: str
