@@ -9,6 +9,9 @@ import typing
 import pycamunda.incident
 
 
+__all__ = []
+
+
 @dataclasses.dataclass
 class TransitionInstance:
     """Data class of transition instance as returned by the REST api of Camunda."""

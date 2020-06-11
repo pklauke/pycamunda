@@ -18,6 +18,12 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 URL_SUFFIX = '/external-task'
 
 
+__all__ = [
+    'GetList', 'Count', 'FetchAndLock', 'Complete', 'HandleBPMNError', 'HandleFailure', 'Unlock',
+    'ExtendLock', 'SetPriority', 'SetRetries', 'SetRetriesAsync', 'SetRetriesSync'
+]
+
+
 @dataclasses.dataclass
 class ExternalTask:
     """Data class of external task as returned by the REST api of Camunda."""

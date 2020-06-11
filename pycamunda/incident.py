@@ -17,6 +17,9 @@ from pycamunda.request import QueryParameter, PathParameter
 URL_SUFFIX = '/incident'
 
 
+__all__ = ['IncidentType', 'Get', 'GetList', 'Resolve']
+
+
 class IncidentType(enum.Enum):
     failed_job = 'failedJob'
     failed_external_task = 'failedExternalTask'

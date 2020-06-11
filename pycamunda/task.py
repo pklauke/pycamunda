@@ -17,6 +17,12 @@ from pycamunda.request import BodyParameter, PathParameter, QueryParameter
 URL_SUFFIX = '/task'
 
 
+__all__ = [
+    'DelegationState', 'Get', 'GetList', 'Claim', 'Unclaim', 'Complete', 'Resolve', 'SetAssignee',
+    'Delegate', 'Create', 'Update'
+]
+
+
 @dataclasses.dataclass
 class Task:
     """Data class of task as returned by the REST api of Camunda."""

@@ -18,6 +18,9 @@ from pycamunda.request import BodyParameter
 URL_SUFFIX = '/message'
 
 
+__all__ = ['ResultType', 'CorrelateSingle', 'CorrelateAll']
+
+
 class ResultType(enum.Enum):
     process_definition = 'ProcessDefinition'
     execution = 'Execution'

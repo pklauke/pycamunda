@@ -17,6 +17,12 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter, Body
 URL_SUFFIX = '/user'
 
 
+__all__ = [
+    'Delete', 'Count', 'GetList', 'GetProfile', 'Options', 'Create', 'UpdateCredentials',
+    'UpdateProfile', 'Unlock'
+]
+
+
 @dataclasses.dataclass
 class User:
     """Data class of user as returned by the REST api of Camunda."""

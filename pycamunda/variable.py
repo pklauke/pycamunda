@@ -14,6 +14,9 @@ from pycamunda.request import QueryParameter, PathParameter
 URL_SUFFIX = '/variable-instance'
 
 
+__all__ = ['GetList', 'Get']
+
+
 @dataclasses.dataclass
 class Variable:
     """Data class of variable as returned by the REST api of Camunda."""

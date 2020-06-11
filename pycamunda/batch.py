@@ -7,6 +7,9 @@ import dataclasses
 import typing
 
 
+__all__ = []
+
+
 @dataclasses.dataclass
 class Batch:
     """Data class of batch as returned by the REST api of Camunda."""

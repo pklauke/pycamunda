@@ -20,6 +20,9 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 URL_SUFFIX = '/process-instance'
 
 
+__all__ = ['Delete', 'GetActivityInstance', 'GetList', 'Get', 'Modify', 'Activate', 'Suspend']
+
+
 @dataclasses.dataclass
 class ProcessInstance:
     """Data class of process instance as returned by the REST api of Camunda."""

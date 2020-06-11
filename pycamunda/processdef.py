@@ -20,6 +20,13 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter, Body
 URL_SUFFIX = '/process-definition'
 
 
+__all__ = [
+    'GetActivityInstanceStats', 'GetProcessDiagram', 'Count', 'GetList', 'GetProcessInstanceStats',
+    'GetXML', 'Get', 'StartInstance', 'Activate', 'Suspend', 'UpdateHistoryTimeToLive', 'Delete',
+    'RestartProcessInstance'
+]
+
+
 @dataclasses.dataclass
 class ProcessDefinition:
     """Data class of process definition as returned by the REST api of Camunda."""

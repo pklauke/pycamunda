@@ -14,6 +14,9 @@ from pycamunda.request import BodyParameter
 URL_SUFFIX = '/signal'
 
 
+__all__ = ['EventAll', 'EventSingle']
+
+
 class _Event(pycamunda.base.CamundaRequest):
 
     name = BodyParameter('name')
