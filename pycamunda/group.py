@@ -18,6 +18,12 @@ URL_SUFFIX = '/group'
 URL_SUFFIX_MEMBERS = '/members'
 
 
+__all__ = [
+    'Get', 'GetList', 'Create', 'Update', 'Options', 'Delete', 'MemberCreate', 'MemberDelete',
+    'MemberOptions'
+]
+
+
 @dataclasses.dataclass
 class Group:
     """Data class of group as returned by the REST api of Camunda."""

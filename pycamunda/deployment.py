@@ -16,6 +16,9 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 URL_SUFFIX = '/deployment'
 
 
+__all__ = ['GetList', 'Get', 'Create', 'GetResources', 'GetResource', 'Delete']
+
+
 @dataclasses.dataclass
 class Deployment:
     """Data class of deployment as returned by the REST api of Camunda."""

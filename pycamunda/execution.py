@@ -7,6 +7,9 @@ import dataclasses
 import typing
 
 
+__all__ = []
+
+
 @dataclasses.dataclass
 class Execution:
     """Data class of execution as returned by the REST api of Camunda."""

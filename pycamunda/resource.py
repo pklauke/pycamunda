@@ -7,6 +7,9 @@ import dataclasses
 import typing
 
 
+__all__ = []
+
+
 @dataclasses.dataclass
 class Link:
     """Data class of link as returned by the REST api of Camunda."""

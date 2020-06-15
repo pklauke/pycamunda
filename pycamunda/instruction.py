@@ -5,6 +5,9 @@
 import enum
 
 
+__all__ = ['InstructionType', 'ModifyInstructionType']
+
+
 class InstructionType(enum.Enum):
     start_before_activity = 'startBeforeActivity'
     start_after_activity = 'startAfterActivity'
