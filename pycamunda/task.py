@@ -83,6 +83,24 @@ class DelegationState(enum.Enum):
     resolved = 'RESOLVED'
 
 
+@dataclasses.dataclass
+class IdentityLink:
+    """Data class of an identity link related to user tasks as returned by the REST api of
+    Camunda.
+    """
+    user_id: str
+    group_id: str
+    type_: str
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> IdentityLink:
+        return cls(
+            user_id=data['userId'],
+            group_id=data['groupId'],
+            type_=data['type']
+        )
+
+
 class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter("id")
@@ -794,3 +812,35 @@ class Update(pycamunda.base.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             pycamunda.base._raise_for_status(response)
+
+
+class IdentityLinksGetList(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    type_ = QueryParameter('type')
+
+    def __init__(self, url: str, id_: str = None, type_: str = None) -> None:
+        """Get the identity links of an user task.
+
+        An identity link is a relationship between an user task and an user or a group. E.g. when
+        the user is the assignee / owner or one of the candidate users of the task.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the task.
+        :param type_: Type of the identity link. Can be 'assignee', 'owner' or custom types.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/identity-links')
+        self.id_ = id_
+        self.type_ = type_
+
+    def __call__(self, *args, **kwargs) -> typing.Tuple[IdentityLink]:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return tuple(IdentityLink.load(link_json) for link_json in response.json())
