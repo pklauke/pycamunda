@@ -188,3 +188,12 @@ def task_output():
         'caseInstanceId': 'anInstanceId',
         'tenantId': 'aTenantId'
     }
+
+
+@pytest.fixture
+def my_identitylink_json():
+    return {
+        'userId': 'anUserId',
+        'groupId': 'aGroupId',
+        'type': 'assignee'
+    }

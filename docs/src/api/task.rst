@@ -17,6 +17,13 @@ DelegationState
     :undoc-members:
     :exclude-members:
 
+IdentityLink
+-------------------------------------
+.. autoclass:: pycamunda.task.IdentityLink
+    :members:
+    :undoc-members:
+    :exclude-members: load
+
 Get
 -------------------------------------
 .. autoclass:: pycamunda.task.Get
@@ -76,3 +83,22 @@ Update
 .. autoclass:: pycamunda.task.Update
     :members:
     :special-members: __call__
+
+IdentityLinksGetList
+-------------------------------------
+.. autoclass:: pycamunda.task.IdentityLinksGetList
+    :members:
+    :special-members: __call__
+
+IdentityLinksAdd
+-------------------------------------
+.. autoclass:: pycamunda.task.IdentityLinksAdd
+    :members:
+    :special-members: __call__
+
+IdentityLinksDelete
+-------------------------------------
+.. autoclass:: pycamunda.task.IdentityLinksDelete
+    :members:
+    :special-members: __call__
+
