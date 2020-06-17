@@ -9,7 +9,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 
 
 def test_identitylinksgetlist_params(engine_url):
-    get_links = pycamunda.task.IdentityLinksGetList(url=engine_url, id_='anId', type_='assignee')
+    get_links = pycamunda.task.IdentityLinksGetList(url=engine_url, task_id='anId', type_='assignee')
 
     assert get_links.url == engine_url + '/task/anId/identity-links'
     assert get_links.query_parameters() == {'type': 'assignee'}

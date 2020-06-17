@@ -90,3 +90,15 @@ IdentityLinksGetList
     :members:
     :special-members: __call__
 
+IdentityLinksAdd
+-------------------------------------
+.. autoclass:: pycamunda.task.IdentityLinksAdd
+    :members:
+    :special-members: __call__
+
+IdentityLinksDelete
+-------------------------------------
+.. autoclass:: pycamunda.task.IdentityLinksDelete
+    :members:
+    :special-members: __call__
+

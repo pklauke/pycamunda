@@ -816,21 +816,22 @@ class Update(pycamunda.base.CamundaRequest):
 
 class IdentityLinksGetList(pycamunda.base.CamundaRequest):
 
-    id_ = PathParameter('id')
+    task_id = PathParameter('id')
     type_ = QueryParameter('type')
 
-    def __init__(self, url: str, id_: str = None, type_: str = None) -> None:
+    def __init__(self, url: str, task_id: str = None, type_: str = None) -> None:
         """Get the identity links of an user task.
 
         An identity link is a relationship between an user task and an user or a group. E.g. when
         the user is the assignee / owner or one of the candidate users of the task.
 
         :param url: Camunda Rest engine URL.
-        :param id_: Id of the task.
-        :param type_: Type of the identity link. Can be 'assignee', 'owner' or custom types.
+        :param task_id: Id of the task.
+        :param type_: Type of the identity link. Can be any custom string. Pre-defined types are
+                      'assignee' (user), 'owner' (user) and 'candidate' (user / group).
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/identity-links')
-        self.id_ = id_
+        self.task_id = task_id
         self.type_ = type_
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[IdentityLink]:
@@ -844,3 +845,87 @@ class IdentityLinksGetList(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
         return tuple(IdentityLink.load(link_json) for link_json in response.json())
+
+
+class IdentityLinksAdd(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    user_id = BodyParameter('userId')
+    group_id = BodyParameter('groupId')
+    type_ = BodyParameter('type')
+
+    def __init__(
+        self, url: str, task_id: str, type_: str, user_id: str = None, group_id: str = None
+    ):
+        """Add an identity link to an user task.
+
+        An identity link is a relationship between an user task and an user or a group. E.g. when
+        the user is the assignee / owner or one of the candidate users of the task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param user_id: Id of the user. Can not be provided if group_id is provided.
+        :param group_id: Id of the groupt. Can not be provided if user_id is provided.
+        :param type_: Type of the identity link. Can be any custom string. Pre-defined types are
+                      'assignee' (user), 'owner' (user) and 'candidate' (user / group).
+        """
+        assert (user_id is None) != (group_id is None), (
+            'Either \'user_id\' or \'group_id\' has to be provided, not both.'
+        )
+        super().__init__(url=url + URL_SUFFIX + '/{id}/identity-links')
+        self.task_id = task_id
+        self.user_id = user_id
+        self.group_id = group_id
+        self.type_ = type_
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+
+class IdentityLinksDelete(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    user_id = BodyParameter('userId')
+    group_id = BodyParameter('groupId')
+    type_ = BodyParameter('type')
+
+    def __init__(
+        self, url: str, task_id: str, type_: str, user_id: str = None, group_id: str = None
+    ):
+        """Delete an identity link of an user task.
+
+        An identity link is a relationship between an user task and an user or a group. E.g. when
+        the user is the assignee / owner or one of the candidate users of the task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param user_id: Id of the user. Can not be provided if group_id is provided.
+        :param group_id: Id of the groupt. Can not be provided if user_id is provided.
+        :param type_: Type of the identity link. Can be any custom string. Pre-defined types are
+                      'assignee' (user), 'owner' (user) and 'candidate' (user / group).
+        """
+        assert (user_id is None) != (group_id is None), (
+            'Either \'user_id\' or \'group_id\' has to be provided, not both.'
+        )
+        super().__init__(url=url + URL_SUFFIX + '/{id}/identity-links/delete')
+        self.task_id = task_id
+        self.user_id = user_id
+        self.group_id = group_id
+        self.type_ = type_
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
