@@ -11,6 +11,32 @@ SOME_DAY = dt.datetime(
 
 
 @pytest.fixture
+def my_task_json():
+    return {
+        'assignee': 'anAssignee',
+        'caseDefinitionId': 'aCaseDefinitionId',
+        'caseExecutionId': 'aCaseExecutionId',
+        'caseInstanceId': 'anInstanceId',
+        'delegationState': 'PENDING',
+        'description': 'aDescription',
+        'executionId': 'anExecutionId',
+        'formKey': 'aFormKey',
+        'id': 'anId',
+        'name': 'aName',
+        'owner': 'anOwner',
+        'parentTaskId': 'aTaskId',
+        'priority': 10,
+        'processDefinitionId': 'aDefinitionid',
+        'processInstanceId': 'aProcessInstanceId',
+        'suspended': True,
+        'taskDefinitionKey': 'aDefinitionKey',
+        'created': '2000-01-01T01:01:01.000+0000',
+        'due': '2000-01-01T01:01:01.000+0000',
+        'followUp': '2000-01-01T01:01:01.000+0000'
+    }
+
+
+@pytest.fixture
 def getlist_input():
     return {
         'process_instance_id': 'anInstanceId',
