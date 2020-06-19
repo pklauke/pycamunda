@@ -12,7 +12,7 @@ def test_task_load(my_task_json):
     assert isinstance(user, pycamunda.task.Task)
 
 
-def test_user_load_raises_key_error(my_task_json):
+def test_task_load_raises_key_error(my_task_json):
     for key in my_task_json:
         json_ = dict(my_task_json)
         del json_[key]
