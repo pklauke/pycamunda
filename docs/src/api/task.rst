@@ -24,6 +24,13 @@ IdentityLink
     :undoc-members:
     :exclude-members: load
 
+Comment
+-------------------------------------
+.. autoclass:: pycamunda.task.Comment
+    :members:
+    :undoc-members:
+    :exclude-members: load
+
 Get
 -------------------------------------
 .. autoclass:: pycamunda.task.Get
@@ -99,6 +106,24 @@ IdentityLinksAdd
 IdentityLinksDelete
 -------------------------------------
 .. autoclass:: pycamunda.task.IdentityLinksDelete
+    :members:
+    :special-members: __call__
+
+CommentGetList
+-------------------------------------
+.. autoclass:: pycamunda.task.CommentGetList
+    :members:
+    :special-members: __call__
+
+CommentGet
+-------------------------------------
+.. autoclass:: pycamunda.task.CommentGet
+    :members:
+    :special-members: __call__
+
+CommentCreate
+-------------------------------------
+.. autoclass:: pycamunda.task.CommentCreate
     :members:
     :special-members: __call__
 

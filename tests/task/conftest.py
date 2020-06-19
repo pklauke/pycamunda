@@ -37,6 +37,19 @@ def my_task_json():
 
 
 @pytest.fixture
+def my_comment_json():
+    return {
+        'id': 'anId',
+        'userId': 'anUserId',
+        'taskId': 'aTaskId',
+        'time': '2000-01-01T01:01:01.000+0000',
+        'message': 'aMessage',
+        'removalTime': '2000-01-01T01:01:01.000+0000',
+        'rootProcessInstanceId': 'anInstanceId'
+    }
+
+
+@pytest.fixture
 def getlist_input():
     return {
         'process_instance_id': 'anInstanceId',

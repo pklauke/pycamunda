@@ -101,6 +101,34 @@ class IdentityLink:
         )
 
 
+@dataclasses.dataclass
+class Comment:
+    """Data class of a comment that is attached to an user task."""
+    id_: str
+    user_id: str
+    task_id: str
+    message: str
+    root_process_instance_id: str
+    time: dt.datetime = None
+    removal_time: dt.datetime = None
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Comment:
+        comment = cls(
+            id_=data['id'],
+            user_id=data['userId'],
+            task_id=data['taskId'],
+            message=data['message'],
+            root_process_instance_id=data['rootProcessInstanceId']
+        )
+        if data['time'] is not None:
+            comment.time = pycamunda.base.from_isoformat(data['time'])
+        if data['removalTime'] is not None:
+            comment.removal_time = pycamunda.base.from_isoformat(data['removalTime'])
+
+        return comment
+
+
 class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter("id")
@@ -929,3 +957,85 @@ class IdentityLinksDelete(pycamunda.base.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             pycamunda.base._raise_for_status(response)
+
+
+class CommentGetList(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+
+    def __init__(self, url: str, task_id: str) -> None:
+        """Get the comments for an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/comment')
+        self.task_id = task_id
+
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Comment]:
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return tuple(Comment.load(data=comment_json) for comment_json in response.json())
+
+
+class CommentGet(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    comment_id = PathParameter('commentId')
+
+    def __init__(self, url: str, task_id: str, comment_id: str) -> None:
+        """Get a comment for an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param comment_id: Id of the comment.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/comment/{commentId}')
+        self.task_id = task_id
+        self.comment_id = comment_id
+
+    def __call__(self, *args, **kwargs) -> Comment:
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return Comment.load(data=response.json())
+
+
+class CommentCreate(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    message = BodyParameter('message')
+
+    def __init__(self, url: str, task_id: str, message: str) -> None:
+        """Create a comment for an user task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param message: Message of the task.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/comment/create')
+        self.task_id = task_id
+        self.message = message
+
+    def __call__(self, *args, **kwargs) -> Comment:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return Comment.load(data=response.json())

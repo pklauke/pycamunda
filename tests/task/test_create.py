@@ -16,9 +16,9 @@ def test_create_params(engine_url, task_input, task_output):
     assert create_task.body_parameters() == {'id': 'anId', **task_output}
 
 
-@unittest.mock.patch('requests.put')
+@unittest.mock.patch('requests.post')
 def test_create_calls_requests(mock, engine_url, task_input):
-    create_task = pycamunda.task.Update(url=engine_url, id_='anId', **task_input)
+    create_task = pycamunda.task.Create(url=engine_url, id_='anId', **task_input)
     create_task()
 
     assert mock.called
