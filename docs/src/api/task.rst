@@ -127,3 +127,9 @@ CommentCreate
     :members:
     :special-members: __call__
 
+LocalVariablesModify
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesModify
+    :members:
+    :special-members: __call__
+

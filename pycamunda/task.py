@@ -568,7 +568,7 @@ class Complete(pycamunda.base.CamundaRequest):
         self.variables = {}
 
     def add_variable(
-        self, name: str, value: typing.Any, type_: str = None, value_info: str = None
+        self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
     ) -> None:
         """Add a variable to send to the Camunda process instance.
 
@@ -617,7 +617,7 @@ class Resolve(pycamunda.base.CamundaRequest):
         self.variables = {}
 
     def add_variable(
-        self, name: str, value: typing.Any, type_: str=None, value_info: str=None
+        self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
     ) -> None:
         """Add a variable to send to the Camunda process instance.
 
@@ -1039,3 +1039,49 @@ class CommentCreate(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
         return Comment.load(data=response.json())
+
+
+class LocalVariablesModify(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    modifications = BodyParameter('modifications')
+    deletions = BodyParameter('deletions')
+
+    def __init__(self, url: str, task_id: str, deletions: typing.Iterable[str] = None):
+        """Update or delete local variables of an user task.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param deletions: Variables to delete.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables')
+        self.task_id = task_id
+        self.deletions = deletions
+
+        self.modifications = {}
+
+    def add_variable(
+            self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
+    ) -> None:
+        self.modifications[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+    def body_parameters(self, apply: typing.Callable = ...) -> typing.Dict[str, typing.Any]:
+        params = super().body_parameters(apply=apply)
+        deletions = params.get('deletions', [])
+        if isinstance(deletions, str):
+            params['deletions'] = [deletions]
+        else:
+            params['deletions'] = list(deletions)
+        return params
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
