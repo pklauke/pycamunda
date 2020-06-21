@@ -19,7 +19,7 @@ URL_SUFFIX = '/task'
 
 __all__ = [
     'DelegationState', 'Get', 'GetList', 'Claim', 'Unclaim', 'Complete', 'Resolve', 'SetAssignee',
-    'Delegate', 'Create', 'Update'
+    'Delegate', 'Create', 'Update', 'LocalVariablesGet', 'LocalVariablesModify'
 ]
 
 
@@ -1039,6 +1039,41 @@ class CommentCreate(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
         return Comment.load(data=response.json())
+
+
+class LocalVariablesGet(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    var_name = PathParameter('varName')
+    deserialize_value = QueryParameter('deserializeValue')
+
+    def __init__(self, url: str, task_id: str, var_name: str, deserialize_value: bool = False):
+        """Get a local variable of an user task.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param var_name: Name of the variable.
+        :param deserialize_value: Whether serializable variable values are deserialized on server
+                                  side.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
+        self.task_id = task_id
+        self.var_name = var_name
+        self.deserialize_value = deserialize_value
+
+    def __call__(self, *args, **kwargs) -> pycamunda.variable.Variable:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return pycamunda.variable.Variable.load(data=response.json())
 
 
 class LocalVariablesModify(pycamunda.base.CamundaRequest):
