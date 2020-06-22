@@ -19,6 +19,14 @@ def test_localvariablesget_params(engine_url):
     assert get_var.body_parameters() == {}
 
 
+def test_localvariablesget_binary_params(engine_url):
+    get_var = pycamunda.task.LocalVariablesGet(
+        url=engine_url, task_id='anId', var_name='aVar', deserialize_value=True, binary=True
+    )
+
+    assert get_var.url == engine_url + '/task/anId/localVariables/aVar/data'
+
+
 @unittest.mock.patch('requests.get')
 def test_localvariablesget_calls_requests(mock, engine_url):
     get_var = pycamunda.task.LocalVariablesGet(url=engine_url, task_id='anId', var_name='aVar')

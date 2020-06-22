@@ -1047,7 +1047,14 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
     var_name = PathParameter('varName')
     deserialize_value = QueryParameter('deserializeValue')
 
-    def __init__(self, url: str, task_id: str, var_name: str, deserialize_value: bool = False):
+    def __init__(
+        self,
+        url: str,
+        task_id: str,
+        var_name: str,
+        deserialize_value: bool = False,
+        binary: bool = False
+    ):
         """Get a local variable of an user task.
 
         Local variables are variables that do only exist in the context of a task.
@@ -1057,11 +1064,17 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
         :param var_name: Name of the variable.
         :param deserialize_value: Whether serializable variable values are deserialized on server
                                   side.
+        :param binary: Whether the requested variable is a binary array or file variable.
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
         self.task_id = task_id
         self.var_name = var_name
         self.deserialize_value = deserialize_value
+        self.binary = binary
+
+    @property
+    def url(self):
+        return super().url + ('/data' if self.binary else '')
 
     def __call__(self, *args, **kwargs) -> pycamunda.variable.Variable:
         """Send the request."""
@@ -1073,6 +1086,8 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
         if not response:
             pycamunda.base._raise_for_status(response)
 
+        if self.binary:
+            return response.content
         return pycamunda.variable.Variable.load(data=response.json())
 
 
