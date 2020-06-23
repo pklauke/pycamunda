@@ -1091,6 +1091,46 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
         return pycamunda.variable.Variable.load(data=response.json())
 
 
+class LocalVariablesGetList(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    deserialize_values = QueryParameter('deserializeValues')
+
+    def __init__(
+        self,
+        url: str,
+        task_id: str,
+        deserialize_values: bool = False
+    ):
+        """Get the local variables of an user task.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param deserialize_values: Whether serializable variable values are deserialized on server
+                                   side.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables')
+        self.task_id = task_id
+        self.deserialize_values = deserialize_values
+
+    def __call__(self, *args, **kwargs) -> typing.Dict[str, pycamunda.variable.Variable]:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return {
+            name: pycamunda.variable.Variable.load(data=var_json)
+            for name, var_json in response.json().items()
+        }
+
+
 class LocalVariablesModify(pycamunda.base.CamundaRequest):
 
     task_id = PathParameter('id')

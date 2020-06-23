@@ -133,6 +133,12 @@ LocalVariablesGet
     :members:
     :special-members: __call__
 
+LocalVariablesGetList
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesGetList
+    :members:
+    :special-members: __call__
+
 LocalVariablesModify
 -------------------------------------
 .. autoclass:: pycamunda.task.LocalVariablesModify
