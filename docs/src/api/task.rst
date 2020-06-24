@@ -145,3 +145,9 @@ LocalVariablesModify
     :members:
     :special-members: __call__
 
+LocalVariablesUpdate
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesUpdate
+    :members:
+    :special-members: __call__
+
