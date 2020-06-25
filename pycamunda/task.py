@@ -1227,3 +1227,31 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             pycamunda.base._raise_for_status(response)
+
+
+class LocalVariablesDelete(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    var_name = PathParameter('varName')
+
+    def __init__(self, url: str, task_id: str, var_name: str):
+        """Delete a local variable.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param var_name: Name of the variable.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
+        self.task_id = task_id
+        self.var_name = var_name
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        try:
+            response = requests.delete(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
