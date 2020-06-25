@@ -1103,7 +1103,7 @@ class LocalVariablesGetList(pycamunda.base.CamundaRequest):
         task_id: str,
         deserialize_values: bool = False
     ):
-        """Get a local variable of an user task.
+        """Get local variables of an user task.
 
         Local variables are variables that do only exist in the context of a task.
 
@@ -1139,7 +1139,8 @@ class LocalVariablesModify(pycamunda.base.CamundaRequest):
     deletions = BodyParameter('deletions')
 
     def __init__(self, url: str, task_id: str, deletions: typing.Iterable[str] = None):
-        """Get the local variables of an user task.
+        """Modify local variables of an user task. This can be either updating or deleting
+        variables.
 
         Local variables are variables that do only exist in the context of a task.
 
@@ -1201,7 +1202,7 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
         value: typing.Any, type_: str = None,
         value_info: typing.Any = None
     ):
-        """Update a local variable. May be used to send binary and file variables.
+        """Update a local variable. May be used with binary and file variables.
 
         Local variables are variables that do only exist in the context of a task.
 
