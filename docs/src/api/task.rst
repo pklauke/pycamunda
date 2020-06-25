@@ -127,3 +127,33 @@ CommentCreate
     :members:
     :special-members: __call__
 
+LocalVariablesGet
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesGet
+    :members:
+    :special-members: __call__
+
+LocalVariablesGetList
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesGetList
+    :members:
+    :special-members: __call__
+
+LocalVariablesModify
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesModify
+    :members:
+    :special-members: __call__
+
+LocalVariablesUpdate
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesUpdate
+    :members:
+    :special-members: __call__
+
+LocalVariablesDelete
+-------------------------------------
+.. autoclass:: pycamunda.task.LocalVariablesDelete
+    :members:
+    :special-members: __call__
+
