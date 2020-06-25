@@ -1200,7 +1200,7 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
         value: typing.Any, type_: str = None,
         value_info: typing.Any = None
     ):
-        """Update a local variable.
+        """Update a local variable. May be used to send binary and file variables.
 
         Local variables are variables that do only exist in the context of a task.
 
@@ -1208,8 +1208,11 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
         :param task_id: Id of the task.
         :param var_name: Name of the variable.
         :param value: Value of the variable.
-        :param type_: Value type of the variable.
-        :param value_info: Additional information regarding the value type.
+        :param type_: Value type of the variable. To send binary variables use the value 'Bytes' and
+                      to send the binary value of a file variable use the value 'File' for this
+                      parameter.
+        :param value_info: Additional information regarding the value type. Ignored if 'type_' is
+                           'Bytes' or 'File'.
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
         self.task_id = task_id
@@ -1218,13 +1221,32 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
         self.type_ = type_
         self.value_info = value_info
 
+    def _is_binary(self):
+        return self.type_ in ('File', 'Bytes')
+
+    @property
+    def url(self):
+        return super().url + ('/data' if self._is_binary() else '')
+
+    def body_parameters(self, apply: typing.Callable = ...):
+        if self._is_binary():
+            return {'valueType': self.type_}
+        return super().body_parameters(apply=apply)
+
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
+        if self._is_binary():
+            try:
+                response = requests.post(self.url, data=params, files={'data': self.value})
+            except requests.exceptions.RequestException:
+                raise pycamunda.PyCamundaException()
+        else:
+            try:
+                response = requests.put(self.url, json=params)
+            except requests.exceptions.RequestException:
+                raise pycamunda.PyCamundaException()
+
         if not response:
             pycamunda.base._raise_for_status(response)
 
