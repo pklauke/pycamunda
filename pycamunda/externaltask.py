@@ -395,20 +395,31 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
     worker_id = BodyParameter('workerId')
     max_tasks = BodyParameter('maxTasks')
     use_priority = BodyParameter('usePriority')
+    async_response_timeout = BodyParameter('asyncResponseTimeout')
     topics = BodyParameter('topics')
 
-    def __init__(self, url: str, worker_id: str, max_tasks: int, use_priority: bool = False):
+    def __init__(
+        self,
+        url: str,
+        worker_id: str,
+        max_tasks: int,
+        async_response_timeout: int = None,
+        use_priority: bool = False
+    ):
         """Fetch and lock external tasks for a specific worker. Only external tasks with topics that
         are added to this request are fetched.
 
         :param url: Camunda Rest engine URL.
         :param worker_id: Id of the worker the external tasks are locked for.
         :param max_tasks: Maximum number of tasks to fetch.
+        :param async_response_timeout: Long polling timeout in milliseconds. Cannot be set larger
+                                       than 1800000 (30 minutes).
         :param use_priority: Whether the tasks should be fetched based on their priority.
         """
         super().__init__(url=url + URL_SUFFIX + '/fetchAndLock')
         self.worker_id = worker_id
         self.max_tasks = max_tasks
+        self.async_response_timeout = async_response_timeout
         self.use_priority = use_priority
         self.topics = []
 
