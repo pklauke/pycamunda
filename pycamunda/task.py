@@ -19,7 +19,8 @@ URL_SUFFIX = '/task'
 
 __all__ = [
     'DelegationState', 'Get', 'GetList', 'Claim', 'Unclaim', 'Complete', 'Resolve', 'SetAssignee',
-    'Delegate', 'Create', 'Update'
+    'Delegate', 'Create', 'Update', 'LocalVariablesGet', 'LocalVariablesGetList',
+    'LocalVariablesModify', 'LocalVariablesUpdate', 'LocalVariablesDelete'
 ]
 
 
@@ -568,7 +569,7 @@ class Complete(pycamunda.base.CamundaRequest):
         self.variables = {}
 
     def add_variable(
-        self, name: str, value: typing.Any, type_: str = None, value_info: str = None
+        self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
     ) -> None:
         """Add a variable to send to the Camunda process instance.
 
@@ -617,7 +618,7 @@ class Resolve(pycamunda.base.CamundaRequest):
         self.variables = {}
 
     def add_variable(
-        self, name: str, value: typing.Any, type_: str=None, value_info: str=None
+        self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
     ) -> None:
         """Add a variable to send to the Camunda process instance.
 
@@ -1039,3 +1040,242 @@ class CommentCreate(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
         return Comment.load(data=response.json())
+
+
+class LocalVariablesGet(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    var_name = PathParameter('varName')
+    deserialize_value = QueryParameter('deserializeValue')
+
+    def __init__(
+        self,
+        url: str,
+        task_id: str,
+        var_name: str,
+        deserialize_value: bool = False,
+        binary: bool = False
+    ):
+        """Get a local variable of an user task.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param var_name: Name of the variable.
+        :param deserialize_value: Whether serializable variable values are deserialized on server
+                                  side.
+        :param binary: Whether the requested variable is a binary array or file variable.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
+        self.task_id = task_id
+        self.var_name = var_name
+        self.deserialize_value = deserialize_value
+        self.binary = binary
+
+    @property
+    def url(self):
+        return super().url + ('/data' if self.binary else '')
+
+    def __call__(self, *args, **kwargs) -> pycamunda.variable.Variable:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        if self.binary:
+            return response.content
+        return pycamunda.variable.Variable.load(data=response.json())
+
+
+class LocalVariablesGetList(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    deserialize_values = QueryParameter('deserializeValues')
+
+    def __init__(
+        self,
+        url: str,
+        task_id: str,
+        deserialize_values: bool = False
+    ):
+        """Get local variables of an user task.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param deserialize_values: Whether serializable variable values are deserialized on server
+                                   side.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables')
+        self.task_id = task_id
+        self.deserialize_values = deserialize_values
+
+    def __call__(self, *args, **kwargs) -> typing.Dict[str, pycamunda.variable.Variable]:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return {
+            name: pycamunda.variable.Variable.load(data=var_json)
+            for name, var_json in response.json().items()
+        }
+
+
+class LocalVariablesModify(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    modifications = BodyParameter('modifications')
+    deletions = BodyParameter('deletions')
+
+    def __init__(self, url: str, task_id: str, deletions: typing.Iterable[str] = None):
+        """Modify local variables of an user task. This can be either updating or deleting
+        variables.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param deletions: Variables to delete.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables')
+        self.task_id = task_id
+        self.deletions = deletions
+
+        self.modifications = {}
+
+    def add_variable(
+            self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
+    ) -> None:
+        """Add a variable to modify.
+
+        :param name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable.
+        :param value_info: Additional information regarding the value type.
+        """
+        self.modifications[name] = {'value': value, 'type': type_, 'valueInfo': value_info}
+
+    def body_parameters(self, apply: typing.Callable = ...) -> typing.Dict[str, typing.Any]:
+        params = super().body_parameters(apply=apply)
+        deletions = params.get('deletions', [])
+        if isinstance(deletions, str):
+            params['deletions'] = [deletions]
+        else:
+            params['deletions'] = list(deletions)
+        return params
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+
+class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    var_name = PathParameter('varName')
+    value = BodyParameter('value')
+    type_ = BodyParameter('type')
+    value_info = BodyParameter('valueInfo')
+
+    def __init__(
+        self,
+        url: str,
+        task_id: str,
+        var_name: str,
+        value: typing.Any, type_: str = None,
+        value_info: typing.Any = None
+    ):
+        """Update a local variable. May be used with binary and file variables.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param var_name: Name of the variable.
+        :param value: Value of the variable.
+        :param type_: Value type of the variable. To send binary variables use the value 'Bytes' and
+                      to send the binary value of a file variable use the value 'File' for this
+                      parameter.
+        :param value_info: Additional information regarding the value type. Ignored if 'type_' is
+                           'Bytes' or 'File'.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
+        self.task_id = task_id
+        self.var_name = var_name
+        self.value = value
+        self.type_ = type_
+        self.value_info = value_info
+
+    def _is_binary(self):
+        return self.type_ in ('File', 'Bytes')
+
+    @property
+    def url(self):
+        return super().url + ('/data' if self._is_binary() else '')
+
+    def body_parameters(self, apply: typing.Callable = ...):
+        if self._is_binary():
+            return {'valueType': self.type_}
+        return super().body_parameters(apply=apply)
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        params = self.body_parameters()
+        if self._is_binary():
+            try:
+                response = requests.post(self.url, data=params, files={'data': self.value})
+            except requests.exceptions.RequestException:
+                raise pycamunda.PyCamundaException()
+        else:
+            try:
+                response = requests.put(self.url, json=params)
+            except requests.exceptions.RequestException:
+                raise pycamunda.PyCamundaException()
+
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+
+class LocalVariablesDelete(pycamunda.base.CamundaRequest):
+
+    task_id = PathParameter('id')
+    var_name = PathParameter('varName')
+
+    def __init__(self, url: str, task_id: str, var_name: str):
+        """Delete a local variable.
+
+        Local variables are variables that do only exist in the context of a task.
+
+        :param url: Camunda Rest engine URL.
+        :param task_id: Id of the task.
+        :param var_name: Name of the variable.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
+        self.task_id = task_id
+        self.var_name = var_name
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        try:
+            response = requests.delete(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
