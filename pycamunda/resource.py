@@ -64,5 +64,6 @@ class ResourceType(enum.IntEnum):
     report = 15
     dashboard = 16
     user_operation_log_category = 17
+    optimize = 18
     historic_task = 19
     historic_process_instance = 20

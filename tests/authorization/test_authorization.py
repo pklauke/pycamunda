@@ -25,13 +25,13 @@ def test_authorization_load(my_authorization_json):
 
 def test_authorization_load_raises_keyerror(my_authorization_json):
     for key in (k for k in my_authorization_json
-                if k not in ('removalTime', 'rootProcessInstanceId')):
+                if k not in ('links', 'removalTime', 'rootProcessInstanceId')):
         json_ = dict(my_authorization_json)
         del json_[key]
         with pytest.raises(KeyError):
             pycamunda.authorization.Authorization.load(json_)
 
-    for key in ('removalTime', 'rootProcessInstanceId'):
+    for key in ('links', 'removalTime', 'rootProcessInstanceId'):
         json_ = dict(my_authorization_json)
         del json_[key]
         pycamunda.authorization.Authorization.load(json_)

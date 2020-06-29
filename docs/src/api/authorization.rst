@@ -16,3 +16,10 @@ Authorization
     :members:
     :undoc-members:
     :exclude-members: load
+
+GetList
+-------------------------------------
+.. autoclass:: pycamunda.authorization.GetList
+    :members:
+    :special-members: __call__
+
