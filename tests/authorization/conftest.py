@@ -72,3 +72,25 @@ def count_output():
         'groupIdIn': ['aGroup'],
         'resourceType': pycamunda.resource.ResourceType(1).value
     }
+
+
+@pytest.fixture
+def check_input():
+    return {
+        'permission_name': 'READ',
+        'permission_value': 1,
+        'resource_name': 'USER',
+        'resource_type': 1,
+        'resource_id': 'demo'
+    }
+
+
+@pytest.fixture
+def check_output():
+    return {
+        'permissionName': 'READ',
+        'permissionValue': 1,
+        'resourceName': 'USER',
+        'resourceType': 1,
+        'resourceId': 'demo'
+    }

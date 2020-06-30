@@ -18,7 +18,7 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 URL_SUFFIX = '/authorization'
 
 
-__all__ = ['AuthorizationType']
+__all__ = ['AuthorizationType', 'GetList', 'Count', 'Get', 'Check']
 
 
 class AuthorizationType(enum.IntEnum):
@@ -42,7 +42,7 @@ class Authorization:
     removal_time: dt.datetime = None
 
     @classmethod
-    def load(cls, data) -> Authorization:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Authorization:
         authorization = cls(
             id_=data['id'],
             type_=data['type'],
@@ -68,6 +68,24 @@ class Authorization:
             pass
 
         return authorization
+
+
+@dataclasses.dataclass
+class Permission:
+    """Data class of permission as returned by the REST api of Camunda."""
+    permission_name: str
+    resource_name: str
+    resource_id: str
+    authorized: bool
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> Permission:
+        return cls(
+            permission_name=data['permissionName'],
+            resource_name=data['resourceName'],
+            resource_id=data['resourceId'],
+            authorized=data['authorized']
+        )
 
 
 class GetList(pycamunda.base.CamundaRequest):
@@ -222,7 +240,7 @@ class Get(pycamunda.base.CamundaRequest):
     def __call__(self, *args, **kwargs) -> Authorization:
         """Send the request."""
         try:
-            response = requests.get(self.url)
+            response = requests.get(self.url, auth=None)
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
@@ -231,13 +249,47 @@ class Get(pycamunda.base.CamundaRequest):
         return Authorization.load(data=response.json())
 
 
-if __name__ == '__main__':
-    url = 'http://localhost:8080/engine-rest'
+class Check(pycamunda.base.CamundaRequest):
 
-    get_authorizations = GetList(url=url)
-    authorizations = get_authorizations()
+    permission_name = QueryParameter('permissionName')
+    permission_value = QueryParameter('permissionValue')
+    resource_name = QueryParameter('resourceName')
+    resource_type = QueryParameter('resourceType')
+    resource_id = QueryParameter('resourceId')
 
-    get_authorization = Get(url=url, id_=authorizations[0].id_)
-    authorization = get_authorization()
+    def __init__(
+        self,
+        url: str,
+        permission_name: str,
+        permission_value: int,
+        resource_name: str,
+        resource_type: typing.Union[str, pycamunda.resource.ResourceType],
+        resource_id: str = None
+    ):
+        """Check the authorization of the currently authenticated user.
 
-    print(authorization)
+        :param url: Camunda Rest engine URL.
+        :param permission_name: Name of the permission to check.
+        :param permission_value: Value of the permission to check for.
+        :param resource_name: Name of the resource to check for.
+        :param resource_type: Type of the resource to check for.
+        :param resource_id: Id of the resource to check for.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/check')
+        self.permission_name = permission_name
+        self.permission_value = permission_value
+        self.resource_name = resource_name
+        self.resource_type = resource_type
+        self.resource_id = resource_id
+
+    def __call__(self, *args, **kwargs) -> Permission:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return Permission.load(data=response.json())
