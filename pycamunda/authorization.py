@@ -148,6 +148,96 @@ class GetList(pycamunda.base.CamundaRequest):
             raise pycamunda.PyCamundaException()
         if not response:
             pycamunda.base._raise_for_status(response)
-        print(response.json())
 
         return tuple(Authorization.load(auth_json) for auth_json in response.json())
+
+
+class Count(pycamunda.base.CamundaRequest):
+
+    id_ = QueryParameter('id')
+    type_ = QueryParameter('type')
+    user_id_in = QueryParameter('userIdIn')
+    group_id_in = QueryParameter('groupIdIn')
+    resource_type = QueryParameter('resourceType')
+    resource_id = QueryParameter('resourceId')
+
+    def __init__(
+        self,
+        url: str,
+        id_: str = None,
+        type_: typing.Union[str, AuthorizationType] = None,
+        user_id_in: typing.Iterable[str] = None,
+        group_id_in: typing.Iterable[str] = None,
+        resource_type: typing.Union[str, pycamunda.resource.ResourceType] = None,
+        resource_id: int = None,
+    ):
+        """Get the size of the result returned by the Get List request.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Filter by the id of the authorization.
+        :param type_: Filter by the authorization type.
+        :param user_id_in: Filter whether the user id is one of multiple ones.
+        :param group_id_in: Filter whether the group id is one of multiple ones.
+        :param resource_type: Filter by the resource type.
+        :param resource_id: Filter by the resource id.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/count')
+        self.id_ = id_
+        self.type_ = None
+        if type_ is not None:
+            self.type_ = AuthorizationType(type_)
+        self.user_id_in = user_id_in
+        self.group_id_in = group_id_in
+        self.resource_type = None
+        if type_ is not None:
+            self.resource_type = pycamunda.resource.ResourceType(resource_type)
+        self.resource_id = resource_id
+
+    def __call__(self, *args, **kwargs) -> int:
+        """Send the request."""
+        params = self.query_parameters()
+        try:
+            response = requests.get(self.url, params=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return int(response.json()['count'])
+
+
+class Get(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get an authorization.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the authorization.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def __call__(self, *args, **kwargs) -> Authorization:
+        """Send the request."""
+        try:
+            response = requests.get(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return Authorization.load(data=response.json())
+
+
+if __name__ == '__main__':
+    url = 'http://localhost:8080/engine-rest'
+
+    get_authorizations = GetList(url=url)
+    authorizations = get_authorizations()
+
+    get_authorization = Get(url=url, id_=authorizations[0].id_)
+    authorization = get_authorization()
+
+    print(authorization)

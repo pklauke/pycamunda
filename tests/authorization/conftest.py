@@ -50,3 +50,25 @@ def getlist_output():
         'firstResult': 1,
         'maxResults': 10
     }
+
+
+@pytest.fixture
+def count_input():
+    return {
+        'id_': 'anId',
+        'type_': 0,
+        'user_id_in': ['anUser'],
+        'group_id_in': ['aGroup'],
+        'resource_type': 1
+    }
+
+
+@pytest.fixture
+def count_output():
+    return {
+        'id': 'anId',
+        'type': pycamunda.authorization.AuthorizationType(0).value,
+        'userIdIn': ['anUser'],
+        'groupIdIn': ['aGroup'],
+        'resourceType': pycamunda.resource.ResourceType(1).value
+    }

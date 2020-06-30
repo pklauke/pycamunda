@@ -23,3 +23,15 @@ GetList
     :members:
     :special-members: __call__
 
+Count
+-------------------------------------
+.. autoclass:: pycamunda.authorization.Count
+    :members:
+    :special-members: __call__
+
+Get
+-------------------------------------
+.. autoclass:: pycamunda.authorization.Get
+    :members:
+    :special-members: __call__
+
