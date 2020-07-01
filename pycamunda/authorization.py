@@ -293,3 +293,33 @@ class Check(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
         return Permission.load(data=response.json())
+
+
+class Options(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter
+
+    def __init__(self, url: str, id_: str = None):
+        """Get a list of options the currently authenticated user can perform on the authorization
+        resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the authorization
+        """
+        super().__init__(url=url + URL_SUFFIX + '{path}')
+        self.id_ = id_
+
+    @property
+    def url(self):
+        return self._url.format(path='/{id}'.format(id=self.id_) if self.id_ is not None else '')
+
+    def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
+        """Send the request."""
+        try:
+            response = requests.options(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return pycamunda.resource.ResourceOptions.load(data=response.json())
