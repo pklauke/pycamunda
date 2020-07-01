@@ -297,7 +297,7 @@ class Check(pycamunda.base.CamundaRequest):
 
 class Options(pycamunda.base.CamundaRequest):
 
-    id_ = PathParameter
+    id_ = PathParameter('id')
 
     def __init__(self, url: str, id_: str = None):
         """Get a list of options the currently authenticated user can perform on the authorization
@@ -323,3 +323,132 @@ class Options(pycamunda.base.CamundaRequest):
             pycamunda.base._raise_for_status(response)
 
         return pycamunda.resource.ResourceOptions.load(data=response.json())
+
+
+class Create(pycamunda.base.CamundaRequest):
+
+    type_ = BodyParameter('type')
+    permissions = BodyParameter('permissions')
+    user_id = BodyParameter('userId')
+    group_id = BodyParameter('groupId')
+    resource_type = BodyParameter('resourceType')
+    resource_id = BodyParameter('resourceId')
+
+    def __init__(
+        self,
+        url: str,
+        type_: typing.Union[int, AuthorizationType],
+        permissions: typing.Iterable[str],
+        resource_type: typing.Union[str, pycamunda.resource.ResourceType],
+        resource_id: str,
+        user_id: str = None,
+        group_id: str = None
+    ):
+        """Create an authorization.
+
+        :param url: Camunda Rest engine URL.
+        :param type_: Id of the authorization.
+        :param permissions: Permissions provided by this authorization. A permission be 'READ' or
+                            'CREATE' for example.
+        :param user_id: Id of the user this authorization is for. The value '*' means all users.
+        :param group_id: Id of the group this authorization is for.
+        :param resource_type: Resource type this authorization is for.
+        :param resource_id: Id of the resource. The value '*' means all instances of a resource.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/create')
+        self.type_ = type_
+        self.permissions = permissions
+        self.user_id = user_id
+        self.group_id = group_id
+        self.resource_type = resource_type
+        self.resource_id = resource_id
+
+    def __call__(self, *args, **kwargs) -> Authorization:
+        """Send the request."""
+        assert (self.user_id is not None) != (self.group_id is not None), (
+            'Either \'user_id\' or \'group_id\' has to be provided, not both.'
+        )
+        params = self.body_parameters()
+        try:
+            response = requests.post(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return Authorization.load(data=response.json())
+
+
+class Update(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    permissions = BodyParameter('permissions')
+    user_id = BodyParameter('userId')
+    group_id = BodyParameter('groupId')
+    resource_type = BodyParameter('resourceType')
+    resource_id = BodyParameter('resourceId')
+
+    def __init__(
+        self,
+        url: str,
+        id_: str,
+        permissions: typing.Iterable[str],
+        resource_type: typing.Union[str, pycamunda.resource.ResourceType],
+        resource_id: str,
+        user_id: str = None,
+        group_id: str = None
+    ):
+        """Update an authorization.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the authorization.
+        :param permissions: Permissions provided by this authorization. A permission be 'READ' or
+                            'CREATE' for example.
+        :param user_id: Id of the user this authorization is for. The value '*' means all users.
+        :param group_id: Id of the group this authorization is for.
+        :param resource_type: Resource type this authorization is for.
+        :param resource_id: Id of the resource. The value '*' means all instances of a resource.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.permissions = permissions
+        self.user_id = user_id
+        self.group_id = group_id
+        self.resource_type = resource_type
+        self.resource_id = resource_id
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        assert (self.user_id is not None) != (self.group_id is not None), (
+            'Either \'user_id\' or \'group_id\' has to be provided, not both.'
+        )
+        params = self.body_parameters()
+        try:
+            response = requests.put(self.url, json=params)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+
+class Delete(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Delete an authorization.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the authorization.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        try:
+            response = requests.delete(self.url)
+        except requests.exceptions.RequestException:
+            raise pycamunda.PyCamundaException()
+        if not response:
+            pycamunda.base._raise_for_status(response)

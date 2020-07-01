@@ -41,3 +41,20 @@ Options
     :members:
     :special-members: __call__
 
+Create
+-------------------------------------
+.. autoclass:: pycamunda.authorization.Create
+    :members:
+    :special-members: __call__
+
+Update
+-------------------------------------
+.. autoclass:: pycamunda.authorization.Update
+    :members:
+    :special-members: __call__
+
+Delete
+-------------------------------------
+.. autoclass:: pycamunda.authorization.Delete
+    :members:
+    :special-members: __call__

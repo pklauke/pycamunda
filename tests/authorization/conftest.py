@@ -94,3 +94,46 @@ def check_output():
         'resourceType': 1,
         'resourceId': 'demo'
     }
+
+
+@pytest.fixture
+def create_input():
+    return {
+        'type_': 0,
+        'permissions': ['CREATE'],
+        'user_id': 'anId',
+        'resource_type': 1,
+        'resource_id': 'demo'
+    }
+
+
+@pytest.fixture
+def create_output():
+    return {
+        'type': 0,
+        'permissions': ['CREATE'],
+        'userId': 'anId',
+        'resourceType': 1,
+        'resourceId': 'demo'
+    }
+
+
+@pytest.fixture
+def update_input():
+    return {
+        'id_': 'anId',
+        'permissions': ['CREATE'],
+        'user_id': 'anId',
+        'resource_type': 1,
+        'resource_id': 'demo'
+    }
+
+
+@pytest.fixture
+def update_output():
+    return {
+        'permissions': ['CREATE'],
+        'userId': 'anId',
+        'resourceType': 1,
+        'resourceId': 'demo'
+    }
