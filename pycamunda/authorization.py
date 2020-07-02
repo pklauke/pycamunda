@@ -18,7 +18,8 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 URL_SUFFIX = '/authorization'
 
 
-__all__ = ['AuthorizationType', 'GetList', 'Count', 'Get', 'Check']
+__all__ = ['AuthorizationType', 'GetList', 'Count', 'Get', 'Check', 'Options', 'Update', 'Create',
+           'Delete']
 
 
 class AuthorizationType(enum.IntEnum):

@@ -35,6 +35,12 @@ Get
     :members:
     :special-members: __call__
 
+Check
+-------------------------------------
+.. autoclass:: pycamunda.authorization.Check
+    :members:
+    :special-members: __call__
+
 Options
 -------------------------------------
 .. autoclass:: pycamunda.authorization.Options
