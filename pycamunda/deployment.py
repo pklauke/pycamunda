@@ -144,13 +144,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Deployment]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(Deployment.load(deployment_json) for deployment_json in response.json())
 
@@ -170,12 +164,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Deployment:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return Deployment.load(response.json())
 
@@ -216,29 +205,23 @@ class Create(pycamunda.base.CamundaRequest):
         self.deploy_changed_only = deploy_changed_only
         self.tenant_id = tenant_id
 
-        self.files = []
+        self._files = []
 
     def add_resource(self, file) -> None:
         """Add a resource to the deployment.
 
         :param file: Binary data of the resource.
         """
-        self.files.append(file)
+        self._files.append(file)
+
+    @property
+    def files(self):
+        return {f'resource-{i}': resource for i, resource in enumerate(self._files)}
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         assert bool(self.files), 'Cannot create deployment without resources.'
-        params = self.body_parameters()
-        try:
-            response = requests.post(
-                self.url,
-                data=params,
-                files={f'resource-{i}': resource for i, resource in enumerate(self.files)}
-            )
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class GetResources(pycamunda.base.CamundaRequest):
@@ -256,12 +239,7 @@ class GetResources(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Resource]:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(Resource.load(resource_json) for resource_json in response.json())
 
@@ -290,12 +268,7 @@ class GetResource(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Union[Resource, typing.ByteString]:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         if self.binary:
             return response.content
@@ -333,9 +306,4 @@ class Delete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        try:
-            response = requests.delete(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)

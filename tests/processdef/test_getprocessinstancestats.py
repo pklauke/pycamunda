@@ -68,7 +68,7 @@ def test_getprocessdiagramm_raises_exception_on_invalid_inputs(engine_url):
         )
 
 
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_getprocessdiagram_calls_requests(mock, engine_url):
     get_process_instance_stats = pycamunda.processdef.GetProcessInstanceStats(url=engine_url)
     get_process_instance_stats()
@@ -76,14 +76,14 @@ def test_getprocessdiagram_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_getprocessdiagram_raises_pycamunda_exception(engine_url):
     get_process_instance_stats = pycamunda.processdef.GetProcessDiagram(url=engine_url)
     with pytest.raises(pycamunda.PyCamundaException):
         get_process_instance_stats()
 
 
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.processdef.ActivityStats', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_getprocessdiagram_raises_for_status(mock, engine_url):
@@ -93,7 +93,7 @@ def test_getprocessdiagram_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', response_mock)
+@unittest.mock.patch('requests.Session.request', response_mock)
 def test_getprocessdiagram_returns_response_content(engine_url):
     get_process_instance_stats = pycamunda.processdef.GetProcessDiagram(url=engine_url)
     result = get_process_instance_stats()

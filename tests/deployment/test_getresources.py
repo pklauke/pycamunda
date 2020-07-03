@@ -16,7 +16,7 @@ def test_getresources_params(engine_url):
     assert get_resources.body_parameters() == {}
 
 
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_getresources_calls_requests(mock, engine_url):
     get_resources = pycamunda.deployment.GetResources(url=engine_url, id_='anId')
     get_resources()
@@ -24,14 +24,14 @@ def test_getresources_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_getresources_raises_pycamunda_exception(engine_url):
     get_resources = pycamunda.deployment.GetResources(url=engine_url, id_='anId')
     with pytest.raises(pycamunda.PyCamundaException):
         get_resources()
 
 
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 @unittest.mock.patch('pycamunda.deployment.Resource', unittest.mock.MagicMock())
 def test_getresources_raises_for_status(mock, engine_url):
@@ -41,7 +41,7 @@ def test_getresources_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.deployment.Resource', unittest.mock.MagicMock())
 def test_getresources_returns_resources(engine_url):
     get_resources = pycamunda.deployment.GetResources(url=engine_url, id_='anId')

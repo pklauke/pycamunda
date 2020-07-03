@@ -160,13 +160,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Authorization]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(Authorization.load(auth_json) for auth_json in response.json())
 
@@ -214,13 +208,7 @@ class Count(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return int(response.json()['count'])
 
@@ -240,12 +228,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Authorization:
         """Send the request."""
-        try:
-            response = requests.get(self.url, auth=None)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return Authorization.load(data=response.json())
 
@@ -285,13 +268,7 @@ class Check(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Permission:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return Permission.load(data=response.json())
 
@@ -316,12 +293,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request."""
-        try:
-            response = requests.options(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
 
         return pycamunda.resource.ResourceOptions.load(data=response.json())
 
@@ -369,13 +341,7 @@ class Create(pycamunda.base.CamundaRequest):
         assert (self.user_id is not None) != (self.group_id is not None), (
             'Either \'user_id\' or \'group_id\' has to be provided, not both.'
         )
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return Authorization.load(data=response.json())
 
@@ -423,13 +389,7 @@ class Update(pycamunda.base.CamundaRequest):
         assert (self.user_id is not None) != (self.group_id is not None), (
             'Either \'user_id\' or \'group_id\' has to be provided, not both.'
         )
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class Delete(pycamunda.base.CamundaRequest):
@@ -447,9 +407,4 @@ class Delete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        try:
-            response = requests.delete(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)

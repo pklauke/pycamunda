@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import abc
+import enum
 import datetime as dt
 import typing
 import json
@@ -17,11 +17,43 @@ def value_is_true(self, obj: typing.Any, obj_type: typing.Any) -> bool:
     return bool(obj.__dict__[self.name])
 
 
+class RequestMethod(enum.Enum):
+    GET = 'GET'
+    POST = 'POST'
+    PUT = 'PUT'
+    PATCH = 'PATCH'
+    DELETE = 'DELETE'
+    OPTIONS = 'OPTIONS'
+    HEAD = 'HEAD'
+
+
 class CamundaRequest(pycamunda.request.Request):
 
-    @abc.abstractmethod
-    def __call__(self, *args, **kwargs):
-        return NotImplementedError
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.auth = None
+        self._files = None
+
+    @property
+    def files(self):
+        return self._files
+
+    def __call__(self, method: RequestMethod, *args, **kwargs) -> requests.Response:
+        try:
+            response = requests.request(
+                method=method.value,
+                url=self.url,
+                params=self.query_parameters(),
+                json=self.body_parameters(),
+                auth=self.auth,
+                files=self.files
+            )
+        except requests.exceptions.RequestException as exc:
+            raise pycamunda.PyCamundaException(exc)
+        if not response:
+            pycamunda.base._raise_for_status(response)
+
+        return response
 
     def body_parameters(self, apply: typing.Callable = ...):
         if apply is Ellipsis:

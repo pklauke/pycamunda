@@ -29,7 +29,7 @@ def test_getprocessdiagram_path(engine_url):
                                                           '/tenant-id/aTenantId/diagram'
 
 
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_getprocessdiagram_calls_requests(mock, engine_url):
     get_process_diagram = pycamunda.processdef.GetProcessDiagram(url=engine_url, id_='anId')
     get_process_diagram()
@@ -37,14 +37,14 @@ def test_getprocessdiagram_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_getprocessdiagram_raises_pycamunda_exception(engine_url):
     get_process_diagram = pycamunda.processdef.GetProcessDiagram(url=engine_url, id_='anId')
     with pytest.raises(pycamunda.PyCamundaException):
         get_process_diagram()
 
 
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.processdef.ActivityStats', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_getprocessdiagram_raises_for_status(mock, engine_url):
@@ -54,7 +54,7 @@ def test_getprocessdiagram_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', response_mock)
+@unittest.mock.patch('requests.Session.request', response_mock)
 def test_getprocessdiagram_returns_response_content(engine_url):
     get_process_diagram = pycamunda.processdef.GetProcessDiagram(url=engine_url, id_='anId')
     result = get_process_diagram()

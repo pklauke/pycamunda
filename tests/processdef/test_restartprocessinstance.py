@@ -42,7 +42,7 @@ def test_restartprocessinstance_params(
     assert restart_instance_async.url == engine_url + '/process-definition/anId/restart-async'
 
 
-@unittest.mock.patch('requests.post')
+@unittest.mock.patch('requests.Session.request')
 def test_restartprocessinstance_calls_requests(mock, engine_url):
     start_instance = pycamunda.processdef.RestartProcessInstance(
         url=engine_url, id_='anId', process_instance_ids=[]
@@ -52,7 +52,7 @@ def test_restartprocessinstance_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_restartprocessinstance_raises_pycamunda_exception(engine_url):
     restart_instance = pycamunda.processdef.RestartProcessInstance(
         url=engine_url, id_='anId', process_instance_ids=[]
@@ -61,7 +61,7 @@ def test_restartprocessinstance_raises_pycamunda_exception(engine_url):
         restart_instance()
 
 
-@unittest.mock.patch('requests.post', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.processinst.ProcessInstance', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_restartprocessinstance_raises_for_status(mock, engine_url):
@@ -73,7 +73,7 @@ def test_restartprocessinstance_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_restartprocessinstance_returns_none(engine_url):
     restart_instance = pycamunda.processdef.RestartProcessInstance(
         url=engine_url, id_='anId', process_instance_ids=[]
@@ -83,7 +83,7 @@ def test_restartprocessinstance_returns_none(engine_url):
     assert result is None
 
 
-@unittest.mock.patch('requests.post', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_restartprocessinstance_async_returns_batch(engine_url):
     restart_instance = pycamunda.processdef.RestartProcessInstance(
         url=engine_url, id_='anId', process_instance_ids=[], async_=True

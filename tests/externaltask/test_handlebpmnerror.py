@@ -28,7 +28,7 @@ def test_handlebpmnerror_params(engine_url):
         }
 
 
-@unittest.mock.patch('requests.post')
+@unittest.mock.patch('requests.Session.request')
 def test_handlebpmnerror_calls_requests(mock, engine_url):
     handle_error = pycamunda.externaltask.HandleBPMNError(
         url=engine_url, worker_id='1', id_='anId', error_code='anErrorCode'
@@ -38,7 +38,7 @@ def test_handlebpmnerror_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_handlebpmnerror_raises_pycamunda_exception(engine_url):
     handle_error = pycamunda.externaltask.HandleBPMNError(
         url=engine_url, worker_id='1', id_='anId', error_code='anErrorCode'
@@ -47,7 +47,7 @@ def test_handlebpmnerror_raises_pycamunda_exception(engine_url):
         handle_error()
 
 
-@unittest.mock.patch('requests.post', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_handlebpmnerror_raises_for_status(mock, engine_url):
     handle_error = pycamunda.externaltask.HandleBPMNError(
@@ -58,7 +58,7 @@ def test_handlebpmnerror_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_handlebpmnerror_returns_none(engine_url):
     handle_error = pycamunda.externaltask.HandleBPMNError(
         url=engine_url, worker_id='1', id_='anId', error_code='anErrorCode'

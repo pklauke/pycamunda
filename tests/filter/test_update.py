@@ -20,7 +20,7 @@ def test_update_params(engine_url):
     }
 
 
-@unittest.mock.patch('requests.put')
+@unittest.mock.patch('requests.Session.request')
 def test_update_calls_requests(mock, engine_url):
     update_filter = pycamunda.filter.Update(
         url=engine_url, id_='anId', name='aName', owner='anOwner'
@@ -30,7 +30,7 @@ def test_update_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.put', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_update_raises_pycamunda_exception(engine_url):
     update_filter = pycamunda.filter.Update(
         url=engine_url, id_='anId', name='aName', owner='anOwner'
@@ -39,7 +39,7 @@ def test_update_raises_pycamunda_exception(engine_url):
         update_filter()
 
 
-@unittest.mock.patch('requests.put', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.filter.Filter')
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_update_raises_for_status(mock, engine_url):
@@ -51,7 +51,7 @@ def test_update_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.put', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_update_returns_none(engine_url):
     update_filter = pycamunda.filter.Update(
         url=engine_url, id_='anId', name='aName', owner='anOwner'

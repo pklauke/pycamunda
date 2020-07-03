@@ -19,7 +19,7 @@ def test_localvariablesgetlist_params(engine_url):
     assert get_vars.body_parameters() == {}
 
 
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_localvariablesgetlist_calls_requests(mock, engine_url):
     get_vars = pycamunda.task.LocalVariablesGetList(
         url=engine_url, task_id='anId', deserialize_values=True
@@ -29,7 +29,7 @@ def test_localvariablesgetlist_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_localvariablesgetlist_raises_pycamunda_exception(engine_url):
     get_vars = pycamunda.task.LocalVariablesGetList(
         url=engine_url, task_id='anId', deserialize_values=True
@@ -38,7 +38,7 @@ def test_localvariablesgetlist_raises_pycamunda_exception(engine_url):
         get_vars()
 
 
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.variable.Variable', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_localvariablesgetlist_raises_for_status(mock, engine_url):
@@ -50,7 +50,7 @@ def test_localvariablesgetlist_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_localvariablesgetlist_returns_dict(engine_url):
     get_vars = pycamunda.task.LocalVariablesGetList(
         url=engine_url, task_id='anId', deserialize_values=True

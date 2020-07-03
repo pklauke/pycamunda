@@ -171,13 +171,7 @@ class _Correlate(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[MessageCorrelationResult]:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return tuple(
             MessageCorrelationResult.load(data=result_json) for result_json in response.json()

@@ -54,7 +54,7 @@ def test_startinstance_path(engine_url):
                                                      '/tenant-id/aTenantId/start'
 
 
-@unittest.mock.patch('requests.post')
+@unittest.mock.patch('requests.Session.request')
 def test_startinstance_calls_requests(mock, engine_url):
     start_instance = pycamunda.processdef.StartInstance(url=engine_url, id_='anId')
     start_instance()
@@ -62,14 +62,14 @@ def test_startinstance_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_startinstance_raises_pycamunda_exception(engine_url):
     start_instance = pycamunda.processdef.StartInstance(url=engine_url, id_='anId')
     with pytest.raises(pycamunda.PyCamundaException):
         start_instance()
 
 
-@unittest.mock.patch('requests.post', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.processinst.ProcessInstance', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_startinstance_raises_for_status(mock, engine_url):
@@ -79,7 +79,7 @@ def test_startinstance_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_startinstance_returns_activitystats(engine_url):
     start_instance = pycamunda.processdef.StartInstance(url=engine_url, id_='anId')
     instance = start_instance()

@@ -163,13 +163,7 @@ class GetActivityInstanceStats(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ActivityStats]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(ActivityStats.load(activity_json) for activity_json in response.json())
 
@@ -202,12 +196,7 @@ class GetProcessDiagram(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs):
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return response.content
 
@@ -361,13 +350,7 @@ class Count(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return response.json()['count']
 
@@ -555,13 +538,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessDefinition]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
 
@@ -605,13 +582,7 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessInstanceStats]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(ProcessInstanceStats.load(stats_json) for stats_json in response.json())
 
@@ -645,12 +616,7 @@ class GetXML(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> str:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return response.json()['bpmn20Xml']
 
@@ -685,12 +651,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> ProcessDefinition:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return ProcessDefinition.load(response.json())
 
@@ -860,13 +821,7 @@ class StartInstance(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.processinst.ProcessInstance:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return pycamunda.processinst.ProcessInstance.load(response.json())
 
@@ -919,13 +874,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class Activate(_ActivateSuspend):
@@ -1033,13 +982,7 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class Delete(pycamunda.base.CamundaRequest):
@@ -1090,13 +1033,7 @@ class Delete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.delete(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
 
 
 class RestartProcessInstance(pycamunda.base.CamundaRequest):
@@ -1205,13 +1142,7 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())

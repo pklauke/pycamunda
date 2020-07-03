@@ -108,12 +108,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> ExternalTask:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
         external_task = ExternalTask.load(response.json())
 
         if self.request_error_details:
@@ -261,13 +256,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
         external_tasks = tuple(ExternalTask.load(task_json) for task_json in response.json())
 
         if self.request_error_details:
@@ -374,14 +363,17 @@ class Count(GetList):
         )
         self._url += '/count'
 
-    def __call__(self, *args, **kwargs) -> int:
-        """Send the request."""
-        params = self.query_parameters()
+    def query_parameters(self, apply: typing.Callable = ...):
+        params = super().query_parameters(apply=apply)
         for key, value in params.items():
             if isinstance(value, dt.datetime):
                 params[key] = pycamunda.base.isoformat(datetime_=value)
+        return params
+
+    def __call__(self, *args, **kwargs) -> int:
+        """Send the request."""
         try:
-            response = requests.get(self.url, params=params)
+            response = requests.get(self.url, params=self.query_parameters())
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
@@ -450,13 +442,7 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
 
@@ -562,13 +548,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class HandleFailure(pycamunda.base.CamundaRequest):
@@ -615,13 +595,7 @@ class HandleFailure(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Unlock(pycamunda.base.CamundaRequest):
@@ -639,12 +613,7 @@ class Unlock(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        try:
-            response = requests.post(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class ExtendLock(pycamunda.base.CamundaRequest):
@@ -669,13 +638,7 @@ class ExtendLock(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class SetPriority(pycamunda.base.CamundaRequest):
@@ -696,13 +659,7 @@ class SetPriority(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class SetRetries(pycamunda.base.CamundaRequest):
@@ -723,13 +680,7 @@ class SetRetries(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class SetRetriesAsync(pycamunda.base.CamundaRequest):
@@ -758,13 +709,7 @@ class SetRetriesAsync(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.batch.Batch:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return pycamunda.batch.Batch.load(response.json())
 
@@ -795,10 +740,4 @@ class SetRetriesSync(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)

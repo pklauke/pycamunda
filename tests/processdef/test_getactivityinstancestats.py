@@ -35,7 +35,7 @@ def test_getactivityinstancestats_path(engine_url):
                                                          '/tenant-id/aTenantId/statistics'
 
 
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_getactivityinstancestats_calls_requests(mock, engine_url):
     get_instance_stats = pycamunda.processdef.GetActivityInstanceStats(url=engine_url, id_='anId')
     get_instance_stats()
@@ -43,14 +43,14 @@ def test_getactivityinstancestats_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_getactivityinstancestats_raises_pycamunda_exception(engine_url):
     get_instance_stats = pycamunda.processdef.GetActivityInstanceStats(url=engine_url, id_='anId')
     with pytest.raises(pycamunda.PyCamundaException):
         get_instance_stats()
 
 
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.processdef.ActivityStats', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_getactivityinstancestats_raises_for_status(mock, engine_url):
@@ -60,7 +60,7 @@ def test_getactivityinstancestats_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_getactivityinstancestats_returns_activitystats(engine_url):
     get_instance_stats = pycamunda.processdef.GetActivityInstanceStats(url=engine_url, id_='anId')
     instance_stats = get_instance_stats()

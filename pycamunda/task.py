@@ -145,12 +145,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Task:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return Task.load(response.json())
 
@@ -486,13 +481,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Task]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(Task.load(task_json) for task_json in response.json())
 
@@ -517,13 +506,7 @@ class Claim(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Unclaim(pycamunda.base.CamundaRequest):
@@ -541,13 +524,7 @@ class Unclaim(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Complete(pycamunda.base.CamundaRequest):
@@ -584,13 +561,7 @@ class Complete(pycamunda.base.CamundaRequest):
         self, *args, **kwargs
     ) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         if self.with_variables_in_return:
             return {
@@ -631,13 +602,7 @@ class Resolve(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class SetAssignee(pycamunda.base.CamundaRequest):
@@ -658,13 +623,7 @@ class SetAssignee(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Delegate(pycamunda.base.CamundaRequest):
@@ -685,13 +644,7 @@ class Delegate(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Create(pycamunda.base.CamundaRequest):
@@ -759,13 +712,7 @@ class Create(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Update(pycamunda.base.CamundaRequest):
@@ -834,13 +781,7 @@ class Update(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class IdentityLinksGetList(pycamunda.base.CamundaRequest):
@@ -865,13 +806,7 @@ class IdentityLinksGetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[IdentityLink]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(IdentityLink.load(link_json) for link_json in response.json())
 
@@ -909,13 +844,7 @@ class IdentityLinksAdd(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
 
 class IdentityLinksDelete(pycamunda.base.CamundaRequest):
@@ -951,13 +880,7 @@ class IdentityLinksDelete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class CommentGetList(pycamunda.base.CamundaRequest):
@@ -975,12 +898,7 @@ class CommentGetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Comment]:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(Comment.load(data=comment_json) for comment_json in response.json())
 
@@ -1003,12 +921,7 @@ class CommentGet(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Comment:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return Comment.load(data=response.json())
 
@@ -1031,13 +944,7 @@ class CommentCreate(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Comment:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return Comment.load(data=response.json())
 
@@ -1079,13 +986,7 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.variable.Variable:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         if self.binary:
             return response.content
@@ -1118,13 +1019,7 @@ class LocalVariablesGetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Dict[str, pycamunda.variable.Variable]:
         """Send the request."""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return {
             name: pycamunda.variable.Variable.load(data=var_json)
@@ -1177,13 +1072,7 @@ class LocalVariablesModify(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
@@ -1235,19 +1124,16 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
             return {'valueType': self.type_}
         return super().body_parameters(apply=apply)
 
+    @property
+    def files(self):
+        return {'data': self.value}
+
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        params = self.body_parameters()
         if self._is_binary():
-            try:
-                response = requests.post(self.url, data=params, files={'data': self.value})
-            except requests.exceptions.RequestException:
-                raise pycamunda.PyCamundaException()
+            response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
         else:
-            try:
-                response = requests.put(self.url, json=params)
-            except requests.exceptions.RequestException:
-                raise pycamunda.PyCamundaException()
+            response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
         if not response:
             pycamunda.base._raise_for_status(response)
@@ -1273,9 +1159,4 @@ class LocalVariablesDelete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        try:
-            response = requests.delete(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
