@@ -5,6 +5,7 @@ API
    :maxdepth: 3
    :caption: API:
 
+   api/authorization
    api/activityinst
    api/batch
    api/deployment

@@ -16,6 +16,11 @@ class BadRequest(NoSuccess):
     http_code = 400
 
 
+class Unauthorized(NoSuccess):
+    """Exception that is raised when the user is not authorized."""
+    http_code = 401
+
+
 class Forbidden(NoSuccess):
     """Exception that is raised when the tried action was valid but not permitted."""
     http_code = 403

@@ -16,3 +16,10 @@ ResourceOptions
     :members:
     :undoc-members:
     :exclude-members: load
+
+ResourceType
+-------------------------------------
+.. autoclass:: pycamunda.resource.ResourceType
+    :members:
+    :undoc-members:
+    :exclude-members:

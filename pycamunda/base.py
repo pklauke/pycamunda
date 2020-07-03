@@ -3,6 +3,7 @@
 import abc
 import datetime as dt
 import typing
+import json
 
 import requests
 
@@ -84,9 +85,13 @@ def _raise_for_status(response: requests.Response) -> None:
         message = ''
     except TypeError:
         message = ''
+    except json.decoder.JSONDecodeError:
+        message = ''
 
     if response.status_code == 400:
         raise pycamunda.BadRequest(message)
+    if response.status_code == 401:
+        raise pycamunda.Unauthorized(message)
     elif response.status_code == 403:
         raise pycamunda.Forbidden(message)
     elif response.status_code == 404:
