@@ -53,6 +53,7 @@ def test_correlatesingle_calls_requests(mock, engine_url):
     correlate()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'POST'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

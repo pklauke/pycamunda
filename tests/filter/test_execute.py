@@ -31,6 +31,7 @@ def test_execute_calls_requests(mock, engine_url):
     execute_filter()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'GET'
 
 
 @unittest.mock.patch('requests.Session.request')

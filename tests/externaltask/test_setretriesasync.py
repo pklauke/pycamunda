@@ -38,6 +38,7 @@ def test_setretriesasync_calls_requests(mock, engine_url):
     set_retries()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'POST'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

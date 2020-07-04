@@ -37,6 +37,7 @@ def test_setretriessync_calls_requests(mock, engine_url):
     set_retries()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'PUT'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

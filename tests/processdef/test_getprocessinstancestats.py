@@ -74,6 +74,7 @@ def test_getprocessdiagram_calls_requests(mock, engine_url):
     get_process_instance_stats()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'GET'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

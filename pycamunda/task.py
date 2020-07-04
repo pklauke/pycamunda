@@ -844,7 +844,7 @@ class IdentityLinksAdd(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class IdentityLinksDelete(pycamunda.base.CamundaRequest):

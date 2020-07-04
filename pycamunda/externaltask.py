@@ -373,7 +373,11 @@ class Count(GetList):
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
         try:
-            response = requests.get(self.url, params=self.query_parameters())
+            response = requests.request(
+                method=pycamunda.base.RequestMethod.GET.value,
+                url=self.url,
+                params=self.query_parameters()
+            )
         except requests.exceptions.RequestException:
             raise pycamunda.PyCamundaException()
         if not response:
@@ -494,13 +498,7 @@ class Complete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class HandleBPMNError(pycamunda.base.CamundaRequest):
@@ -548,7 +546,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class HandleFailure(pycamunda.base.CamundaRequest):
@@ -595,7 +593,7 @@ class HandleFailure(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class Unlock(pycamunda.base.CamundaRequest):
@@ -613,7 +611,7 @@ class Unlock(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class ExtendLock(pycamunda.base.CamundaRequest):
@@ -638,7 +636,7 @@ class ExtendLock(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
 
 class SetPriority(pycamunda.base.CamundaRequest):
@@ -659,7 +657,7 @@ class SetPriority(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class SetRetries(pycamunda.base.CamundaRequest):
@@ -680,7 +678,7 @@ class SetRetries(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class SetRetriesAsync(pycamunda.base.CamundaRequest):

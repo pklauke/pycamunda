@@ -43,6 +43,7 @@ def test_localvariablesupdate_calls_requests(mock, engine_url):
     update_var()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'PUT'
 
 
 @unittest.mock.patch('requests.Session.request')

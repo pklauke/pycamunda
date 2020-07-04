@@ -32,6 +32,7 @@ def test_update_calls_requests(mock, engine_url, update_input):
     update_authorization()
 
     assert mock.called
+    assert mock.call_args[1]['method'] == 'PUT'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
