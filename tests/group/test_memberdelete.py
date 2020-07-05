@@ -22,7 +22,7 @@ def test_memberdelete_calls_requests(mock, engine_url):
     delete_member()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'DELETE'
+    assert mock.call_args[1]['method'].upper() == 'DELETE'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

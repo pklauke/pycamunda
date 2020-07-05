@@ -23,7 +23,7 @@ def test_count_calls_requests(mock, engine_url):
 
     assert mock.called
     print(mock.call_args)
-    assert mock.call_args[1]['method'] == 'GET'
+    assert mock.call_args[1]['method'].upper() == 'GET'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

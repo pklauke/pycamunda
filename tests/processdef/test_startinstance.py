@@ -60,7 +60,7 @@ def test_startinstance_calls_requests(mock, engine_url):
     start_instance()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'POST'
+    assert mock.call_args[1]['method'].upper() == 'POST'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

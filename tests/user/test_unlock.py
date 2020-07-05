@@ -24,7 +24,7 @@ def test_unlock_calls_requests(mock, engine_url):
     unlock_user()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'POST'
+    assert mock.call_args[1]['method'].upper() == 'POST'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

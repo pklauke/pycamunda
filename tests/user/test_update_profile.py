@@ -28,7 +28,7 @@ def test_update_profile_calls_requests(mock, engine_url, jane_doe_dict):
     update_profile()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'PUT'
+    assert mock.call_args[1]['method'].upper() == 'PUT'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

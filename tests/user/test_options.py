@@ -24,7 +24,7 @@ def test_options_calls_requests(mock, engine_url):
     get_options()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'OPTIONS'
+    assert mock.call_args[1]['method'].upper() == 'OPTIONS'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

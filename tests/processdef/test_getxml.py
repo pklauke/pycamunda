@@ -32,7 +32,7 @@ def test_getxml_calls_requests(mock, engine_url):
     get_xml()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'GET'
+    assert mock.call_args[1]['method'].upper() == 'GET'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)

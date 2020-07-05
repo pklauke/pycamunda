@@ -23,7 +23,7 @@ def test_commentget_calls_requests(mock, engine_url, task_input):
     get_comment()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'GET'
+    assert mock.call_args[1]['method'].upper() == 'GET'
 
 
 @unittest.mock.patch('pycamunda.task.Comment.load', unittest.mock.MagicMock())

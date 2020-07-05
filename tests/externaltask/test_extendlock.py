@@ -29,7 +29,7 @@ def test_extendlock_calls_requests(mock, engine_url):
     extend_task_lock()
 
     assert mock.called
-    assert mock.call_args[1]['method'] == 'POST'
+    assert mock.call_args[1]['method'].upper() == 'POST'
 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
