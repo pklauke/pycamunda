@@ -17,16 +17,17 @@ def test_commentget_params(engine_url):
 
 
 @unittest.mock.patch('pycamunda.task.Comment.load', unittest.mock.MagicMock())
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_commentget_calls_requests(mock, engine_url, task_input):
     get_comment = pycamunda.task.CommentGet(url=engine_url, task_id='anId', comment_id='anotherId')
     get_comment()
 
     assert mock.called
+    assert mock.call_args[1]['method'].upper() == 'GET'
 
 
 @unittest.mock.patch('pycamunda.task.Comment.load', unittest.mock.MagicMock())
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_commentget_raises_pycamunda_exception(engine_url, task_input):
     get_comment = pycamunda.task.CommentGet(url=engine_url, task_id='anId', comment_id='anotherId')
     with pytest.raises(pycamunda.PyCamundaException):
@@ -34,7 +35,7 @@ def test_commentget_raises_pycamunda_exception(engine_url, task_input):
 
 
 @unittest.mock.patch('pycamunda.task.Comment.load', unittest.mock.MagicMock())
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_commentget_raises_for_status(mock, engine_url, task_input):
     get_comment = pycamunda.task.CommentGet(url=engine_url, task_id='anId', comment_id='anotherId')
@@ -43,7 +44,7 @@ def test_commentget_raises_for_status(mock, engine_url, task_input):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base.from_isoformat', unittest.mock.MagicMock())
 def test_commentget_returns_comment(engine_url, task_input):
     get_comment = pycamunda.task.CommentGet(url=engine_url, task_id='anId', comment_id='anotherId')

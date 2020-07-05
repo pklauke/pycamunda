@@ -16,22 +16,23 @@ def test_setpriority_params(engine_url):
     assert set_priority.body_parameters() == {'priority': 10}
 
 
-@unittest.mock.patch('requests.put')
+@unittest.mock.patch('requests.Session.request')
 def test_setpriority_calls_requests(mock, engine_url):
     set_priority = pycamunda.externaltask.SetPriority(url=engine_url, id_='anId', priority=10)
     set_priority()
 
     assert mock.called
+    assert mock.call_args[1]['method'].upper() == 'PUT'
 
 
-@unittest.mock.patch('requests.put', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_setpriority_raises_pycamunda_exception(engine_url):
     set_priority = pycamunda.externaltask.SetPriority(url=engine_url, id_='anId', priority=10)
     with pytest.raises(pycamunda.PyCamundaException):
         set_priority()
 
 
-@unittest.mock.patch('requests.put', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_setpriority_raises_for_status(mock, engine_url):
     set_priority = pycamunda.externaltask.SetPriority(url=engine_url, id_='anId', priority=10)
@@ -40,7 +41,7 @@ def test_setpriority_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.put', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_setpriority_returns_none(engine_url):
     set_priority = pycamunda.externaltask.SetPriority(url=engine_url, id_='anId', priority=10)
     result = set_priority()

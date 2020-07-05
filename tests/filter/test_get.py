@@ -16,22 +16,23 @@ def test_get_params(engine_url):
     assert get_filter.body_parameters() == {}
 
 
-@unittest.mock.patch('requests.get')
+@unittest.mock.patch('requests.Session.request')
 def test_get_calls_requests(mock, engine_url):
     get_filter = pycamunda.filter.Get(url=engine_url, id_='anId', item_count=True)
     get_filter()
 
     assert mock.called
+    assert mock.call_args[1]['method'].upper() == 'GET'
 
 
-@unittest.mock.patch('requests.get', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_get_raises_pycamunda_exception(engine_url):
     get_filter = pycamunda.filter.Get(url=engine_url, id_='anId', item_count=True)
     with pytest.raises(pycamunda.PyCamundaException):
         get_filter()
 
 
-@unittest.mock.patch('requests.get', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.filter.Filter', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_get_raises_for_status(mock, engine_url):
@@ -41,7 +42,7 @@ def test_get_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.get', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_get_returns_filter(engine_url):
     get_filter = pycamunda.filter.Get(url=engine_url, id_='anId', item_count=True)
     filter_ = get_filter()

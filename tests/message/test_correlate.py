@@ -47,22 +47,23 @@ def test_correlatesingle_method_params(engine_url):
 
 
 @unittest.mock.patch('pycamunda.message.MessageCorrelationResult', unittest.mock.MagicMock())
-@unittest.mock.patch('requests.post')
+@unittest.mock.patch('requests.Session.request')
 def test_correlatesingle_calls_requests(mock, engine_url):
     correlate = pycamunda.message.CorrelateSingle(url=engine_url, message_name='aMessageName')
     correlate()
 
     assert mock.called
+    assert mock.call_args[1]['method'].upper() == 'POST'
 
 
-@unittest.mock.patch('requests.post', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_correlatesingle_raises_pycamunda_exception(engine_url):
     correlate = pycamunda.message.CorrelateSingle(url=engine_url, message_name='aMessageName')
     with pytest.raises(pycamunda.PyCamundaException):
         correlate()
 
 
-@unittest.mock.patch('requests.post', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.message.MessageCorrelationResult', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_correlatesingle_raises_for_status(mock, engine_url):
@@ -72,7 +73,7 @@ def test_correlatesingle_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.message.ResultType', unittest.mock.MagicMock())
 def test_correlatesingle_returns_messagecorrelationresult(engine_url):
     correlate = pycamunda.message.CorrelateSingle(url=engine_url, message_name='aMessageName')
@@ -121,7 +122,7 @@ def test_correlateall_method_params(engine_url):
 
 
 @unittest.mock.patch('pycamunda.message.MessageCorrelationResult', unittest.mock.MagicMock())
-@unittest.mock.patch('requests.post')
+@unittest.mock.patch('requests.Session.request')
 def test_correlateall_calls_requests(mock, engine_url):
     correlate = pycamunda.message.CorrelateAll(url=engine_url, message_name='aMessageName')
     correlate()
@@ -129,14 +130,14 @@ def test_correlateall_calls_requests(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', raise_requests_exception_mock)
+@unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_correlateall_raises_pycamunda_exception(engine_url):
     correlate = pycamunda.message.CorrelateAll(url=engine_url, message_name='aMessageName')
     with pytest.raises(pycamunda.PyCamundaException):
         correlate()
 
 
-@unittest.mock.patch('requests.post', not_ok_response_mock)
+@unittest.mock.patch('requests.Session.request', not_ok_response_mock)
 @unittest.mock.patch('pycamunda.message.MessageCorrelationResult', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_correlateall_raises_for_status(mock, engine_url):
@@ -146,7 +147,7 @@ def test_correlateall_raises_for_status(mock, engine_url):
     assert mock.called
 
 
-@unittest.mock.patch('requests.post', unittest.mock.MagicMock())
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.message.ResultType', unittest.mock.MagicMock())
 def test_correlateall_returns_messagecorrelationresult(engine_url):
     correlate = pycamunda.message.CorrelateAll(url=engine_url, message_name='aMessageName')

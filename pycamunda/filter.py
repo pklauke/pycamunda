@@ -135,13 +135,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Filter]:
         """Send the request"""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(Filter.load(filter_json) for filter_json in response.json())
 
@@ -179,13 +173,7 @@ class Count(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request"""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return response.json()['count']
 
@@ -208,18 +196,12 @@ class Get(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> Filter:
         """Send the request"""
-        params = self.query_parameters()
-        try:
-            response = requests.get(self.url, params=params)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return Filter.load(response.json())
 
 
-class _Criteria(pycamunda.request.Request):
+class _Criteria(pycamunda.base.CamundaRequest):
 
     process_instance_id = BodyParameter('processInstanceId')
     process_instance_business_key = BodyParameter('processInstanceBusinessKey')
@@ -578,7 +560,7 @@ class _Criteria(pycamunda.request.Request):
             self.follow_up_before_or_not_existent = follow_up_before_or_not_existent
 
     def __call__(self, *args, **kwargs):
-        return NotImplementedError
+        return super().__call__(*args, **kwargs)
 
 
 class Create(_Criteria):
@@ -601,13 +583,7 @@ class Create(_Criteria):
 
     def __call__(self, *args, **kwargs) -> Filter:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.post(self.url, json=params)
-        except requests.exceptions.RequestException as exc:
-            raise pycamunda.PyCamundaException(exc)
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return Filter.load(response.json())
 
@@ -635,13 +611,7 @@ class Update(_Criteria):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        params = self.body_parameters()
-        try:
-            response = requests.put(self.url, json=params)
-        except requests.exceptions.RequestException as exc:
-            raise pycamunda.PyCamundaException(exc)
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
 class Delete(pycamunda.base.CamundaRequest):
@@ -659,12 +629,7 @@ class Delete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        try:
-            response = requests.delete(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
 
 
 class Execute(_Criteria):
@@ -681,21 +646,21 @@ class Execute(_Criteria):
         self.id_ = id_
         self.single_result = single_result
 
+    @property
+    def url(self) -> str:
+        return super().url + ('/singleResult' if self.single_result else '/list')
+
+    def body_parameters(self, apply: typing.Callable = ...) -> typing.Dict[str, typing.Any]:
+        return super().body_parameters(apply=apply)['query']
+
     def __call__(
         self, *args, **kwargs
     ) -> typing.Union[pycamunda.task.Task, typing.Tuple[pycamunda.task.Task]]:
         """Send the request."""
-        params = self.body_parameters()['query']
-        url = self.url + ('/singleResult' if self.single_result else '/list')
-        try:
-            if params:
-                response = requests.post(url, json=params)
-            else:
-                response = requests.get(url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        if self.body_parameters():
+            response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        else:
+            response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         if self.single_result:
             return pycamunda.task.Task.load(response.json())
@@ -717,11 +682,6 @@ class ExecuteCount(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        try:
-            response = requests.get(self.url)
-        except requests.exceptions.RequestException:
-            raise pycamunda.PyCamundaException()
-        if not response:
-            pycamunda.base._raise_for_status(response)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return response.json()['count']
