@@ -3,7 +3,7 @@
 import pytest
 
 import pycamunda.resource
-import pycamunda.authorization
+import pycamunda.auth
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def getlist_input():
 def getlist_output():
     return {
         'id': 'anId',
-        'type': pycamunda.authorization.AuthorizationType(0).value,
+        'type': pycamunda.auth.AuthorizationType(0).value,
         'userIdIn': ['anUser'],
         'groupIdIn': ['aGroup'],
         'resourceType': pycamunda.resource.ResourceType(1).value,
@@ -67,7 +67,7 @@ def count_input():
 def count_output():
     return {
         'id': 'anId',
-        'type': pycamunda.authorization.AuthorizationType(0).value,
+        'type': pycamunda.auth.AuthorizationType(0).value,
         'userIdIn': ['anUser'],
         'groupIdIn': ['aGroup'],
         'resourceType': pycamunda.resource.ResourceType(1).value

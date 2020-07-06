@@ -4,12 +4,12 @@ import unittest.mock
 
 import pytest
 
-import pycamunda.authorization
+import pycamunda.auth
 from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 
 
 def test_create_params(engine_url, create_input, create_output):
-    create_authorization = pycamunda.authorization.Create(url=engine_url, **create_input)
+    create_authorization = pycamunda.auth.Create(url=engine_url, **create_input)
 
     assert create_authorization.url == engine_url + '/authorization/create'
     assert create_authorization.query_parameters() == {}
@@ -19,7 +19,7 @@ def test_create_params(engine_url, create_input, create_output):
 @unittest.mock.patch('pycamunda.authorization.Authorization')
 @unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
 def test_create_raises_assert(engine_url, create_input):
-    create_authorization = pycamunda.authorization.Create(
+    create_authorization = pycamunda.auth.Create(
         url=engine_url, **create_input, group_id='*'
     )
 
@@ -30,7 +30,7 @@ def test_create_raises_assert(engine_url, create_input):
 @unittest.mock.patch('pycamunda.authorization.Authorization')
 @unittest.mock.patch('requests.Session.request')
 def test_create_calls_requests(mock, engine_url, create_input):
-    create_authorization = pycamunda.authorization.Create(url=engine_url, **create_input)
+    create_authorization = pycamunda.auth.Create(url=engine_url, **create_input)
     create_authorization()
 
     assert mock.called
@@ -39,7 +39,7 @@ def test_create_calls_requests(mock, engine_url, create_input):
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_create_raises_pycamunda_exception(engine_url, create_input):
-    create_authorization = pycamunda.authorization.Create(url=engine_url, **create_input)
+    create_authorization = pycamunda.auth.Create(url=engine_url, **create_input)
     with pytest.raises(pycamunda.PyCamundaException):
         create_authorization()
 
@@ -48,7 +48,7 @@ def test_create_raises_pycamunda_exception(engine_url, create_input):
 @unittest.mock.patch('pycamunda.authorization.Authorization', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_create_raises_for_status(mock, engine_url, create_input):
-    create_authorization = pycamunda.authorization.Create(url=engine_url, **create_input)
+    create_authorization = pycamunda.auth.Create(url=engine_url, **create_input)
     create_authorization()
 
     assert mock.called
@@ -58,7 +58,7 @@ def test_create_raises_for_status(mock, engine_url, create_input):
 @unittest.mock.patch('pycamunda.resource.ResourceType', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base.from_isoformat', unittest.mock.MagicMock())
 def test_create_returns_authorization(engine_url, create_input):
-    create_authorization = pycamunda.authorization.Create(url=engine_url, **create_input)
+    create_authorization = pycamunda.auth.Create(url=engine_url, **create_input)
     authorization = create_authorization()
 
-    assert isinstance(authorization, pycamunda.authorization.Authorization)
+    assert isinstance(authorization, pycamunda.auth.Authorization)

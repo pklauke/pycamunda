@@ -4,12 +4,12 @@ import datetime as dt
 
 import pytest
 
-import pycamunda.authorization
+import pycamunda.auth
 import pycamunda.resource
 
 
 def test_authorization_load(my_authorization_json):
-    auth = pycamunda.authorization.Authorization.load(my_authorization_json)
+    auth = pycamunda.auth.Authorization.load(my_authorization_json)
 
     assert auth.id_ == my_authorization_json['id']
     assert auth.type_ == my_authorization_json['type']
@@ -29,9 +29,9 @@ def test_authorization_load_raises_keyerror(my_authorization_json):
         json_ = dict(my_authorization_json)
         del json_[key]
         with pytest.raises(KeyError):
-            pycamunda.authorization.Authorization.load(json_)
+            pycamunda.auth.Authorization.load(json_)
 
     for key in ('links', 'removalTime', 'rootProcessInstanceId'):
         json_ = dict(my_authorization_json)
         del json_[key]
-        pycamunda.authorization.Authorization.load(json_)
+        pycamunda.auth.Authorization.load(json_)
