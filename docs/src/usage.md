@@ -51,3 +51,22 @@ for task in tasks:
     complete.add_variable(name='ServiceTaskVariable', value=2)  # Send this variable to the instance
     complete()
 ```
+
+## Authentication
+
+In case authentication for the REST api of Camunda is enabled as described in
+<a href="https://docs.camunda.org/manual/latest/reference/rest/overview/authentication/">Configure Authentication</a>,
+base64-encoded credentials have to be provided with each request. In PyCamunda this can be done
+by using the `auth` attribute.
+```python
+import requests.auth
+import pycamunda.task
+
+
+url = 'http://localhost:8080/engine-rest'
+
+get_tasks = pycamunda.task.GetList(url)
+get_tasks.auth = requests.auth.HTTPBasicAuth(username='demo', password='demo')
+tasks = get_tasks()
+```
+PyCamunda will raise a `pycamunda.Unauthorized` exception if the authentication fails.
