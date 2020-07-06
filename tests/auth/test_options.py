@@ -13,7 +13,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 def test_options_params(engine_url):
     get_options = pycamunda.auth.Options(url=engine_url, id_='anId')
 
-    assert get_options.url == engine_url + '/authorization/anId'
+    assert get_options.url == engine_url + '/auth/anId'
     assert get_options.query_parameters() == {}
     assert get_options.body_parameters() == {}
 

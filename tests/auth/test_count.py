@@ -11,7 +11,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock, coun
 def test_count_params(engine_url, count_input, count_output):
     get_count = pycamunda.auth.Count(url=engine_url, **count_input)
 
-    assert get_count.url == engine_url + '/authorization/count'
+    assert get_count.url == engine_url + '/auth/count'
     assert get_count.query_parameters() == count_output
     assert get_count.body_parameters() == {}
 

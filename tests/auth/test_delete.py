@@ -11,7 +11,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 def test_delete_params(engine_url):
     delete_authorization = pycamunda.auth.Delete(url=engine_url, id_='anId')
 
-    assert delete_authorization.url == engine_url + '/authorization/anId'
+    assert delete_authorization.url == engine_url + '/auth/anId'
     assert delete_authorization.query_parameters() == {}
     assert delete_authorization.body_parameters() == {}
 

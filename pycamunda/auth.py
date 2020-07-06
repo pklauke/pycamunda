@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This module provides access to the authorization REST api of Camunda."""
+"""This module provides access to the auth REST api of Camunda."""
 
 from __future__ import annotations
 import typing
@@ -15,7 +15,7 @@ import pycamunda.base
 import pycamunda.resource
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
-URL_SUFFIX = '/authorization'
+URL_SUFFIX = '/auth'
 
 
 __all__ = ['AuthorizationType', 'GetList', 'Count', 'Get', 'Check', 'Options', 'Update', 'Create',
@@ -218,7 +218,7 @@ class Get(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
 
     def __init__(self, url: str, id_: str):
-        """Get an authorization.
+        """Get an auth.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the authorization.
@@ -317,7 +317,7 @@ class Create(pycamunda.base.CamundaRequest):
         user_id: str = None,
         group_id: str = None
     ):
-        """Create an authorization.
+        """Create an auth.
 
         :param url: Camunda Rest engine URL.
         :param type_: Id of the authorization.
@@ -365,7 +365,7 @@ class Update(pycamunda.base.CamundaRequest):
         user_id: str = None,
         group_id: str = None
     ):
-        """Update an authorization.
+        """Update an auth.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the authorization.
@@ -397,7 +397,7 @@ class Delete(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
 
     def __init__(self, url: str, id_: str):
-        """Delete an authorization.
+        """Delete an auth.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the authorization.

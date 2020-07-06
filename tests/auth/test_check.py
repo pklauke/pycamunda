@@ -11,7 +11,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 def test_check_params(engine_url, check_input, check_output):
     check_authorization = pycamunda.auth.Check(url=engine_url, **check_input)
 
-    assert check_authorization.url == engine_url + '/authorization/check'
+    assert check_authorization.url == engine_url + '/auth/check'
     assert check_authorization.query_parameters() == check_output
     assert check_authorization.body_parameters() == {}
 
@@ -33,7 +33,7 @@ def test_check_raises_pycamunda_exception(engine_url, check_input):
 
 
 @unittest.mock.patch('requests.Session.request', not_ok_response_mock)
-@unittest.mock.patch('pycamunda.authorization.Permission', unittest.mock.MagicMock())
+@unittest.mock.patch('pycamunda.auth.Permission', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_check_raises_for_status(mock, engine_url, check_input):
     check_authorization = pycamunda.auth.Check(url=engine_url, **check_input)

@@ -11,7 +11,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 def test_getlist_params(engine_url, getlist_input, getlist_output):
     get_authorizations = pycamunda.auth.GetList(url=engine_url, **getlist_input)
 
-    assert get_authorizations.url == engine_url + '/authorization'
+    assert get_authorizations.url == engine_url + '/auth'
     assert get_authorizations.query_parameters() == getlist_output
     assert get_authorizations.body_parameters() == {}
 
@@ -33,7 +33,7 @@ def test_getlist_raises_pycamunda_exception(engine_url):
 
 
 @unittest.mock.patch('requests.Session.request', not_ok_response_mock)
-@unittest.mock.patch('pycamunda.authorization.Authorization', unittest.mock.MagicMock())
+@unittest.mock.patch('pycamunda.auth.Authorization', unittest.mock.MagicMock())
 @unittest.mock.patch('pycamunda.base._raise_for_status')
 def test_getlist_raises_for_status(mock, engine_url):
     get_authorizations = pycamunda.auth.GetList(url=engine_url)

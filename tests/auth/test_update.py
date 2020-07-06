@@ -11,7 +11,7 @@ from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 def test_update_params(engine_url, update_input, update_output):
     update_authorization = pycamunda.auth.Update(url=engine_url, **update_input)
 
-    assert update_authorization.url == engine_url + '/authorization/anId'
+    assert update_authorization.url == engine_url + '/auth/anId'
     assert update_authorization.query_parameters() == {}
     assert update_authorization.body_parameters() == update_output
 
