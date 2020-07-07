@@ -1,7 +1,9 @@
 Welcome to PyCamunda's documentation!
 =====================================
 
-A high-level framework for communicating with the workflow and decision automation engine Camunda.
+PyCamunda is a Python REST api client for the workflow and decision automation engine Camunda.
+
+PyCamunda takes care of Camunda-specific characteristics and gives you an intuitive Python interface so you can focus on developing your actual business application. So PyCamunda deals with http requests, nested dictionaries, camelCase keys, datetime formatting and more for you.
 
 
 .. toctree::
