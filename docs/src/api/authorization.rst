@@ -1,66 +1,66 @@
 Authorization
 =====================================
 
-.. automodule:: pycamunda.authorization
+.. automodule:: pycamunda.auth
 
 AuthorizationType
 -------------------------------------
-.. autoclass:: pycamunda.authorization.AuthorizationType
+.. autoclass:: pycamunda.auth.AuthorizationType
     :members:
     :undoc-members:
     :exclude-members:
 
 Authorization
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Authorization
+.. autoclass:: pycamunda.auth.Authorization
     :members:
     :undoc-members:
     :exclude-members: load
 
 GetList
 -------------------------------------
-.. autoclass:: pycamunda.authorization.GetList
+.. autoclass:: pycamunda.auth.GetList
     :members:
     :special-members: __call__
 
 Count
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Count
+.. autoclass:: pycamunda.auth.Count
     :members:
     :special-members: __call__
 
 Get
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Get
+.. autoclass:: pycamunda.auth.Get
     :members:
     :special-members: __call__
 
 Check
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Check
+.. autoclass:: pycamunda.auth.Check
     :members:
     :special-members: __call__
 
 Options
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Options
+.. autoclass:: pycamunda.auth.Options
     :members:
     :special-members: __call__
 
 Create
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Create
+.. autoclass:: pycamunda.auth.Create
     :members:
     :special-members: __call__
 
 Update
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Update
+.. autoclass:: pycamunda.auth.Update
     :members:
     :special-members: __call__
 
 Delete
 -------------------------------------
-.. autoclass:: pycamunda.authorization.Delete
+.. autoclass:: pycamunda.auth.Delete
     :members:
     :special-members: __call__
