@@ -5,8 +5,6 @@
 from __future__ import annotations
 import typing
 
-import requests
-
 import pycamunda.variable
 import pycamunda.base
 from pycamunda.request import BodyParameter

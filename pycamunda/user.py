@@ -6,8 +6,6 @@ from __future__ import annotations
 import dataclasses
 import typing
 
-import requests
-
 import pycamunda
 import pycamunda.resource
 import pycamunda.variable

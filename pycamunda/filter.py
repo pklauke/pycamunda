@@ -7,8 +7,6 @@ import datetime as dt
 import dataclasses
 import typing
 
-import requests
-
 import pycamunda
 import pycamunda.task
 import pycamunda.variable

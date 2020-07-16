@@ -6,8 +6,6 @@ from __future__ import annotations
 import dataclasses
 import typing
 
-import requests
-
 import pycamunda.base
 from pycamunda.request import QueryParameter, PathParameter
 

@@ -7,8 +7,6 @@ import dataclasses
 import enum
 import typing
 
-import requests
-
 import pycamunda.processinst
 import pycamunda.execution
 import pycamunda.variable

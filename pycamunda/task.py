@@ -8,8 +8,6 @@ import dataclasses
 import enum
 import typing
 
-import requests
-
 import pycamunda.variable
 import pycamunda.base
 from pycamunda.request import BodyParameter, PathParameter, QueryParameter
@@ -233,7 +231,8 @@ class GetList(pycamunda.base.CamundaRequest):
             'execution_id': 'executionId',
             'case_execution_id': 'caseExecutionId',
             'assignee': 'assignee',
-            'created': 'description',
+            'created': 'created',
+            'description': 'description',
             'id': 'id',
             'name': 'name',
             'name_case_insensitive': 'nameCaseInsensitive',

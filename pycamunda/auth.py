@@ -8,8 +8,6 @@ import dataclasses
 import enum
 import datetime as dt
 
-import requests
-
 import pycamunda
 import pycamunda.base
 import pycamunda.resource
