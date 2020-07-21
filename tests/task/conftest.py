@@ -236,3 +236,11 @@ def my_identitylink_json():
         'groupId': 'aGroupId',
         'type': 'assignee'
     }
+
+
+@pytest.fixture
+def my_countbycandidategroup_json():
+    return {
+        'groupName': 'myGroup',
+        'taskCount': 1
+    }

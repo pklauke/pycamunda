@@ -31,6 +31,13 @@ Comment
     :undoc-members:
     :exclude-members: load
 
+CountByCandidateGroup
+-------------------------------------
+.. autoclass:: pycamunda.task.CountByCandidateGroup
+    :members:
+    :undoc-members:
+    :exclude-members: load
+
 Get
 -------------------------------------
 .. autoclass:: pycamunda.task.Get
@@ -154,6 +161,12 @@ LocalVariablesUpdate
 LocalVariablesDelete
 -------------------------------------
 .. autoclass:: pycamunda.task.LocalVariablesDelete
+    :members:
+    :special-members: __call__
+
+GetCountByCandidateGroup
+-------------------------------------
+.. autoclass:: pycamunda.task.GetCountByCandidateGroup
     :members:
     :special-members: __call__
 
