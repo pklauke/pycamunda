@@ -18,7 +18,8 @@ URL_SUFFIX = '/task'
 __all__ = [
     'DelegationState', 'Get', 'GetList', 'Claim', 'Unclaim', 'Complete', 'Resolve', 'SetAssignee',
     'Delegate', 'Create', 'Update', 'LocalVariablesGet', 'LocalVariablesGetList',
-    'LocalVariablesModify', 'LocalVariablesUpdate', 'LocalVariablesDelete'
+    'LocalVariablesModify', 'LocalVariablesUpdate', 'LocalVariablesDelete',
+    'GetCountByCandidateGroup'
 ]
 
 
@@ -126,6 +127,20 @@ class Comment:
             comment.removal_time = pycamunda.base.from_isoformat(data['removalTime'])
 
         return comment
+
+
+@dataclasses.dataclass
+class CountByCandidateGroup:
+    """Data class of task count by candidate group."""
+    group_name: typing.Optional[str]
+    task_count: int
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> CountByCandidateGroup:
+        return cls(
+            group_name=data['groupName'],
+            task_count=int(data['taskCount'])
+        )
 
 
 class Get(pycamunda.base.CamundaRequest):
@@ -1159,3 +1174,19 @@ class LocalVariablesDelete(pycamunda.base.CamundaRequest):
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+
+
+class GetCountByCandidateGroup(pycamunda.base.CamundaRequest):
+
+    def __init__(self, url: str):
+        """Get the number of tasks for each candidate group.
+
+        :param url: Camunda Rest engine URL.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/report/candidate-group-count')
+
+    def __call__(self, *args, **kwargs) -> typing.Tuple[CountByCandidateGroup]:
+        """Send the request."""
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+
+        return tuple(CountByCandidateGroup.load(data=count_json) for count_json in response.json())
