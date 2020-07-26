@@ -14,9 +14,10 @@ def test_group_load():
 
 
 def test_group_load_raises_keyerror():
-    group_json = {'id': 'anId', 'name': 'aName', 'type': 'String'}
+    group_json = {'id': 'anId', 'name': 'aName'}
     for key in group_json:
         json_ = dict(group_json)
         del json_[key]
         with pytest.raises(KeyError):
             pycamunda.group.Group.load(json_)
+    pycamunda.group.Group.load({**group_json, 'type': 'String'})

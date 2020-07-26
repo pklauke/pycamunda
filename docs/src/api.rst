@@ -13,6 +13,7 @@ API
    api/externaltask
    api/filter
    api/group
+   api/identity
    api/incident
    api/instruction
    api/message
