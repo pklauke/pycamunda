@@ -15,9 +15,7 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter, Body
 URL_SUFFIX = '/identity'
 
 
-__all__ = [
-    'GetGroups'
-]
+__all__ = ['GetGroups', 'VerifyUser']
 
 
 @dataclasses.dataclass
@@ -32,6 +30,20 @@ class UsersGroups:
         return cls(
             groups=tuple(pycamunda.group.Group.load(group) for group in data['groups']),
             group_users=tuple(pycamunda.user.User.load(user) for user in data['groupUsers'])
+        )
+
+
+@dataclasses.dataclass
+class AuthStatus:
+    """Data class of the authentication status of an user as returned by the REST api of Camunda."""
+    user_id: str
+    authenticated: bool
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> AuthStatus:
+        return cls(
+            user_id=data['authenticatedUser'],
+            authenticated=data['authenticated']
         )
 
 
@@ -53,3 +65,26 @@ class GetGroups(pycamunda.base.CamundaRequest):
         response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return UsersGroups.load(response.json())
+
+
+class VerifyUser(pycamunda.base.CamundaRequest):
+
+    username = BodyParameter('username')
+    password = BodyParameter('password')
+
+    def __init__(self, url: str, username: str, password: str):
+        """Verify the credentials of an user.
+
+        :param url: Camunda Rest engine URL.
+        :param username: Name of the user.
+        :param password: Password of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/verify')
+        self.username = username
+        self.password = password
+
+    def __call__(self, *args, **kwargs) -> AuthStatus:
+        """Send the request."""
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+
+        return AuthStatus.load(response.json())
