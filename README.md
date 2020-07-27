@@ -32,7 +32,7 @@ Process instance id: 1a70a8e9-a7ed-11ea-8129-0242ac110002
 
 ## Installation
 
-PyCamunda can be installed from the offical <a href="https://pypi.org">Python Package Index</a>.
+PyCamunda requires Python >= 3.7 and can be installed from the offical <a href="https://pypi.org">Python Package Index</a>.
 
 ```
 $ pip install pycamunda
