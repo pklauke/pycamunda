@@ -47,6 +47,20 @@ class AuthStatus:
         )
 
 
+@dataclasses.dataclass
+class PasswordPolicy:
+    """Data class of the password policy as returned by the REST api of Camunda."""
+    placeholder: str
+    parameters: typing.Dict[str, typing.Any]
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> PasswordPolicy:
+        return cls(
+            placeholder=data['placeholder'],
+            parameters=data['parameters']
+        )
+
+
 class GetGroups(pycamunda.base.CamundaRequest):
 
     user_id = QueryParameter('userId')
@@ -88,3 +102,19 @@ class VerifyUser(pycamunda.base.CamundaRequest):
         response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
         return AuthStatus.load(response.json())
+
+
+class GetPasswordPolicy(pycamunda.base.CamundaRequest):
+
+    def __init__(self, url: str):
+        """Get the list of password policy rules.
+
+        :param url: Camunda Rest engine URL.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/password-policy')
+
+    def __call__(self, *args, **kwargs) -> typing.Tuple[PasswordPolicy]:
+        """Send the request."""
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+
+        return tuple(PasswordPolicy.load(policy_json) for policy_json in response.json()['rules'])

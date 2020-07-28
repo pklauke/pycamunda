@@ -19,3 +19,11 @@ def my_auth_status_json():
         'authenticatedUser': 'anId',
         'authenticated': True
     }
+
+
+@pytest.fixture
+def my_passwordpolicy_json():
+    return {
+        'placeholder': 'aPlaceholder',
+        'parameters': {'minChars': '1'}
+    }

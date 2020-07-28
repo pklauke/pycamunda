@@ -17,6 +17,13 @@ AuthStatus
     :undoc-members:
     :exclude-members: load
 
+PasswordPolicy
+-------------------------------------
+.. autoclass:: pycamunda.identity.PasswordPolicy
+    :members:
+    :undoc-members:
+    :exclude-members: load
+
 GetGroups
 -------------------------------------
 .. autoclass:: pycamunda.identity.GetGroups
@@ -26,6 +33,12 @@ GetGroups
 VerifyUser
 -------------------------------------
 .. autoclass:: pycamunda.identity.VerifyUser
+    :members:
+    :special-members: __call__
+
+GetPasswordPolicy
+-------------------------------------
+.. autoclass:: pycamunda.identity.GetPasswordPolicy
     :members:
     :special-members: __call__
 
