@@ -61,6 +61,20 @@ class PasswordPolicy:
         )
 
 
+@dataclasses.dataclass
+class PasswordPolicyCompliance:
+    """Data class of the password policy compliance as returned by the REST api of Camunda."""
+    policy: PasswordPolicy
+    valid: bool
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> PasswordPolicyCompliance:
+        policy = PasswordPolicy.load(
+            {k: v for k, v in data.items() if k in ('placeholder', 'parameters')}
+        )
+        return cls(policy=policy, valid=data['valid'])
+
+
 class GetGroups(pycamunda.base.CamundaRequest):
 
     user_id = QueryParameter('userId')
@@ -118,3 +132,26 @@ class GetPasswordPolicy(pycamunda.base.CamundaRequest):
         response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return tuple(PasswordPolicy.load(policy_json) for policy_json in response.json()['rules'])
+
+
+class ValidatePassword(pycamunda.base.CamundaRequest):
+
+    password = BodyParameter('password')
+
+    def __init__(self, url: str, password: str):
+        """Validate a password against the password policy rules.
+
+        :param url: Camunda Rest engine URL.
+        :param password: Password to validate.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/password-policy')
+        self.password = password
+
+    def __call__(self, *args, **kwargs) -> typing.Tuple[PasswordPolicyCompliance]:
+        """Send the request."""
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+
+        return tuple(
+            PasswordPolicyCompliance.load(policy_comp_json)
+            for policy_comp_json in response.json()['rules']
+        )

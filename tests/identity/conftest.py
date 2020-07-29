@@ -27,3 +27,12 @@ def my_passwordpolicy_json():
         'placeholder': 'aPlaceholder',
         'parameters': {'minChars': '1'}
     }
+
+
+@pytest.fixture
+def my_passwordpolicycompliance_json():
+    return {
+        'placeholder': 'aPlaceholder',
+        'parameters': {'minChars': '1'},
+        'valid': True
+    }

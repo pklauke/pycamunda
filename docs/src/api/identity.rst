@@ -24,6 +24,13 @@ PasswordPolicy
     :undoc-members:
     :exclude-members: load
 
+PasswordPolicyCompliance
+-------------------------------------
+.. autoclass:: pycamunda.identity.PasswordPolicyCompliance
+    :members:
+    :undoc-members:
+    :exclude-members: load
+
 GetGroups
 -------------------------------------
 .. autoclass:: pycamunda.identity.GetGroups
@@ -39,6 +46,12 @@ VerifyUser
 GetPasswordPolicy
 -------------------------------------
 .. autoclass:: pycamunda.identity.GetPasswordPolicy
+    :members:
+    :special-members: __call__
+
+ValidatePassword
+-------------------------------------
+.. autoclass:: pycamunda.identity.ValidatePassword
     :members:
     :special-members: __call__
 
