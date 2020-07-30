@@ -27,16 +27,26 @@ class User:
     id_: str
     first_name: str
     last_name: str
-    email: str
+    email: str = None
+    display_name = None
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> User:
-        return cls(
+        user = cls(
             id_=data['id'],
             first_name=data['firstName'],
-            last_name=data['lastName'],
-            email=data['email']
+            last_name=data['lastName']
         )
+        try:
+            user.email = data['email']
+        except KeyError:
+            pass
+        try:
+            user.display_name = data['displayName']
+        except KeyError:
+            pass
+
+        return user
 
 
 class Delete(pycamunda.base.CamundaRequest):

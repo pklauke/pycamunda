@@ -30,7 +30,9 @@ def test_user_load_raises_key_error():
         pycamunda.user.User.load(data={
             'id': 'janedoe', 'firstName': 'Jane', 'email': 'jane.doe@email.com'
         })
-    with pytest.raises(KeyError):
-        pycamunda.user.User.load(data={
-            'id': 'janedoe', 'firstName': 'Jane', 'lastName': 'Doe'
-        })
+    pycamunda.user.User.load(data={
+        'id': 'janedoe', 'firstName': 'Jane', 'lastName': 'Doe'
+    })
+    pycamunda.user.User.load(data={
+        'id': 'janedoe', 'firstName': 'Jane', 'lastName': 'Doe', 'displayName': 'Jane Doe'
+    })

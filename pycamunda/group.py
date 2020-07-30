@@ -27,15 +27,20 @@ class Group:
     """Data class of group as returned by the REST api of Camunda."""
     id_: str
     name: str
-    type_: str
+    type_: str = None
 
     @classmethod
-    def load(cls, data):
-        return cls(
+    def load(cls, data) -> Group:
+        group = cls(
             id_=data['id'],
-            name=data['name'],
-            type_=data['type']
+            name=data['name']
         )
+        try:
+            group.type_ = data['type']
+        except KeyError:
+            pass
+
+        return group
 
 
 class Get(pycamunda.base.CamundaRequest):
