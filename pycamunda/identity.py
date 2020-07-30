@@ -15,7 +15,7 @@ from pycamunda.request import QueryParameter, PathParameter, BodyParameter, Body
 URL_SUFFIX = '/identity'
 
 
-__all__ = ['GetGroups', 'VerifyUser']
+__all__ = ['GetGroups', 'VerifyUser', 'GetPasswordPolicy', 'ValidatePassword']
 
 
 @dataclasses.dataclass
