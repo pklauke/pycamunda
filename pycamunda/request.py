@@ -191,10 +191,18 @@ class Request(metaclass=RequestMeta):
         return {key: apply(value) for key, value in query.items()}
 
     def __repr__(self) -> str:
-        params = self.__class__._parameters.keys()
+        keys_values = {}
+        for param in self.__class__._parameters.keys():
+            try:
+                value = getattr(self, param)
+            except KeyError:
+                pass
+            else:
+                if value is not None:
+                    keys_values[param] = value
         return (
             f'{self.__class__.__qualname__}('
             f'url={self.url!r}, '
-            f'{", ".join(f"{param}={getattr(self, param)!r}" for param in params)}'
+            f'{", ".join(f"{key}={value!r}" for key, value in keys_values.items())}'
             f')'
         )
