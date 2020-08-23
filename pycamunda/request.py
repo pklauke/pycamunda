@@ -200,9 +200,5 @@ class Request(metaclass=RequestMeta):
             else:
                 if value is not None:
                     keys_values[param] = value
-        return (
-            f'{self.__class__.__qualname__}('
-            f'url={self.url!r}, '
-            f'{", ".join(f"{key}={value!r}" for key, value in keys_values.items())}'
-            f')'
-        )
+        args = [f"url={self.url!r}"] + [f"{key}={value!r}" for key, value in keys_values.items()]
+        return f'{self.__class__.__qualname__}({", ".join(args)})'
