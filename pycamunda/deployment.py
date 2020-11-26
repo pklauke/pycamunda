@@ -9,6 +9,11 @@ import typing
 
 import pycamunda.variable
 import pycamunda.base
+import pycamunda.resource
+import pycamunda.processdef
+import pycamunda.casedef
+import pycamunda.decisiondef
+import pycamunda.decisionreqdef
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 URL_SUFFIX = '/deployment'
@@ -53,6 +58,64 @@ class Resource:
             id_=data['id'],
             name=data['name'],
             deployment_id=data['deploymentId']
+        )
+
+
+@dataclasses.dataclass
+class DeploymentWithDefinitions:
+    """Data class of deployment with definitions as returned by the REST api of Camunda."""
+    links: typing.List[pycamunda.resource.Link]
+    id: str
+    name: str
+    source: str
+    deployed_process_definitions: typing.Dict[str, pycamunda.processdef.ProcessDefinition]
+    deployed_case_definitions: typing.Dict[str, ]
+    deployed_decision_definitions: typing.Dict
+    deployed_decision_requirements_definitions: typing.Dict
+    tenant_id: str = None
+    deployment_time: dt.datetime = None
+
+    @classmethod
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> DeploymentWithDefinitions:
+        if data['deployedProcessDefinitions'] is not None:
+            deployed_process_definitions = {
+                name: pycamunda.processdef.ProcessDefinition.load(process_definition)
+                for name, process_definition in data['deployedProcessDefinitions'].items()
+            }
+        else:
+            deployed_process_definitions = None
+        if data['deployedCaseDefinitions'] is not None:
+            deployed_case_definitions = {
+                name: pycamunda.casedef.CaseDefinition.load(case_definition)
+                for name, case_definition in data['deployedCaseDefinitions'].items()
+            }
+        else:
+            deployed_case_definitions = None
+        if data['deployedDecisionDefinitions'] is not None:
+            deployed_decision_definitions = {
+                name: pycamunda.decisiondef.CaseDefinition.load(decision_definition)
+                for name, decision_definition in data['deployedDecisionDefinitions'].items()
+            }
+        else:
+            deployed_decision_definitions = None
+        if data['deployedDecisionRequirementsDefinitions'] is not None:
+            deployed_decision_requirements_definitions = {
+                name: pycamunda.decisionreqdef.DecisionRequirementsDefinition.load(dec_req_def)
+                for name, dec_req_def in data['deployedDecisionRequirementsDefinitions'].items()
+            }
+        else:
+            deployed_decision_requirements_definitions = None
+        return cls(
+            links=[pycamunda.resource.Link.load(link) for link in data['links']],
+            id=data['id'],
+            name=data['name'],
+            source=data['source'],
+            deployed_process_definitions=deployed_process_definitions,
+            deployed_case_definitions=deployed_case_definitions,
+            deployed_decision_definitions=deployed_decision_definitions,
+            deployed_decision_requirements_definitions=deployed_decision_requirements_definitions,
+            tenant_id=data['tenantId'],
+            deployment_time=pycamunda.base.from_isoformat(data['deploymentTime'])
         )
 
 
@@ -216,10 +279,12 @@ class Create(pycamunda.base.CamundaRequest):
     def files(self):
         return {f'resource-{i}': resource for i, resource in enumerate(self._files)}
 
-    def __call__(self, *args, **kwargs) -> None:
+    def __call__(self, *args, **kwargs) -> DeploymentWithDefinitions:
         """Send the request."""
         assert bool(self.files), 'Cannot create deployment without resources.'
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+
+        return DeploymentWithDefinitions.load(data=response.json())
 
 
 class GetResources(pycamunda.base.CamundaRequest):
