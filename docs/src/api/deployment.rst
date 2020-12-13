@@ -17,6 +17,13 @@ Resource
     :undoc-members:
     :exclude-members: load
 
+DeploymentWithDefinitions
+-------------------------------------
+.. autoclass:: pycamunda.deployment.DeploymentWithDefinitions
+    :members:
+    :undoc-members:
+    :exclude-members: load
+
 GetList
 -------------------------------------
 .. autoclass:: pycamunda.deployment.GetList
