@@ -65,7 +65,7 @@ class Resource:
 class DeploymentWithDefinitions:
     """Data class of deployment with definitions as returned by the REST api of Camunda."""
     links: typing.List[pycamunda.resource.Link]
-    id: str
+    id_: str
     name: str
     source: str
     deployed_process_definitions: typing.Dict[str, pycamunda.processdef.ProcessDefinition]
@@ -107,7 +107,7 @@ class DeploymentWithDefinitions:
             deployed_decision_requirements_definitions = None
         return cls(
             links=[pycamunda.resource.Link.load(link) for link in data['links']],
-            id=data['id'],
+            id_=data['id'],
             name=data['name'],
             source=data['source'],
             deployed_process_definitions=deployed_process_definitions,
