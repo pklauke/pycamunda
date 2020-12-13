@@ -8,7 +8,7 @@ import dataclasses
 
 
 @dataclasses.dataclass
-class DecisionDefinition:
+class DecisionRequirementsDefinition:
     """Data class of decision requirements definition as returned by the REST api of Camunda."""
     id_: str
     key: str
@@ -20,7 +20,7 @@ class DecisionDefinition:
     tenant_id: str
 
     @classmethod
-    def load(cls, data: typing.Mapping[str, typing.Any]) -> DecisionDefinition:
+    def load(cls, data: typing.Mapping[str, typing.Any]) -> DecisionRequirementsDefinition:
         return cls(
             id_=data['id'],
             key=data['key'],

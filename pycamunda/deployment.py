@@ -93,7 +93,7 @@ class DeploymentWithDefinitions:
             deployed_case_definitions = None
         if data['deployedDecisionDefinitions'] is not None:
             deployed_decision_definitions = {
-                name: pycamunda.decisiondef.CaseDefinition.load(decision_definition)
+                name: pycamunda.decisiondef.DecisionDefinition.load(decision_definition)
                 for name, decision_definition in data['deployedDecisionDefinitions'].items()
             }
         else:

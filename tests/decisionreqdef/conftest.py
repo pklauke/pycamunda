@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.fixture
-def my_decision_definition_json():
+def my_decision_req_def_json():
     return {
         'id': 'anId',
         'key': 'aKey',
