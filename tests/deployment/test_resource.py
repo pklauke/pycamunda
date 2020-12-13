@@ -16,7 +16,7 @@ def test_resource_load():
 
 
 def test_resource_load_raises_keyerror():
-    resource_json = {'id': 'anId', 'name': 'aName', 'deploymendId': 'aDeploymentId'}
+    resource_json = {'id': 'anId', 'name': 'aName', 'deploymentId': 'aDeploymentId'}
     for key in resource_json:
         json_ = dict(resource_json)
         del json_[key]
