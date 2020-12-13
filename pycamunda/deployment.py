@@ -69,9 +69,11 @@ class DeploymentWithDefinitions:
     name: str
     source: str
     deployed_process_definitions: typing.Dict[str, pycamunda.processdef.ProcessDefinition]
-    deployed_case_definitions: typing.Dict[str, ]
-    deployed_decision_definitions: typing.Dict
-    deployed_decision_requirements_definitions: typing.Dict
+    deployed_case_definitions: typing.Dict[str, pycamunda.casedef.CaseDefinition]
+    deployed_decision_definitions: typing.Dict[str, pycamunda.decisiondef.DecisionDefinition]
+    deployed_decision_requirements_definitions: typing.Dict[
+        str, pycamunda.decisionreqdef.DecisionRequirementsDefinition
+    ]
     tenant_id: str = None
     deployment_time: dt.datetime = None
 
