@@ -8,6 +8,9 @@ API
    api/authorization
    api/activityinst
    api/batch
+   api/casedef
+   api/decisiondef
+   api/decisionreqdef
    api/deployment
    api/execution
    api/externaltask

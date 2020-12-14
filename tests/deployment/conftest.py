@@ -78,3 +78,19 @@ def create_output():
         'deploy-changed-only': True,
         'tenant-id': 'aTenantId'
     }
+
+
+@pytest.fixture
+def my_depl_with_def_json():
+    return {
+        'links': [],
+        'id': 'anId',
+        'name': 'aName',
+        'source': 'aSource',
+        'deployedProcessDefinitions': {},
+        'deployedCaseDefinitions': {},
+        'deployedDecisionDefinitions': {},
+        'deployedDecisionRequirementsDefinitions': {},
+        'tenantId': 'aTenantId',
+        'deploymentTime': '2020-01-01T00:00:00.000+0000'
+    }
