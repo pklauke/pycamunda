@@ -7,6 +7,8 @@ import datetime as dt
 import dataclasses
 import typing
 
+import requests
+
 import pycamunda.variable
 import pycamunda.base
 import pycamunda.resource
@@ -279,12 +281,24 @@ class Create(pycamunda.base.CamundaRequest):
 
     @property
     def files(self):
-        return {f'resource-{i}.bpmn': resource for i, resource in enumerate(self._files)}
+        return {f'resource-{i}': resource for i, resource in enumerate(self._files)}
 
     def __call__(self, *args, **kwargs) -> DeploymentWithDefinitions:
         """Send the request."""
         assert bool(self.files), 'Cannot create deployment without resources.'
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        try:
+            response = requests.request(
+                method=pycamunda.base.RequestMethod.POST.value,
+                url=self.url,
+                params=self.query_parameters(),
+                data=self.body_parameters(),
+                auth=self.auth,
+                files=self.files
+            )
+        except requests.exceptions.RequestException as exc:
+            raise pycamunda.PyCamundaException(exc)
+        if not response:
+            pycamunda.base._raise_for_status(response)
 
         return DeploymentWithDefinitions.load(data=response.json())
 
