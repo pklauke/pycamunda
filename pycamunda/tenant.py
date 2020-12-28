@@ -12,9 +12,15 @@ import pycamunda.resource
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 URL_SUFFIX = '/tenant'
+URL_SUFFIX_USER_MEMBERS = '/user-members'
+URL_SUFFIX_GROUP_MEMBERS = '/group-members'
 
 
-__all__ = ['GetList', 'Count', 'Get', 'Create', 'Update', 'Options', 'Delete']
+__all__ = [
+    'UserMemberCreate', 'UserMemberDelete', 'UserMemberOptions', 'GroupMemberCreate',
+    'GroupMemberDelete', 'GroupMemberOptions', 'GetList', 'Count', 'Get', 'Create', 'Update',
+    'Options', 'Delete'
+]
 
 
 @dataclasses.dataclass
@@ -26,6 +32,132 @@ class Tenant:
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> Tenant:
         return cls(id_=data['id'], name=data['name'])
+
+
+class UserMemberCreate(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = PathParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Create a membership between a tenant and an user.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        :param user_id: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_USER_MEMBERS + '/{userId}')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+
+
+class UserMemberDelete(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    user_id = PathParameter('userId')
+
+    def __init__(self, url: str, id_: str, user_id: str):
+        """Delete a membership between a tenant and an user.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        :param user_id: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_USER_MEMBERS + '/{userId}')
+        self.id_ = id_
+        self.user_id = user_id
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+
+
+class UserMemberOptions(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get a list of options the currently authenticated user can perform on the tenant
+        membership resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_USER_MEMBERS)
+        self.id_ = id_
+
+    def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
+        """Send the request"""
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+
+        return pycamunda.resource.ResourceOptions.load(response.json())
+
+
+class GroupMemberCreate(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    group_id = PathParameter('groupId')
+
+    def __init__(self, url: str, id_: str, group_id: str):
+        """Create a membership between a tenant and a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        :param group_id: Id of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_GROUP_MEMBERS + '/{groupId}')
+        self.id_ = id_
+        self.group_id = group_id
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+
+
+class GroupMemberDelete(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    group_id = PathParameter('groupId')
+
+    def __init__(self, url: str, id_: str, group_id: str):
+        """Delete a membership between a tenant and a group.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        :param group_id: Id of the group.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_GROUP_MEMBERS + '/{groupId}')
+        self.id_ = id_
+        self.group_id = group_id
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request."""
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+
+
+class GroupMemberOptions(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Get a list of options the currently authenticated user can perform on the tenant
+        membership resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_GROUP_MEMBERS)
+        self.id_ = id_
+
+    def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
+        """Send the request"""
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+
+        return pycamunda.resource.ResourceOptions.load(response.json())
 
 
 class GetList(pycamunda.base.CamundaRequest):
@@ -236,7 +368,7 @@ class Delete(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
 
     def __init__(self, url: str, id_: str):
-        """Deletes a tenant.
+        """Delete a tenant.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the tenant.

@@ -10,6 +10,42 @@ Tenant
     :undoc-members:
     :exclude-members: load
 
+UserMemberCreate
+-------------------------------------
+.. autoclass:: pycamunda.tenant.UserMemberCreate
+    :members:
+    :special-members: __call__
+
+UserMemberDelete
+-------------------------------------
+.. autoclass:: pycamunda.tenant.UserMemberDelete
+    :members:
+    :special-members: __call__
+
+UserMemberOptions
+-------------------------------------
+.. autoclass:: pycamunda.tenant.UserMemberOptions
+    :members:
+    :special-members: __call__
+
+GroupMemberCreate
+-------------------------------------
+.. autoclass:: pycamunda.tenant.GroupMemberCreate
+    :members:
+    :special-members: __call__
+
+GroupMemberDelete
+-------------------------------------
+.. autoclass:: pycamunda.tenant.GroupMemberDelete
+    :members:
+    :special-members: __call__
+
+GroupMemberOptions
+-------------------------------------
+.. autoclass:: pycamunda.tenant.GroupMemberOptions
+    :members:
+    :special-members: __call__
+
 GetList
 -------------------------------------
 .. autoclass:: pycamunda.tenant.GetList
