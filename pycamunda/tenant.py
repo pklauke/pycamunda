@@ -8,12 +8,13 @@ import typing
 
 import pycamunda
 import pycamunda.base
+import pycamunda.resource
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 URL_SUFFIX = '/tenant'
 
 
-__all__ = ['GetList', 'Count', 'Get', 'Create']
+__all__ = ['GetList', 'Count', 'Get', 'Create', 'Update', 'Options', 'Delete']
 
 
 @dataclasses.dataclass
@@ -183,3 +184,66 @@ class Create(pycamunda.base.CamundaRequest):
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
         super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+
+
+class Update(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+    new_id = BodyParameter('id')
+    new_name = BodyParameter('name')
+
+    def __init__(self, url: str, id_: str, new_id: str, new_name: str):
+        """Update a tenant.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        :param new_id: New id of the tenant.
+        :param new_name: New name of the tenant.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+        self.new_id = new_id
+        self.new_name = new_name
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request"""
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+
+
+class Options(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str = None):
+        """Get a list of options the currently authenticated user can perform on the tenant
+        resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
+        """Send the request"""
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+
+        return pycamunda.resource.ResourceOptions.load(response.json())
+
+
+class Delete(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_: str):
+        """Deletes a tenant.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the tenant.
+        """
+        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        self.id_ = id_
+
+    def __call__(self, *args, **kwargs) -> None:
+        """Send the request"""
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)

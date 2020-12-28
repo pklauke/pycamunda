@@ -57,3 +57,13 @@ def count_output():
         'groupMember': 'aGroup',
         'includingGroupsOfUser': True
     }
+
+
+@pytest.fixture
+def update_input():
+    return {'id_': 'anId', 'new_id': 'anotherId', 'new_name': 'aName'}
+
+
+@pytest.fixture
+def update_output():
+    return {'id': 'anotherId', 'name': 'aName'}

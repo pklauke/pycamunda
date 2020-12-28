@@ -34,3 +34,21 @@ Create
     :members:
     :special-members: __call__
 
+Update
+-------------------------------------
+.. autoclass:: pycamunda.tenant.Update
+    :members:
+    :special-members: __call__
+
+Options
+-------------------------------------
+.. autoclass:: pycamunda.tenant.Options
+    :members:
+    :special-members: __call__
+
+Delete
+-------------------------------------
+.. autoclass:: pycamunda.tenant.Delete
+    :members:
+    :special-members: __call__
+
