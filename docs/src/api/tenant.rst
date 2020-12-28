@@ -10,6 +10,18 @@ Tenant
     :undoc-members:
     :exclude-members: load
 
+GetList
+-------------------------------------
+.. autoclass:: pycamunda.tenant.GetList
+    :members:
+    :special-members: __call__
+
+Count
+-------------------------------------
+.. autoclass:: pycamunda.tenant.Count
+    :members:
+    :special-members: __call__
+
 Get
 -------------------------------------
 .. autoclass:: pycamunda.tenant.Get
