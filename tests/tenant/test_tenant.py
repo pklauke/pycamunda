@@ -15,7 +15,7 @@ def test_tenant_load():
     assert tenant.name == 'a tenant'
 
 
-def test_user_load_raises_key_error():
+def test_tenant_load_raises_key_error():
     with pytest.raises(KeyError):
         pycamunda.tenant.Tenant.load(data={'name': 'a tenant'})
     with pytest.raises(KeyError):
