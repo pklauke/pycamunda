@@ -15,7 +15,7 @@ def test_localvariablesgetlist_params(engine_url):
     )
 
     assert get_vars.url == engine_url + '/task/anId/localVariables'
-    assert get_vars.query_parameters() == {'deserializeValues': True}
+    assert get_vars.query_parameters() == {'deserializeValues': 'true'}
     assert get_vars.body_parameters() == {}
 
 

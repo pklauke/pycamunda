@@ -12,7 +12,7 @@ def test_get_params(engine_url):
     get_variables = pycamunda.variable.Get(url=engine_url, id_='anId')
 
     assert get_variables.url == engine_url + '/variable-instance/anId'
-    assert get_variables.query_parameters() == {'deserializeValue': False}
+    assert get_variables.query_parameters() == {'deserializeValue': 'false'}
     assert get_variables.body_parameters() == {}
 
 

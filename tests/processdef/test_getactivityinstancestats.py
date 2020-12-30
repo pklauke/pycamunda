@@ -14,7 +14,7 @@ def test_getactivityinstancestats_params(engine_url):
     )
 
     assert get_instance_stats.url == engine_url + '/process-definition/anId/statistics'
-    assert get_instance_stats.query_parameters() == {'failedJobs': True, 'incidents': True}
+    assert get_instance_stats.query_parameters() == {'failedJobs': 'true', 'incidents': 'true'}
     assert get_instance_stats.body_parameters() == {}
 
 

@@ -33,10 +33,10 @@ def delete_input():
 @pytest.fixture
 def delete_output():
     return {
-        'skipCustomListeners': False,
-        'skipIoMappings': False,
-        'skipSubprocesses': False,
-        'failIfNotExists': False
+        'skipCustomListeners': 'false',
+        'skipIoMappings': 'false',
+        'skipSubprocesses': 'false',
+        'failIfNotExists': 'false'
     }
 
 
@@ -91,22 +91,22 @@ def getlist_output():
         'deploymentId': 'anDeploymentId',
         'superProcessInstance': 'anSuperProcessInstance',
         'subProcessInstance': 'anSubProcessInstance',
-        'active': True,
-        'suspended': True,
-        'withIncident': True,
+        'active': 'true',
+        'suspended': 'true',
+        'withIncident': 'true',
         'incidentId': 'anIncidentId',
         'incidentType': 'failedExternalTask',
         'incidentMessage': 'anIncidentMessage',
         'incidentMessageLike': 'anIncidentMessageLike',
         'tenantIdIn': [],
-        'withoutTenantId': True,
+        'withoutTenantId': 'true',
         'activityIdIn': [],
-        'rootProcessInstances': True,
-        'leafProcessInstances': True,
-        'processDefinitionWithoutTenantIdIn': True,
+        'rootProcessInstances': 'true',
+        'leafProcessInstances': 'true',
+        'processDefinitionWithoutTenantIdIn': 'true',
         #'variables': None,  TODO
-        'variableNamesIgnoreCase': True,
-        'variableValuesIgnoreCase': True,
+        'variableNamesIgnoreCase': 'true',
+        'variableValuesIgnoreCase': 'true',
         'sortBy': 'instanceId',
         'sortOrder': 'asc',
         'firstResult': 1,

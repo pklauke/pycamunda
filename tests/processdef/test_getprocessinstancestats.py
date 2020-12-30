@@ -15,7 +15,7 @@ def test_getprocessdiagram_params(engine_url):
     )
 
     assert get_process_instance_stats.url == engine_url + '/process-definition/statistics'
-    assert get_process_instance_stats.query_parameters() == {'failedJobs': True}
+    assert get_process_instance_stats.query_parameters() == {'failedJobs': 'true'}
     assert get_process_instance_stats.body_parameters() == {}
 
 
@@ -31,13 +31,13 @@ def test_getprocessdiagram_path(engine_url):
     )
 
     assert get_process_instance_stats1.query_parameters() == {
-        'failedJobs': False, 'incidents': True
+        'failedJobs': 'false', 'incidents': 'true'
     }
     assert get_process_instance_stats2.query_parameters() == {
-        'failedJobs': False, 'rootIncidents': True
+        'failedJobs': 'false', 'rootIncidents': 'true'
     }
     assert get_process_instance_stats3.query_parameters() == {
-        'failedJobs': False,
+        'failedJobs': 'false',
         'incidentsForType': pycamunda.incident.IncidentType.failed_external_task.value
     }
 

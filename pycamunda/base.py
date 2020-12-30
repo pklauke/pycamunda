@@ -62,7 +62,7 @@ class CamundaRequest(pycamunda.request.Request):
 
     def query_parameters(self, apply: typing.Callable = ...):
         if apply is Ellipsis:
-            return super().query_parameters(apply=prepare)
+            return super().query_parameters(apply=query_prepare)
         return super().query_parameters(apply=apply)
 
 
@@ -104,6 +104,17 @@ def prepare(value: typing.Any) -> typing.Any:
     except AttributeError:
         pass
     return value
+
+
+def query_prepare(value: typing.Any) -> typing.Any:
+    """Prepare parameter values for Camunda including converting boolean values to lowercase
+    strings.
+
+    :param value: Value to prepare.
+    """
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+    return prepare(value)
 
 
 def _raise_for_status(response: requests.Response) -> None:

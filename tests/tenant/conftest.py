@@ -27,7 +27,7 @@ def get_list_output():
         'nameLike': 'aNam',
         'userMember': 'aUser',
         'groupMember': 'aGroup',
-        'includingGroupsOfUser': True,
+        'includingGroupsOfUser': 'true',
         'sortBy': 'id',
         'sortOrder': 'desc',
         'firstResult': 1,
@@ -55,7 +55,7 @@ def count_output():
         'nameLike': 'aNam',
         'userMember': 'aUser',
         'groupMember': 'aGroup',
-        'includingGroupsOfUser': True
+        'includingGroupsOfUser': 'true'
     }
 
 

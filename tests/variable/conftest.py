@@ -56,5 +56,5 @@ def getlist_output():
         'sortOrder': 'desc',
         'firstResult': 1,
         'maxResults': 10,
-        'deserializeValues': True
+        'deserializeValues': 'true'
     }

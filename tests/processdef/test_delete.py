@@ -16,7 +16,7 @@ def test_delete_params(engine_url):
 
     assert delete_definition.url == engine_url + '/process-definition/anId'
     assert delete_definition.query_parameters() == {
-        'cascade': True, 'skipCustomListeners': True, 'skipIoMappings': True
+        'cascade': 'true', 'skipCustomListeners': 'true', 'skipIoMappings': 'true'
     }
     assert delete_definition.body_parameters() == {}
 

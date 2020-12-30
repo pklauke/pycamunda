@@ -15,7 +15,7 @@ def test_delete_params(engine_url):
 
     assert delete_deployment.url == engine_url + '/deployment/anId'
     assert delete_deployment.query_parameters() == {
-        'cascade': True, 'skipCustomListeners': True, 'skipIoMappings': True
+        'cascade': 'true', 'skipCustomListeners': 'true', 'skipIoMappings': 'true'
     }
     assert delete_deployment.body_parameters() == {}
 

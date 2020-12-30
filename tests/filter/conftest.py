@@ -38,7 +38,7 @@ def getlist_output():
         'name': 'aName',
         'nameLike': 'aNam',
         'owner': 'anOwner',
-        'itemCount': True,
+        'itemCount': 'true',
         'sortBy': 'filterId',
         'sortOrder': 'desc',
         'firstResult': 1,

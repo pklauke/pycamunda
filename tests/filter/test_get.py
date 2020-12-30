@@ -12,7 +12,7 @@ def test_get_params(engine_url):
     get_filter = pycamunda.filter.Get(url=engine_url, id_='anId', item_count=True)
 
     assert get_filter.url == engine_url + '/filter/anId'
-    assert get_filter.query_parameters() == {'itemCount': True}
+    assert get_filter.query_parameters() == {'itemCount': 'true'}
     assert get_filter.body_parameters() == {}
 
 
