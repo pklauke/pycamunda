@@ -188,14 +188,18 @@ class Options(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url, id_=None):
+    def __init__(self, url: str, id_=None):
         """Get a list of options the currently authenticated user can perform on the group resource.
 
         :param url: Camunda Rest engine URL.
         :param id_: Id of the user.
         """
-        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
+
+    @property
+    def url(self):
+        return super().url + (f'/{self.id_}' if self.id_ is not None else '')
 
     def __call__(self, *args, **kwargs):
         """Send the request"""

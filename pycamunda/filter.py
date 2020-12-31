@@ -11,6 +11,7 @@ import pycamunda
 import pycamunda.task
 import pycamunda.variable
 import pycamunda.base
+import pycamunda.resource
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter, BodyParameterContainer
 
 URL_SUFFIX = '/filter'
@@ -683,3 +684,28 @@ class ExecuteCount(pycamunda.base.CamundaRequest):
         response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
 
         return response.json()['count']
+
+
+class Options(pycamunda.base.CamundaRequest):
+
+    id_ = PathParameter('id')
+
+    def __init__(self, url: str, id_=None):
+        """Get a list of options the currently authenticated user can perform on the filter
+        resource.
+
+        :param url: Camunda Rest engine URL.
+        :param id_: Id of the user.
+        """
+        super().__init__(url=url + URL_SUFFIX)
+        self.id_ = id_
+
+    @property
+    def url(self):
+        return super().url + (f'/{self.id_}' if self.id_ is not None else '')
+
+    def __call__(self, *args, **kwargs):
+        """Send the request"""
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+
+        return pycamunda.resource.ResourceOptions.load(response.json())

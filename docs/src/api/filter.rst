@@ -74,3 +74,10 @@ ExecuteCount
 .. autoclass:: pycamunda.filter.ExecuteCount
     :members:
     :special-members: __call__
+
+Options
+-------------------------------------
+.. autoclass:: pycamunda.filter.Options
+    :members:
+    :special-members: __call__
+

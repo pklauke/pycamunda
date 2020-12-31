@@ -353,8 +353,12 @@ class Options(pycamunda.base.CamundaRequest):
         :param url: Camunda Rest engine URL.
         :param id_: Id of the tenant.
         """
-        super().__init__(url=url + URL_SUFFIX + '/{id}')
+        super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
+
+    @property
+    def url(self):
+        return super().url + (f'/{self.id_}' if self.id_ is not None else '')
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request"""

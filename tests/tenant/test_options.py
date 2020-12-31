@@ -17,6 +17,10 @@ def test_options_params(engine_url):
     assert get_options.query_parameters() == {}
     assert get_options.body_parameters() == {}
 
+    get_options = pycamunda.tenant.Options(url=engine_url)
+
+    assert get_options.url == engine_url + '/tenant'
+
 
 @unittest.mock.patch('requests.Session.request')
 def test_options_calls_requests(mock, engine_url):

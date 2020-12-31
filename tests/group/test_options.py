@@ -16,6 +16,10 @@ def test_options_params(engine_url):
     assert group_options.query_parameters() == {}
     assert group_options.body_parameters() == {}
 
+    group_options = pycamunda.group.Options(url=engine_url)
+
+    assert group_options.url == engine_url + '/group'
+
 
 @unittest.mock.patch('pycamunda.resource.ResourceOptions.load', unittest.mock.MagicMock())
 @unittest.mock.patch('requests.Session.request')
