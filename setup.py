@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='pycamunda',
-    version='0.0.3',
+    version='0.1.0',
     author='Peter Klauke',
     description='A high-level framework for communicating with the workflow and decision automation engine Camunda.',
     long_description=long_description,
