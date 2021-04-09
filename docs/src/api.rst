@@ -28,3 +28,5 @@ API
    api/tenant
    api/user
    api/variable
+   api/version
+

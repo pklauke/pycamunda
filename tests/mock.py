@@ -19,7 +19,8 @@ def not_ok_response_mock(*args, **kwargs):
             return {
                 'message': 'an error message',
                 'count': 1,
-                'bpmn20Xml': '<my>test</xml>'
+                'bpmn20Xml': '<my>test</xml>',
+                'version': '7.12.0-alpha4'
             }
 
     return Response()
@@ -53,5 +54,18 @@ def count_response_mock(*args, **kwargs):
 
         def json(self):
             return {'count': 1}
+
+    return Response()
+
+
+def version_response_mock(*args, **kwargs):
+    class Response:
+        ok = True
+
+        def __bool__(self):
+            return bool(self.ok)
+
+        def json(self):
+            return {'version': '7.12.0-alpha4'}
 
     return Response()
