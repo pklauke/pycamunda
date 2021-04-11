@@ -20,7 +20,8 @@ def not_ok_response_mock(*args, **kwargs):
                 'message': 'an error message',
                 'count': 1,
                 'bpmn20Xml': '<my>test</xml>',
-                'version': '7.12.0-alpha4'
+                'version': '7.12.0-alpha4',
+                'cmmnXml': '<my>test</xml>'
             }
 
     return Response()
@@ -39,7 +40,8 @@ def response_mock(*args, **kwargs):
             return {
                 'message': 'an error message',
                 'count': 1,
-                'bpmn20Xml': '<my>test</xml>'
+                'bpmn20Xml': '<my>test</xml>',
+                'cmmnXml': '<my>test</xml>'
             }
 
     return Response()

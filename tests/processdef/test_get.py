@@ -5,7 +5,7 @@ import unittest.mock
 import pytest
 
 import pycamunda.processdef
-from tests.mock import raise_requests_exception_mock, not_ok_response_mock, response_mock
+from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 
 
 def test_get_params(engine_url):
