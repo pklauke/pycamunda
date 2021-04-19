@@ -8,7 +8,7 @@ import dataclasses
 import typing
 
 
-__all__ = ['']
+__all__ = []
 
 
 @dataclasses.dataclass
