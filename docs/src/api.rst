@@ -9,6 +9,7 @@ API
    api/activityinst
    api/batch
    api/casedef
+   api/caseinst
    api/decisiondef
    api/decisionreqdef
    api/deployment
