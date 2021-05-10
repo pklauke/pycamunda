@@ -77,7 +77,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     name = QueryParameter('variableName')
     name_like = QueryParameter('variableNameLike')
-    process_instance_id_in = QueryParameter('processInstanceId')
+    process_instance_id_in = QueryParameter('processInstanceIdIn')
     execution_id_in = QueryParameter('executionIdIn')
     case_instance_id_in = QueryParameter('caseInstanceIdIn')
     case_execution_id_in = QueryParameter('caseExecutionIdIn')

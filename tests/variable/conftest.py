@@ -46,7 +46,7 @@ def getlist_output():
     return {
         'variableName': 'aName',
         'variableNameLike': 'aNam',
-        'processInstanceId': [],
+        'processInstanceIdIn': [],
         'caseInstanceIdIn': [],
         'caseExecutionIdIn': [],
         'taskIdIn': [],
