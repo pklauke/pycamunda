@@ -53,3 +53,39 @@ Suspend
     :members:
     :inherited-members:
     :special-members: __call__
+
+VariablesDelete
+-------------------------------------
+.. autoclass:: pycamunda.processinst.VariablesDelete
+    :members:
+    :inherited-members:
+    :special-members: __call__
+
+VariablesGet
+-------------------------------------
+.. autoclass:: pycamunda.processinst.VariablesGet
+    :members:
+    :inherited-members:
+    :special-members: __call__
+
+VariablesGetList
+-------------------------------------
+.. autoclass:: pycamunda.processinst.VariablesGetList
+    :members:
+    :inherited-members:
+    :special-members: __call__
+
+VariablesModify
+-------------------------------------
+.. autoclass:: pycamunda.processinst.VariablesModify
+    :members:
+    :inherited-members:
+    :special-members: __call__
+
+VariablesUpdate
+-------------------------------------
+.. autoclass:: pycamunda.processinst.VariablesUpdate
+    :members:
+    :inherited-members:
+    :special-members: __call__
+
