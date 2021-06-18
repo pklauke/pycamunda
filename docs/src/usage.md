@@ -68,6 +68,29 @@ tasks = get_tasks()
 ```
 PyCamunda will raise a `pycamunda.Unauthorized` exception if the authentication fails.
 
+## Sessions
+
+PyCamunda supports persisting certain parameters like credentials or headers by using 
+`requests.session.Session` between different requests. This is done by setting the `session` 
+attribute of any request object. 
+
+```python
+import requests.auth
+import requests.sessions
+import pycamunda.processinst
+
+url = "http://localhost:8080/engine-rest"
+
+session = requests.sessions.Session()
+session.auth = requests.auth.HTTPBasicAuth(username="demo", password="demo")
+
+get_instances = pycamunda.processinst.GetList(url)
+get_instances.session = session
+instances = get_instances()
+```
+Please note that PyCamunda will not update the instance of `Session` in any way. So when for example
+the `auth` attribute of the request object is set as well, PyCamunda will use the set `auth` 
+attribute of the request object and will not update the session object.
 
 ## Advanced
 Each class that represents a Camunda endpoint inherits from `pycamunda.base.CamundaRequest`. That 
