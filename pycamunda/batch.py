@@ -6,8 +6,13 @@ from __future__ import annotations
 import dataclasses
 import typing
 
+import pycamunda.base
+from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
-__all__ = []
+URL_SUFFIX = '/batch'
+
+
+__all__ = ['GetList']
 
 
 @dataclasses.dataclass
@@ -42,3 +47,63 @@ class Batch:
             tenant_id=data['tenantId'],
             create_user_id=data['createUserId']
         )
+
+
+class GetList(pycamunda.base.CamundaRequest):
+
+    batch_id = QueryParameter('batchId')
+    type_ = QueryParameter('type')
+    tenant_id_in = QueryParameter('tenantIdIn')
+    without_tenant_id = QueryParameter('withoutTenantId')#, provide=pycamunda.base.value_is_true)
+    suspended = QueryParameter('suspended', provide=pycamunda.base.value_is_true)
+    sort_by = QueryParameter('sortBy', mapping={'batch_id': 'batchId', 'tenant_id': 'tenantId'})
+    ascending = QueryParameter(
+        'sortOrder',
+        mapping={True: 'asc', False: 'desc'},
+        provide=lambda self, obj, obj_type: vars(obj).get('sort_by', None) is not None
+    )
+    first_result = QueryParameter('firstResult')
+    max_results = QueryParameter('maxResults')
+
+    def __init__(
+            self,
+            url: str,
+            batch_id: str = None,
+            type_: str = None,
+            tenant_id_in: typing.Iterable[str] = None,
+            without_tenant_id: bool = False,
+            suspended: bool = False,
+            sort_by: str = None,
+            ascending: bool = True,
+            first_result: int = None,
+            max_results: int = None
+    ):
+        """Get a list of batches.
+
+        :param url: Camunda Rest engine URL.
+        :param batch_id: Filter by id.
+        :param type_: Filter by batch type.
+        :param tenant_id_in: Filter whether the tenant id is one of multiple ones.
+        :param without_tenant_id: Whether to include only batches that belong to no tenant.
+        :param suspended: Whether to include only suspended batches.
+        :param sort_by: Sort the results by 'batch_id' or 'tenant_id'.
+        :param ascending: Sort order.
+        :param first_result: Pagination of results. Index of the first result to return.
+        :param max_results: Pagination of results. Maximum number of results to return.
+        """
+        super().__init__(url=url + URL_SUFFIX)
+        self.batch_id = batch_id
+        self.type_ = type_
+        self.tenant_id_in = tenant_id_in
+        self.without_tenant_id = without_tenant_id
+        self.suspended = suspended
+        self.sort_by = sort_by
+        self.ascending = ascending
+        self.first_result = first_result
+        self.max_results = max_results
+
+    def __call__(self, *args, **kwargs) -> typing.Tuple[Batch]:
+        """Send the request."""
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+
+        return tuple(Batch.load(batch_json) for batch_json in response.json())
