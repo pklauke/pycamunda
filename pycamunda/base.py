@@ -32,6 +32,7 @@ class CamundaRequest(pycamunda.request.Request):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.auth = None
+        self.session = None
         self._files = None
 
     @property
@@ -40,14 +41,27 @@ class CamundaRequest(pycamunda.request.Request):
 
     def __call__(self, method: RequestMethod, *args, **kwargs) -> requests.Response:
         try:
-            response = requests.request(
-                method=method.value,
-                url=self.url,
-                params=self.query_parameters(),
-                json=self.body_parameters(),
-                auth=self.auth,
-                files=self.files
-            )
+            if self.session is not None:
+                kwargs = {}
+                if self.auth is not None:
+                    kwargs['auth'] = self.auth
+                response = self.session.request(
+                    method=method.value,
+                    url=self.url,
+                    params=self.query_parameters(),
+                    json=self.body_parameters(),
+                    files=self.files,
+                    **kwargs
+                )
+            else:
+                response = requests.request(
+                    method=method.value,
+                    url=self.url,
+                    params=self.query_parameters(),
+                    json=self.body_parameters(),
+                    auth=self.auth,
+                    files=self.files
+                )
         except requests.exceptions.RequestException as exc:
             raise pycamunda.PyCamundaException(exc)
         if not response:
