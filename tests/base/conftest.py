@@ -20,6 +20,12 @@ def MyRequest():
             self.query_param = query_param
             self.body_param = body_param
 
+        def __call__(self, method: pycamunda.base.RequestMethod = None, *args, **kwargs):
+            if method is None:
+                method = pycamunda.base.RequestMethod.GET
+            super().__call__(method=method)
+
+
     return _MyRequest
 
 
@@ -42,3 +48,8 @@ def date_tz():
 @pytest.fixture
 def date_tz_str():
     return '2020-01-01T01:01:01.000+0000'
+
+
+@pytest.fixture
+def session():
+    return type('Session', (), {})

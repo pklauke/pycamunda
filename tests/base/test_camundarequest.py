@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import unittest.mock
+
+from requests.sessions import Session
+from requests.auth import HTTPBasicAuth
+
 
 def test_camundarequest_keeps_query_params(engine_url, MyRequest):
 
@@ -30,3 +35,19 @@ def test_camundarequest_converts_datetime_params(
 
     assert MyRequest(url=engine_url, body_param=date).body_parameters()['param'] == date_str
     assert MyRequest(url=engine_url, body_param=date_tz).body_parameters()['param'] == date_tz_str
+
+
+@unittest.mock.patch('requests.Session.request')
+def test_camundarequest_session(mock, engine_url, MyRequest):
+    request = MyRequest(url=engine_url)
+    auth = HTTPBasicAuth(username='Jane', password='password')
+
+    session = Session()
+    session.auth = auth
+    request.session = session
+
+    request()
+
+    assert mock.called
+    assert request.session.auth.username == 'Jane'
+    assert request.session.auth.password == 'password'
