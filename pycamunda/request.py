@@ -4,7 +4,7 @@ import abc
 import typing
 
 
-__all__ = []
+__all__ = ['QueryParameter', 'PathParameter', 'BodyParameter', 'BodyParameterContainer']
 
 
 class InvalidInput(ValueError):
