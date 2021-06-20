@@ -218,7 +218,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         """Activate or Suspend a batch.
 
         :param url: Camunda Rest engine URL.
-        :param id_: Id of the process definition.
+        :param id_: Id of the batch.
         :param suspended: Whether to suspend or activate the batch.
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/suspended')
