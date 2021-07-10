@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
  
+## [v0.4.0] - 2021-07-11
+ 
+* Add migration module
+
 ## [v0.3.0] - 2021-06-20
  
 * Add batch module
