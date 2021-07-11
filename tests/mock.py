@@ -21,7 +21,8 @@ def not_ok_response_mock(*args, **kwargs):
                 'count': 1,
                 'bpmn20Xml': '<my>test</xml>',
                 'version': '7.12.0-alpha4',
-                'cmmnXml': '<my>test</xml>'
+                'cmmnXml': '<my>test</xml>',
+                'instructionReports': []
             }
 
     return Response()

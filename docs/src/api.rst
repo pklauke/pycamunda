@@ -21,6 +21,7 @@ API
    api/incident
    api/instruction
    api/message
+   api/migration
    api/processdef
    api/processinst
    api/resource
