@@ -122,7 +122,7 @@ class Validate(pycamunda.base.CamundaRequest):
         self.target_process_definition_id = target_process_definition_id
         self.instructions = []
 
-    def body_parameters(self, apply: typing.Callable = ...):
+    def body_parameters(self, apply: typing.Callable = ...) -> typing.Dict[str, typing.Any]:
         params = super().body_parameters(apply=apply)
         params['instructions'] = [
             {
@@ -155,7 +155,7 @@ class Validate(pycamunda.base.CamundaRequest):
         )
 
     @classmethod
-    def from_migration_plan(cls, url: str, migration_plan: MigrationPlan):
+    def from_migration_plan(cls, url: str, migration_plan: MigrationPlan) -> Validate:
         """Create an instance of Validate using a MigrationPlan instance.
 
         :param url: Camunda REST engine url.
@@ -171,7 +171,7 @@ class Validate(pycamunda.base.CamundaRequest):
 
         return validate_migration
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> typing.Tuple[InstructionReport]:
         """Send the request."""
         response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
 
@@ -221,10 +221,10 @@ class Execute(pycamunda.base.CamundaRequest):
         self.async_ = async_
 
     @property
-    def url(self):
+    def url(self) -> str:
         return super().url + ('Async' if self.async_ else '')
 
-    def body_parameters(self, apply: typing.Callable = ...):
+    def body_parameters(self, apply: typing.Callable = ...) -> typing.Dict[str, typing.Any]:
         params = super().body_parameters(apply=apply)
         params['migrationPlan'] = {
             'sourceProcessDefinitionId': self.migration_plan.source_process_definition_id,
@@ -270,7 +270,7 @@ class Execute(pycamunda.base.CamundaRequest):
         skip_custom_listeners: bool = False,
         skip_io_mappings: bool = False,
         async_: bool = False
-    ):
+    ) -> Execute:
         """Create an instance of Execute using a MigrationPlan instance.
 
         :param url: Camunda REST engine url.
@@ -299,6 +299,9 @@ class Execute(pycamunda.base.CamundaRequest):
 
         return execute_migration
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+
+        if self.async_:
+            return pycamunda.batch.Batch.load(response.json())

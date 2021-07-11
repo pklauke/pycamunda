@@ -5,6 +5,7 @@ import unittest.mock
 import pytest
 
 import pycamunda.migration
+import pycamunda.batch
 from tests.mock import raise_requests_exception_mock, not_ok_response_mock
 
 
@@ -97,7 +98,7 @@ def test_execute_calls_requests(mock, engine_url, my_plan_json):
         process_instance_ids=['anId'],
         skip_custom_listeners=True,
         skip_io_mappings=True,
-        async_=True
+        async_=False
     )
     execute_migration()
 
@@ -114,7 +115,7 @@ def test_execute_raises_pycamunda_exception(engine_url, my_plan_json):
         process_instance_ids=['anId'],
         skip_custom_listeners=True,
         skip_io_mappings=True,
-        async_=True
+        async_=False
     )
     with pytest.raises(pycamunda.PyCamundaException):
         execute_migration()
@@ -130,7 +131,7 @@ def test_execute_raises_for_status(mock, engine_url, my_plan_json):
         process_instance_ids=['anId'],
         skip_custom_listeners=True,
         skip_io_mappings=True,
-        async_=True
+        async_=False
     )
     execute_migration()
 
@@ -146,8 +147,24 @@ def test_execute_returns_none(engine_url, my_plan_json):
         process_instance_ids=['anId'],
         skip_custom_listeners=True,
         skip_io_mappings=True,
-        async_=True
+        async_=False
     )
     result = execute_migration()
 
     assert result is None
+
+
+@unittest.mock.patch('requests.Session.request', unittest.mock.MagicMock())
+def test_execute_async_returns_batch(engine_url, my_plan_json):
+    migration_plan = pycamunda.migration.MigrationPlan.load(data=my_plan_json)
+    execute_migration = pycamunda.migration.Execute.from_migration_plan(
+        url=engine_url,
+        migration_plan=migration_plan,
+        process_instance_ids=['anId'],
+        skip_custom_listeners=True,
+        skip_io_mappings=True,
+        async_=True
+    )
+    batch = execute_migration()
+
+    assert isinstance(batch, pycamunda.batch.Batch)
