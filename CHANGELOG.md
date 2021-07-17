@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
  
+## [v0.5.0] -
+
+* Add telemetry module 
+ 
 ## [v0.4.0] - 2021-07-11
  
 * Add migration module

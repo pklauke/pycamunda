@@ -22,7 +22,8 @@ def not_ok_response_mock(*args, **kwargs):
                 'bpmn20Xml': '<my>test</xml>',
                 'version': '7.12.0-alpha4',
                 'cmmnXml': '<my>test</xml>',
-                'instructionReports': []
+                'instructionReports': [],
+                'enableTelemetry': None
             }
 
     return Response()
@@ -70,5 +71,14 @@ def version_response_mock(*args, **kwargs):
 
         def json(self):
             return {'version': '7.12.0-alpha4'}
+
+    return Response()
+
+
+def fetch_response_mock(*args, **kwargs):
+    class Response:
+
+        def json(self):
+            return {'enableTelemetry': True}
 
     return Response()
