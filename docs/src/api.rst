@@ -27,6 +27,7 @@ API
    api/resource
    api/signal
    api/task
+   api/telemetry
    api/tenant
    api/user
    api/variable
