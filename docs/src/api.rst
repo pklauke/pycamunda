@@ -10,6 +10,7 @@ API
    api/batch
    api/casedef
    api/caseinst
+   api/condition
    api/decisiondef
    api/decisionreqdef
    api/deployment
