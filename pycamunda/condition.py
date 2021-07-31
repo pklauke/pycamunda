@@ -66,7 +66,7 @@ class Evaluate(pycamunda.base.CamundaRequest):
     def __call__(self, *args, **kwargs) -> typing.Tuple[pycamunda.processinst.ProcessInstance]:
         """Send the request."""
         response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
-        print(response.json())
+
         return tuple(
             pycamunda.processinst.ProcessInstance.load(data=result_json)
             for result_json in response.json()
