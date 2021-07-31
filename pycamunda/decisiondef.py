@@ -7,6 +7,9 @@ import typing
 import dataclasses
 
 
+__all__ = []
+
+
 @dataclasses.dataclass
 class DecisionDefinition:
     """Data class of decision definition as returned by the REST api of Camunda."""
