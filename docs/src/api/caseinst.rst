@@ -10,3 +10,9 @@ CaseInstance
     :undoc-members:
     :exclude-members: load
 
+GetList
+-------------------------------------
+.. autoclass:: pycamunda.caseinst.GetList
+    :members:
+    :special-members: __call__
+
