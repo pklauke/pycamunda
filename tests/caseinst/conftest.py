@@ -63,3 +63,46 @@ def getlist_output():
         'firstResult': 1,
         'maxResults': 10
     }
+
+
+@pytest.fixture
+def count_input():
+    return {
+        'case_instance_id': 'anId',
+        'business_key': 'aKey',
+        'case_definition_id': 'anotherId',
+        'case_definition_key': 'anotherKey',
+        'deployment_id': 'aDeploymentId',
+        'super_process_instance': 'aSuperInstanceId',
+        'sub_process_instance': 'aSubInstanceId',
+        'super_case_instance': 'aSuperCaseInstanceId',
+        'sub_case_instance': 'aSubCaseInstanceId',
+        'active': True,
+        'completed': True,
+        'tenant_id_in': [1, 2],
+        'without_tenant_id': True,
+        'variable_names_ignore_case': True,
+        'variable_values_ignore_case': True
+    }
+
+
+@pytest.fixture
+def count_output():
+    return {
+        'caseInstanceId': 'anId',
+        'businessKey': 'aKey',
+        'caseDefinitionId': 'anotherId',
+        'caseDefinitionKey': 'anotherKey',
+        'deploymentId': 'aDeploymentId',
+        'superProcessInstance': 'aSuperInstanceId',
+        'subProcessInstance': 'aSubInstanceId',
+        'superCaseInstance': 'aSuperCaseInstanceId',
+        'subCaseInstance': 'aSubCaseInstanceId',
+        'active': 'true',
+        'completed': 'true',
+        'tenantIdIn': [1, 2],
+        'withoutTenantId': 'true',
+        'variables': {},
+        'variableNamesIgnoreCase': 'true',
+        'variableValuesIgnoreCase': 'true'
+    }
