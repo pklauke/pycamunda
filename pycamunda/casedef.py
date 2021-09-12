@@ -326,8 +326,8 @@ class GetDiagram(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         """Get the diagram of a case definition.
 
         :param url: Camunda Rest engine URL.
-        :param id_: Id of the process definition.
-        :param key: Key of the process definition.
+        :param id_: Id of the case definition.
+        :param key: Key of the case definition.
         """
         super().__init__(url=url + URL_SUFFIX + '/{path}/diagram')
         self.id_ = id_
