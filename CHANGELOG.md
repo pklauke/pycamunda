@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [v0.6.0] - 2021-XX-XX
 
 * Add caseinst module
+* Fix query parameter name in case definition GetList and Count classes
 
 ## [v0.5.0] - 2021-07-31
 

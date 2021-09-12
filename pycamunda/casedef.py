@@ -187,7 +187,7 @@ class Count(pycamunda.base.CamundaRequest):
     tenant_id_in = QueryParameter('tenantIdIn')
     without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     include_without_tenant_id = QueryParameter(
-        'includeProcessDefinitionsWithoutTenantId',
+        'includeCaseDefinitionsWithoutTenantId',
         provide=pycamunda.base.value_is_true
     )
 
