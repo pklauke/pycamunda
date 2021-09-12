@@ -155,3 +155,13 @@ def _raise_for_status(response: requests.Response) -> None:
         raise pycamunda.NotFound(message)
 
     raise pycamunda.NoSuccess(response.text)
+
+
+class _PathMixin:
+    @property
+    def url(self):
+        if self.id_ is not None:
+            return self._url.format(path=self.id_)
+        if self.tenant_id is not None:
+            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
+        return self._url.format(path=f'key/{self.key}')
