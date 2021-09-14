@@ -187,7 +187,7 @@ class Count(pycamunda.base.CamundaRequest):
     tenant_id_in = QueryParameter('tenantIdIn')
     without_tenant_id = QueryParameter('withoutTenantId', provide=pycamunda.base.value_is_true)
     include_without_tenant_id = QueryParameter(
-        'includeProcessDefinitionsWithoutTenantId',
+        'includeCaseDefinitionsWithoutTenantId',
         provide=pycamunda.base.value_is_true
     )
 
@@ -257,7 +257,7 @@ class Count(pycamunda.base.CamundaRequest):
         return response.json()['count']
 
 
-class Get(pycamunda.base.CamundaRequest):
+class Get(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -277,14 +277,6 @@ class Get(pycamunda.base.CamundaRequest):
         self.key = key
         self.tenant_id = tenant_id
 
-    @property
-    def url(self):
-        if self.id_ is not None:
-            return self._url.format(path=self.id_)
-        if self.tenant_id is not None:
-            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
-        return self._url.format(path=f'key/{self.key}')
-
     def __call__(self, *args, **kwargs) -> CaseDefinition:
         """Send the request."""
         response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
@@ -292,7 +284,7 @@ class Get(pycamunda.base.CamundaRequest):
         return CaseDefinition.load(response.json())
 
 
-class GetXML(pycamunda.base.CamundaRequest):
+class GetXML(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -317,14 +309,6 @@ class GetXML(pycamunda.base.CamundaRequest):
         self.key = key
         self.tenant_id = tenant_id
 
-    @property
-    def url(self):
-        if self.id_ is not None:
-            return self._url.format(path=self.id_)
-        if self.tenant_id is not None:
-            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
-        return self._url.format(path=f'key/{self.key}')
-
     def __call__(self, *args, **kwargs) -> str:
         """Send the request."""
         response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
@@ -332,7 +316,7 @@ class GetXML(pycamunda.base.CamundaRequest):
         return response.json()['cmmnXml']
 
 
-class GetDiagram(pycamunda.base.CamundaRequest):
+class GetDiagram(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -342,21 +326,13 @@ class GetDiagram(pycamunda.base.CamundaRequest):
         """Get the diagram of a case definition.
 
         :param url: Camunda Rest engine URL.
-        :param id_: Id of the process definition.
-        :param key: Key of the process definition.
+        :param id_: Id of the case definition.
+        :param key: Key of the case definition.
         """
         super().__init__(url=url + URL_SUFFIX + '/{path}/diagram')
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
-
-    @property
-    def url(self):
-        if self.id_ is not None:
-            return self._url.format(path=self.id_)
-        if self.tenant_id is not None:
-            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
-        return self._url.format(path=f'key/{self.key}')
 
     def __call__(self, *args, **kwargs):
         """Send the request."""
@@ -365,7 +341,7 @@ class GetDiagram(pycamunda.base.CamundaRequest):
         return response.content
 
 
-class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
+class UpdateHistoryTimeToLive(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -398,20 +374,12 @@ class UpdateHistoryTimeToLive(pycamunda.base.CamundaRequest):
         self.key = key
         self.tenant_id = tenant_id
 
-    @property
-    def url(self):
-        if self.id_ is not None:
-            return self._url.format(path=self.id_)
-        if self.tenant_id is not None:
-            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
-        return self._url.format(path=f'key/{self.key}')
-
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
 
 
-class CreateInstance(pycamunda.base.CamundaRequest):
+class CreateInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
     key = PathParameter('key')
@@ -443,14 +411,6 @@ class CreateInstance(pycamunda.base.CamundaRequest):
         self.business_key = business_key
 
         self.variables = {}
-
-    @property
-    def url(self):
-        if self.id_ is not None:
-            return self._url.format(path=self.id_)
-        if self.tenant_id is not None:
-            return self._url.format(path=f'key/{self.key}/tenant-id/{self.tenant_id}')
-        return self._url.format(path=f'key/{self.key}')
 
     def add_variable(
         self, name: str, value: typing.Any, type_: str = None, value_info: str = None
