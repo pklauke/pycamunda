@@ -26,15 +26,15 @@ class IncidentType(enum.Enum):
 @dataclasses.dataclass
 class IncidentTypeCount:
     """Data class of incident type count as returned by the REST api of Camunda."""
+    incident_count: int
     incident_type: IncidentType
-    incident_count: int = 1,
 
     @classmethod
     def load(cls, data) -> IncidentTypeCount:
         return cls(
             # TODO: We consider falsy values (useful) than empty ones. Is it right ?
             incident_type=IncidentType(data.get('incidentType', 'failedJob')),
-            incident_count=data.get('incidentCount')
+            incident_count=data.get('incidentCount', 1)
         )
 
 
