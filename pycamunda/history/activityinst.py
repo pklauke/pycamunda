@@ -10,6 +10,7 @@ import dataclasses
 import typing
 
 import pycamunda.base
+from pycamunda.history import URL_PREFIX
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 __all__ = []
@@ -185,7 +186,7 @@ class GetList(pycamunda.base.CamundaRequest):
         :param first_result: Pagination of results. Index of the first result to return.
         :param max_results: Pagination of results. Maximum number of results to return.
         """
-        super().__init__(url=url + URL_SUFFIX)
+        super().__init__(url=url + URL_PREFIX + URL_SUFFIX)
         self.activity_instance_id = activity_instance_id
         self.process_instance_id = process_instance_id
         self.process_definition_id = process_definition_id,
