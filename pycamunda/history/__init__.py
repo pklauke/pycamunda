@@ -1,1 +1,0 @@
-URL_PREFIX = "/history"
