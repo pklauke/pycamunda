@@ -10,7 +10,6 @@ import dataclasses
 import typing
 
 import pycamunda.base
-from pycamunda.history import URL_PREFIX
 from pycamunda.request import QueryParameter, PathParameter, BodyParameter
 
 __all__ = []
@@ -18,6 +17,7 @@ __all__ = []
 Number = typing.TypeVar('Number', int, float)
 
 URL_SUFFIX = "/activity-instance"
+URL_PREFIX = "/history"
 
 
 @dataclasses.dataclass
