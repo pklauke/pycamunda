@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
  
-## [v0.6.0] - 2021-XX-XX
+## [v0.6.0] - 2021-01-22
 
 * Add caseinst module
 * Add decisiondef module
