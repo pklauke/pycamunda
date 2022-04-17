@@ -30,7 +30,6 @@ class ExternalTask:
     activity_id: str
     activity_instance_id: str
     error_message: str
-    error_details: str
     execution_id: str
     id_: str
     process_definition_id: str
@@ -45,6 +44,7 @@ class ExternalTask:
     suspended: bool = None
     business_key: str = None
     variables: typing.Dict[str, typing.Dict[str, typing.Any]] = None
+    error_details: str = None
 
     @classmethod
     def load(cls, data: typing.Mapping[str, typing.Any]) -> ExternalTask:
@@ -52,7 +52,6 @@ class ExternalTask:
             activity_id=data['activityId'],
             activity_instance_id=data['activityInstanceId'],
             error_message=data['errorMessage'],
-            error_details=data['errorDetails'],
             execution_id=data['executionId'],
             id_=data['id'],
             process_definition_id=data['processDefinitionId'],
@@ -70,6 +69,10 @@ class ExternalTask:
             )
         try:
             external_task.suspended = data['suspended']
+        except KeyError:
+            pass
+        try:
+            external_task.error_details = data['errorDetails']
         except KeyError:
             pass
         try:
