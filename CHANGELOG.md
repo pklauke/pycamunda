@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
+
+## [v0.6.1] - 2021-04-17
+
+* Make external task error details optional
  
+## [v0.6.0] - 2021-01-22
+
+* Add caseinst module
+* Add decisiondef module
+* Fix query parameter name in case definition GetList and Count classes
+
 ## [v0.5.0] - 2021-07-31
 
 * Add condition module

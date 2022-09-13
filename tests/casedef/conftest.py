@@ -110,5 +110,5 @@ def count_output():
         'resourceNameLike': 'aResourceNam',
         'tenantIdIn': [1, 2],
         'withoutTenantId': 'true',
-        'includeProcessDefinitionsWithoutTenantId': 'true'
+        'includeCaseDefinitionsWithoutTenantId': 'true'
     }

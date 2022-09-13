@@ -36,10 +36,18 @@ def test_externaltask_load_definition(my_externaltask_json):
             }
 
 
+def test_externaltask_load_definition_without_error_details(my_externaltask_json):
+    json_ = dict(my_externaltask_json)
+    del json_['errorDetails']
+    external_task = pycamunda.externaltask.ExternalTask.load(json_)
+
+    assert external_task.error_details is None
+
+
 def test_externaltask_load_raises_keyerror(my_externaltask_json):
     for key in {
         key: val for key, val in my_externaltask_json.items()
-        if key not in {'suspended', 'businessKey', 'variables'}
+        if key not in {'suspended', 'businessKey', 'variables', 'errorDetails'}
     }:
         json_ = dict(my_externaltask_json)
         del json_[key]
