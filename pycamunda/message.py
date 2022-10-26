@@ -49,8 +49,10 @@ class MessageCorrelationResult:
         except KeyError:
             pass
         else:
+            # Fix: https://docs.camunda.org/manual/7.18/reference/rest/message/post-message/#response-2
+            # According to the docs, the variables is a mapping
             message_result.variables = tuple(
-                pycamunda.variable.Variable.load(variable_json) for variable_json in variables
+                pycamunda.variable.Variable.load(variable_json) for variable_json in variables.values()
             )
 
         return message_result

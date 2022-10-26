@@ -20,7 +20,7 @@ class Variable:
     """Data class of variable as returned by the REST api of Camunda."""
     value: typing.Any
     type_: str
-    value_info: typing.Dict
+    value_info: typing.Dict = None
     local: bool = None
 
     @classmethod
@@ -28,7 +28,7 @@ class Variable:
         variable = cls(
             value=data['value'],
             type_=data['type'],
-            value_info=data['valueInfo']
+            value_info=data.get('valueInfo')
         )
         try:
             variable.local = data['local']
