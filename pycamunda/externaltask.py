@@ -97,7 +97,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str, request_error_details: bool = True):
+    def __init__(self, url: str, id_: str, request_error_details: bool = False):
         """Query for an external task.
 
         :param url: Camunda Rest engine URL.
@@ -117,7 +117,15 @@ class Get(pycamunda.base.CamundaRequest):
         if self.request_error_details:
             if external_task.error_details is None:
                 try:
-                    response = requests.get(self.url + '/errorDetails')
+                    _request = None
+                    request_data = {}
+                    if self.session is not None:
+                        _request = self.session
+                    else:
+                        _request = requests
+                    if self.auth is not None:
+                        request_data['auth'] = self.auth
+                    response = requests.get(self.url + '/errorDetails', **request_data)
                 except requests.exceptions.RequestException:
                     raise pycamunda.PyCamundaException()
                 if not response:
@@ -193,7 +201,7 @@ class GetList(pycamunda.base.CamundaRequest):
         ascending: bool = True,
         first_result: int = None,
         max_results: int = None,
-        request_error_details: bool = True
+        request_error_details: bool = False
     ):
         """Query for a list of external tasks using a list of parameters. The size of the result set
         can be retrieved by using the Get Count request.
@@ -266,7 +274,15 @@ class GetList(pycamunda.base.CamundaRequest):
             for external_task in external_tasks:
                 if external_task.error_details is None:
                     try:
-                        response = requests.get(self.url + f'/{external_task.id_}/errorDetails')
+                        _request = None
+                        request_data = {}
+                        if self.session is not None:
+                            _request = self.session
+                        else:
+                            _request = requests
+                        if self.auth is not None:
+                            request_data['auth'] = self.auth
+                        response = _request.get(self.url + f'/{external_task.id_}/errorDetails', **request_data)
                     except requests.exceptions.RequestException:
                         raise pycamunda.PyCamundaException()
                     if not response:
