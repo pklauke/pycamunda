@@ -39,7 +39,7 @@ class UserMemberCreate(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = PathParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Create a membership between a tenant and an user.
 
         :param url: Camunda Rest engine URL.
@@ -49,10 +49,11 @@ class UserMemberCreate(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_USER_MEMBERS + '/{userId}')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class UserMemberDelete(pycamunda.base.CamundaRequest):
@@ -60,7 +61,7 @@ class UserMemberDelete(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = PathParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Delete a membership between a tenant and an user.
 
         :param url: Camunda Rest engine URL.
@@ -70,17 +71,18 @@ class UserMemberDelete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_USER_MEMBERS + '/{userId}')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class UserMemberOptions(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the tenant
         membership resource.
 
@@ -89,10 +91,11 @@ class UserMemberOptions(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_USER_MEMBERS)
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -102,7 +105,7 @@ class GroupMemberCreate(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     group_id = PathParameter('groupId')
 
-    def __init__(self, url: str, id_: str, group_id: str):
+    def __init__(self, url: str, id_: str, group_id: str, timeout: int = 5):
         """Create a membership between a tenant and a group.
 
         :param url: Camunda Rest engine URL.
@@ -112,10 +115,11 @@ class GroupMemberCreate(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_GROUP_MEMBERS + '/{groupId}')
         self.id_ = id_
         self.group_id = group_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class GroupMemberDelete(pycamunda.base.CamundaRequest):
@@ -123,7 +127,7 @@ class GroupMemberDelete(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     group_id = PathParameter('groupId')
 
-    def __init__(self, url: str, id_: str, group_id: str):
+    def __init__(self, url: str, id_: str, group_id: str, timeout: int = 5):
         """Delete a membership between a tenant and a group.
 
         :param url: Camunda Rest engine URL.
@@ -133,17 +137,18 @@ class GroupMemberDelete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_GROUP_MEMBERS + '/{groupId}')
         self.id_ = id_
         self.group_id = group_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class GroupMemberOptions(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the tenant
         membership resource.
 
@@ -152,10 +157,11 @@ class GroupMemberOptions(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_GROUP_MEMBERS)
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -192,7 +198,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Query for a list of tenants using a list of parameters. The size of the result set can be
         retrieved by using the Count class.
@@ -221,10 +228,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Tenant]:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Tenant.load(tenant_json) for tenant_json in response.json())
 
@@ -249,7 +257,8 @@ class Count(pycamunda.base.CamundaRequest):
         name_like: str = None,
         user_member: str = None,
         group_member: str = None,
-        including_groups_of_user: bool = False
+        including_groups_of_user: bool = False,
+        timeout: int = 5
     ):
         """Count tenants.
 
@@ -269,10 +278,11 @@ class Count(pycamunda.base.CamundaRequest):
         self.user_member = user_member
         self.group_member = group_member
         self.including_groups_of_user = including_groups_of_user
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']
 
@@ -281,7 +291,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a tenant.
 
         :param url: Camunda Rest engine URL.
@@ -289,10 +299,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Tenant:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Tenant.load(response.json())
 
@@ -302,7 +313,7 @@ class Create(pycamunda.base.CamundaRequest):
     id_ = BodyParameter('id')
     name = BodyParameter('name')
 
-    def __init__(self, url: str, id_: str, name: str):
+    def __init__(self, url: str, id_: str, name: str, timeout: int = 5):
         """Create a new tenant.
 
         :param url: Camunda Rest engine URL.
@@ -312,10 +323,11 @@ class Create(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/create')
         self.id_ = id_
         self.name = name
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Update(pycamunda.base.CamundaRequest):
@@ -324,7 +336,7 @@ class Update(pycamunda.base.CamundaRequest):
     new_id = BodyParameter('id')
     new_name = BodyParameter('name')
 
-    def __init__(self, url: str, id_: str, new_id: str, new_name: str):
+    def __init__(self, url: str, id_: str, new_id: str, new_name: str, timeout: int = 5):
         """Update a tenant.
 
         :param url: Camunda Rest engine URL.
@@ -336,17 +348,18 @@ class Update(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.new_id = new_id
         self.new_name = new_name
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Options(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str = None):
+    def __init__(self, url: str, id_: str = None, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the tenant
         resource.
 
@@ -355,6 +368,7 @@ class Options(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -362,7 +376,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -371,7 +385,7 @@ class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Delete a tenant.
 
         :param url: Camunda Rest engine URL.
@@ -379,7 +393,8 @@ class Delete(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)

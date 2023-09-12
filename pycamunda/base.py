@@ -42,25 +42,33 @@ class CamundaRequest(pycamunda.request.Request):
     def __call__(self, method: RequestMethod, *args, **kwargs) -> requests.Response:
         try:
             if self.session is not None:
-                kwargs = {}
+                request_kwargs = {}
                 if self.auth is not None:
-                    kwargs['auth'] = self.auth
+                    request_kwargs['auth'] = self.auth
+                if "timeout" in kwargs:
+                    request_kwargs["timeout"] = kwargs["timeout"]
+
                 response = self.session.request(
                     method=method.value,
                     url=self.url,
                     params=self.query_parameters(),
                     json=self.body_parameters(),
                     files=self.files,
-                    **kwargs
+                    **request_kwargs
                 )
             else:
+                request_kwargs = {}
+                if "timeout" in kwargs:
+                    request_kwargs["timeout"] = kwargs["timeout"]
+
                 response = requests.request(
                     method=method.value,
                     url=self.url,
                     params=self.query_parameters(),
                     json=self.body_parameters(),
                     auth=self.auth,
-                    files=self.files
+                    files=self.files,
+                    **request_kwargs
                 )
         except requests.exceptions.RequestException as exc:
             raise pycamunda.PyCamundaException(exc)

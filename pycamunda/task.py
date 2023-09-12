@@ -147,7 +147,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter("id")
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get an user task.
 
         :param url: Camunda Rest engine URL.
@@ -155,10 +155,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Task:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Task.load(response.json())
 
@@ -332,7 +333,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Get a list of user tasks.
 
@@ -492,10 +494,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Task]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Task.load(task_json) for task_json in response.json())
 
@@ -505,7 +508,7 @@ class Claim(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Claim a user task for a specific user. Only tasks that are not already claimed by other
         users can be claimed. To change the assignee of a task independently on whether it is
         already claimed by an user, the class 'SetAssignee' can be used.
@@ -517,17 +520,18 @@ class Claim(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/claim')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Unclaim(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Unclaim an user task.
 
         :param url: Camunda Rest engine URL.
@@ -535,10 +539,11 @@ class Unclaim(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/unclaim')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Complete(pycamunda.base.CamundaRequest):
@@ -547,7 +552,7 @@ class Complete(pycamunda.base.CamundaRequest):
     variables = BodyParameter('variables')
     with_variables_in_return = BodyParameter('withVariablesInReturn')
 
-    def __init__(self, url: str, id_: str, with_variables_in_return: bool = False):
+    def __init__(self, url: str, id_: str, with_variables_in_return: bool = False, timeout: int = 5):
         """Complete an user task.
 
         :param url: Camunda Rest engine URL.
@@ -558,6 +563,7 @@ class Complete(pycamunda.base.CamundaRequest):
         self.with_variables_in_return = with_variables_in_return
 
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
@@ -575,7 +581,7 @@ class Complete(pycamunda.base.CamundaRequest):
         self, *args, **kwargs
     ) -> typing.Optional[typing.Dict[str, pycamunda.variable.Variable]]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         if self.with_variables_in_return:
             return {
@@ -589,7 +595,7 @@ class Resolve(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     variables = BodyParameter('variables')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Resolve an user task that was delegated to the current assignee and send it back to the
         original owner. It is necessary that the task was delegated. The assignee of the user task
         will be set back to the owner of the task.
@@ -601,6 +607,7 @@ class Resolve(pycamunda.base.CamundaRequest):
         self.id_ = id_
 
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
@@ -616,7 +623,7 @@ class Resolve(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class SetAssignee(pycamunda.base.CamundaRequest):
@@ -624,7 +631,7 @@ class SetAssignee(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Set the assignee for an user task. Overwrites existing assignees.
 
         :param url: Camunda Rest engine URL.
@@ -634,10 +641,11 @@ class SetAssignee(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/assignee')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Delegate(pycamunda.base.CamundaRequest):
@@ -645,7 +653,7 @@ class Delegate(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = BodyParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Delegate an user task to an user.
 
         :param url: Camunda Rest engine URL.
@@ -655,10 +663,11 @@ class Delegate(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/delegate')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Create(pycamunda.base.CamundaRequest):
@@ -690,7 +699,8 @@ class Create(pycamunda.base.CamundaRequest):
         priority: int = None,
         parent_task_id: str = None,
         case_instance_id: str = None,
-        tenant_id: str = None
+        tenant_id: str = None,
+        timeout: int = 5
     ):
         """Create an user task.
 
@@ -723,10 +733,11 @@ class Create(pycamunda.base.CamundaRequest):
         self.parent_task_id = parent_task_id
         self.case_instance_id = case_instance_id
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Update(pycamunda.base.CamundaRequest):
@@ -758,7 +769,8 @@ class Update(pycamunda.base.CamundaRequest):
         priority: int,
         parent_task_id: str,
         case_instance_id: str,
-        tenant_id: str
+        tenant_id: str,
+        timeout: int = 5
     ):
         """Update an user task.
 
@@ -792,10 +804,11 @@ class Update(pycamunda.base.CamundaRequest):
         self.parent_task_id = parent_task_id
         self.case_instance_id = case_instance_id
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class IdentityLinksGetList(pycamunda.base.CamundaRequest):
@@ -803,7 +816,7 @@ class IdentityLinksGetList(pycamunda.base.CamundaRequest):
     task_id = PathParameter('id')
     type_ = QueryParameter('type')
 
-    def __init__(self, url: str, task_id: str = None, type_: str = None) -> None:
+    def __init__(self, url: str, task_id: str = None, type_: str = None, timeout: int = 5) -> None:
         """Get the identity links of an user task.
 
         An identity link is a relationship between an user task and an user or a group. E.g. when
@@ -817,10 +830,11 @@ class IdentityLinksGetList(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/identity-links')
         self.task_id = task_id
         self.type_ = type_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[IdentityLink]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(IdentityLink.load(link_json) for link_json in response.json())
 
@@ -833,7 +847,7 @@ class IdentityLinksAdd(pycamunda.base.CamundaRequest):
     type_ = BodyParameter('type')
 
     def __init__(
-        self, url: str, task_id: str, type_: str, user_id: str = None, group_id: str = None
+            self, url: str, task_id: str, type_: str, user_id: str = None, group_id: str = None, timeout: int =5
     ):
         """Add an identity link to an user task.
 
@@ -855,10 +869,11 @@ class IdentityLinksAdd(pycamunda.base.CamundaRequest):
         self.user_id = user_id
         self.group_id = group_id
         self.type_ = type_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class IdentityLinksDelete(pycamunda.base.CamundaRequest):
@@ -869,7 +884,7 @@ class IdentityLinksDelete(pycamunda.base.CamundaRequest):
     type_ = BodyParameter('type')
 
     def __init__(
-        self, url: str, task_id: str, type_: str, user_id: str = None, group_id: str = None
+        self, url: str, task_id: str, type_: str, user_id: str = None, group_id: str = None, timeout: int = 5
     ):
         """Delete an identity link of an user task.
 
@@ -891,17 +906,18 @@ class IdentityLinksDelete(pycamunda.base.CamundaRequest):
         self.user_id = user_id
         self.group_id = group_id
         self.type_ = type_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class CommentGetList(pycamunda.base.CamundaRequest):
 
     task_id = PathParameter('id')
 
-    def __init__(self, url: str, task_id: str) -> None:
+    def __init__(self, url: str, task_id: str, timeout: int = 5) -> None:
         """Get the comments for an user task.
 
         :param url: Camunda Rest engine URL.
@@ -909,10 +925,11 @@ class CommentGetList(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/comment')
         self.task_id = task_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Comment]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Comment.load(data=comment_json) for comment_json in response.json())
 
@@ -922,7 +939,7 @@ class CommentGet(pycamunda.base.CamundaRequest):
     task_id = PathParameter('id')
     comment_id = PathParameter('commentId')
 
-    def __init__(self, url: str, task_id: str, comment_id: str) -> None:
+    def __init__(self, url: str, task_id: str, comment_id: str, timeout: int = 5) -> None:
         """Get a comment for an user task.
 
         :param url: Camunda Rest engine URL.
@@ -932,10 +949,11 @@ class CommentGet(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/comment/{commentId}')
         self.task_id = task_id
         self.comment_id = comment_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Comment:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Comment.load(data=response.json())
 
@@ -945,7 +963,7 @@ class CommentCreate(pycamunda.base.CamundaRequest):
     task_id = PathParameter('id')
     message = BodyParameter('message')
 
-    def __init__(self, url: str, task_id: str, message: str) -> None:
+    def __init__(self, url: str, task_id: str, message: str, timeout: int = 5) -> None:
         """Create a comment for an user task.
 
         :param url: Camunda Rest engine URL.
@@ -955,10 +973,11 @@ class CommentCreate(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/comment/create')
         self.task_id = task_id
         self.message = message
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Comment:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return Comment.load(data=response.json())
 
@@ -975,7 +994,8 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
         task_id: str,
         var_name: str,
         deserialize_value: bool = False,
-        binary: bool = False
+        binary: bool = False,
+        timeout: int = 5
     ):
         """Get a local variable of an user task.
 
@@ -993,6 +1013,7 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
         self.var_name = var_name
         self.deserialize_value = deserialize_value
         self.binary = binary
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -1000,7 +1021,7 @@ class LocalVariablesGet(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.variable.Variable:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         if self.binary:
             return response.content
@@ -1016,7 +1037,8 @@ class LocalVariablesGetList(pycamunda.base.CamundaRequest):
         self,
         url: str,
         task_id: str,
-        deserialize_values: bool = False
+        deserialize_values: bool = False,
+        timeout: int = 5
     ):
         """Get local variables of an user task.
 
@@ -1030,10 +1052,11 @@ class LocalVariablesGetList(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables')
         self.task_id = task_id
         self.deserialize_values = deserialize_values
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Dict[str, pycamunda.variable.Variable]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return {
             name: pycamunda.variable.Variable.load(data=var_json)
@@ -1047,7 +1070,7 @@ class LocalVariablesModify(pycamunda.base.CamundaRequest):
     modifications = BodyParameter('modifications')
     deletions = BodyParameter('deletions')
 
-    def __init__(self, url: str, task_id: str, deletions: typing.Iterable[str] = None):
+    def __init__(self, url: str, task_id: str, deletions: typing.Iterable[str] = None, timeout: int = 5):
         """Modify local variables of an user task. This can be either updating or deleting
         variables.
 
@@ -1062,6 +1085,7 @@ class LocalVariablesModify(pycamunda.base.CamundaRequest):
         self.deletions = deletions
 
         self.modifications = {}
+        self.timeout = timeout
 
     def add_variable(
             self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
@@ -1086,7 +1110,7 @@ class LocalVariablesModify(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
@@ -1103,7 +1127,8 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
         task_id: str,
         var_name: str,
         value: typing.Any, type_: str = None,
-        value_info: typing.Any = None
+        value_info: typing.Any = None,
+        timeout: int = 5
     ):
         """Update a local variable. May be used with binary and file variables.
 
@@ -1125,6 +1150,7 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
         self.value = value
         self.type_ = type_
         self.value_info = value_info
+        self.timeout = timeout
 
     def _is_binary(self):
         return self.type_ in ('File', 'Bytes')
@@ -1145,9 +1171,9 @@ class LocalVariablesUpdate(pycamunda.base.CamundaRequest):
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         if self._is_binary():
-            response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+            response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
         else:
-            response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+            response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
         if not response:
             pycamunda.base._raise_for_status(response)
@@ -1158,7 +1184,7 @@ class LocalVariablesDelete(pycamunda.base.CamundaRequest):
     task_id = PathParameter('id')
     var_name = PathParameter('varName')
 
-    def __init__(self, url: str, task_id: str, var_name: str):
+    def __init__(self, url: str, task_id: str, var_name: str, timeout: int = 5):
         """Delete a local variable.
 
         Local variables are variables that do only exist in the context of a task.
@@ -1170,23 +1196,25 @@ class LocalVariablesDelete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/localVariables/{varName}')
         self.task_id = task_id
         self.var_name = var_name
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class GetCountByCandidateGroup(pycamunda.base.CamundaRequest):
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, timeout: int = 5):
         """Get the number of tasks for each candidate group.
 
         :param url: Camunda Rest engine URL.
         """
         super().__init__(url=url + URL_SUFFIX + '/report/candidate-group-count')
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[CountByCandidateGroup]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(CountByCandidateGroup.load(data=count_json) for count_json in response.json())

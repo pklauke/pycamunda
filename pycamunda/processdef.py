@@ -125,7 +125,8 @@ class GetActivityInstanceStats(pycamunda.base._PathMixin, pycamunda.base.Camunda
         tenant_id: str = None,
         failed_jobs: bool = None,
         incidents: bool = False,
-        incidents_for_type: typing.Union[str, pycamunda.incident.IncidentType] = None
+        incidents_for_type: typing.Union[str, pycamunda.incident.IncidentType] = None,
+        timeout: int = 5
     ):
         """Get runtime statistics for a process definition. Does not include historic data.
 
@@ -150,10 +151,11 @@ class GetActivityInstanceStats(pycamunda.base._PathMixin, pycamunda.base.Camunda
         self.incident_type = None
         if incidents_for_type is not None:
             self.incidents_for_type = pycamunda.incident.IncidentType(incidents_for_type)
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ActivityStats]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(ActivityStats.load(activity_json) for activity_json in response.json())
 
@@ -164,7 +166,7 @@ class GetProcessDiagram(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
 
-    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
+    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None, timeout: int = 5):
         """Get the diagram of a process definition.
 
         :param url: Camunda Rest engine URL.
@@ -175,10 +177,11 @@ class GetProcessDiagram(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs):
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.content
 
@@ -255,6 +258,7 @@ class Count(pycamunda.base.CamundaRequest):
         startable_in_tasklist: bool = None,
         startable_permission_check: bool = None,
         not_startable_in_tasklist: bool = None,
+        timeout: int = 5
     ):
         """Count process definitions.
 
@@ -329,10 +333,11 @@ class Count(pycamunda.base.CamundaRequest):
         self.startable_in_tasklist = startable_in_tasklist
         self.not_startable_in_tasklist = not_startable_in_tasklist
         self.startable_permission_check = startable_permission_check
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']
 
@@ -431,7 +436,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Query for a list of process definitions using a list of parameters. The size of the
         result set can be retrieved by using the Get List Count method.
@@ -517,10 +523,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessDefinition]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(ProcessDefinition.load(definition_json) for definition_json in response.json())
 
@@ -538,7 +545,8 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         failed_jobs: bool = False,
         incidents: bool = False,
         root_incidents: bool = False,
-        incidents_for_type: typing.Union[str, pycamunda.incident.IncidentType] = None
+        incidents_for_type: typing.Union[str, pycamunda.incident.IncidentType] = None,
+        timeout: int = 5
     ):
         """Get runtime statistics grouped by process definition. Does not include historic data.
 
@@ -561,10 +569,11 @@ class GetProcessInstanceStats(pycamunda.base.CamundaRequest):
         self.incidents_for_type = None
         if incidents_for_type is not None:
             self.incidents_for_type = pycamunda.incident.IncidentType(incidents_for_type)
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessInstanceStats]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(ProcessInstanceStats.load(stats_json) for stats_json in response.json())
 
@@ -575,7 +584,7 @@ class GetXML(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
 
-    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
+    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None, timeout: int = 5):
         """Get the BPMN xml diagram of a process definition.
 
         :param url: Camunda Rest engine URL.
@@ -587,10 +596,11 @@ class GetXML(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> str:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['bpmn20Xml']
 
@@ -601,7 +611,7 @@ class Get(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
 
-    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
+    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None, timeout: int = 5):
         """Get a process definition.
 
         :param url: Camunda Rest engine URL.
@@ -614,10 +624,11 @@ class Get(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> ProcessDefinition:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return ProcessDefinition.load(response.json())
 
@@ -646,7 +657,8 @@ class StartInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         case_instance_id: str = None,
         skip_custom_listeners: bool = False,
         skip_io_mappings: bool = False,
-        with_variables_in_return: bool = False
+        with_variables_in_return: bool = False,
+        timeout: int = 5
     ):
         """Start a process instance of a specific process definition.
 
@@ -683,6 +695,7 @@ class StartInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
         self.variables = {}
         self.start_instructions = []
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: typing.Any, type_: str = None, value_info: str = None
@@ -779,7 +792,7 @@ class StartInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.processinst.ProcessInstance:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.processinst.ProcessInstance.load(response.json())
 
@@ -802,7 +815,8 @@ class _ActivateSuspend(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest)
         key: str = None,
         tenant_id: str = None,
         include_process_instances: bool = None,
-        execution_datetime: dt.datetime = None
+        execution_datetime: dt.datetime = None,
+        timeout: int = 5
     ):
         """Activate or Suspend a process definition.
 
@@ -821,10 +835,11 @@ class _ActivateSuspend(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest)
         self.tenant_id = tenant_id
         self.include_process_instances = include_process_instances
         self.execution_datetime = execution_datetime
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Activate(_ActivateSuspend):
@@ -867,7 +882,8 @@ class Suspend(_ActivateSuspend):
             key: str = None,
             tenant_id: str = None,
             include_process_instances: bool = None,
-            execution_datetime: dt.datetime = None
+            execution_datetime: dt.datetime = None,
+            timeout: int = 5
     ):
         """Suspend a process definition.
 
@@ -885,7 +901,8 @@ class Suspend(_ActivateSuspend):
             key=key,
             tenant_id=tenant_id,
             include_process_instances=include_process_instances,
-            execution_datetime=execution_datetime
+            execution_datetime=execution_datetime,
+            timeout=timeout
         )
 
 
@@ -906,7 +923,8 @@ class UpdateHistoryTimeToLive(pycamunda.base._PathMixin, pycamunda.base.CamundaR
         history_time_to_live: int,
         id_: str = None,
         key: str = None,
-        tenant_id: str = None
+        tenant_id: str = None,
+        timeout: int = 5
     ):
         """Update the history time to live of a process definition.
 
@@ -921,10 +939,11 @@ class UpdateHistoryTimeToLive(pycamunda.base._PathMixin, pycamunda.base.CamundaR
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Delete(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
@@ -945,7 +964,8 @@ class Delete(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         tenant_id: str = None,
         cascade: bool = False,
         skip_custom_listeners: bool = False,
-        skip_io_mappings: bool = False
+        skip_io_mappings: bool = False,
+        timeout: int = 5
     ):
         """Delete a process definition.
 
@@ -964,10 +984,11 @@ class Delete(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.cascade = cascade
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class RestartProcessInstance(pycamunda.base.CamundaRequest):
@@ -990,7 +1011,8 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
         skip_custom_listeners: bool = False,
         skip_io_mappings: bool = False,
         initial_variables: bool = True,
-        without_business_key: bool = False
+        without_business_key: bool = False,
+        timeout: int = 5
     ):
         """Restart process instances of a specific process definition.
 
@@ -1013,6 +1035,7 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
         self.without_business_key = without_business_key
 
         self.instructions = []
+        self.timeout = timeout
 
     @property
     def url(self) -> str:
@@ -1076,7 +1099,7 @@ class RestartProcessInstance(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())

@@ -17,13 +17,12 @@ def test_getlist_params(engine_url, getlist_input, getlist_output):
 
 
 @unittest.mock.patch('requests.Session.request')
-def test_getlist_calls_requests(mock, engine_url):
-    get_definitions = pycamunda.processdef.GetList(url=engine_url, id_='anId')
+def test_getlist_calls_requests_with_timeout(mock, engine_url):
+    get_definitions = pycamunda.processdef.GetList(url=engine_url, id_='anId', timeout=23)
     get_definitions()
-
     assert mock.called
     assert mock.call_args[1]['method'].upper() == 'GET'
-
+    assert mock.call_args[1]['timeout'] == 23
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_getlist_raises_pycamunda_exception(engine_url):

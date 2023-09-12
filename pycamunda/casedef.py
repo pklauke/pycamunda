@@ -110,7 +110,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Query for a list of case definitions using a list of parameters. The size of the result
         set can be retrieved by using the Count method.
@@ -161,10 +162,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[CaseDefinition]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(CaseDefinition.load(casedef_json) for casedef_json in response.json())
 
@@ -209,7 +211,8 @@ class Count(pycamunda.base.CamundaRequest):
         resource_name_like: str = None,
         tenant_id_in: typing.Iterable[str] = None,
         without_tenant_id: bool = False,
-        include_without_tenant_id: bool = False
+        include_without_tenant_id: bool = False,
+        timeout: int = 5
     ):
         """Count case definitions.
 
@@ -249,10 +252,11 @@ class Count(pycamunda.base.CamundaRequest):
         self.tenant_id_in = tenant_id_in
         self.without_tenant_id = without_tenant_id
         self.include_without_tenant_id = include_without_tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']
 
@@ -263,7 +267,7 @@ class Get(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
 
-    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
+    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None, timeout: int = 5):
         """Get a case definition.
 
         :param url: Camunda Rest engine URL.
@@ -276,10 +280,11 @@ class Get(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> CaseDefinition:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return CaseDefinition.load(response.json())
 
@@ -295,7 +300,8 @@ class GetXML(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         url: str,
         id_: str = None,
         key: str = None,
-        tenant_id: str = None
+        tenant_id: str = None,
+        timeout: int = 5
     ):
         """Retrieve the CMMN XML of a case definition.
 
@@ -308,10 +314,11 @@ class GetXML(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> str:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['cmmnXml']
 
@@ -322,7 +329,7 @@ class GetDiagram(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
     key = PathParameter('key')
     tenant_id = PathParameter('tenant-id')
 
-    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None):
+    def __init__(self, url: str, id_: str = None, key: str = None, tenant_id: str = None, timeout: int = 5):
         """Get the diagram of a case definition.
 
         :param url: Camunda Rest engine URL.
@@ -333,10 +340,11 @@ class GetDiagram(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs):
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.content
 
@@ -358,7 +366,8 @@ class UpdateHistoryTimeToLive(pycamunda.base._PathMixin, pycamunda.base.CamundaR
         history_time_to_live: int,
         id_: str = None,
         key: str = None,
-        tenant_id: str = None
+        tenant_id: str = None,
+        timeout: int = 5
     ):
         """Update the history time to live of a case definition.
 
@@ -373,10 +382,11 @@ class UpdateHistoryTimeToLive(pycamunda.base._PathMixin, pycamunda.base.CamundaR
         self.id_ = id_
         self.key = key
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class CreateInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
@@ -394,7 +404,8 @@ class CreateInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         id_: str = None,
         key: str = None,
         tenant_id: str = None,
-        business_key: str = None
+        business_key: str = None,
+        timeout: int = 5
     ):
         """Create a case instance.
 
@@ -411,6 +422,7 @@ class CreateInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
         self.business_key = business_key
 
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: typing.Any, type_: str = None, value_info: str = None
@@ -426,6 +438,6 @@ class CreateInstance(pycamunda.base._PathMixin, pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.caseinst.CaseInstance:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.caseinst.CaseInstance.load(response.json())

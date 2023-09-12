@@ -82,7 +82,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get an incident.
 
         :param url: Camunda Rest engine URL.
@@ -90,10 +90,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Incident:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Incident.load(response.json())
 
@@ -153,7 +154,8 @@ class GetList(pycamunda.base.CamundaRequest):
         tenant_id_in: typing.Iterable[str] = None,
         job_definition_id_in: typing.Iterable[str] = None,
         sort_by: str = None,
-        ascending: bool = True
+        ascending: bool = True,
+        timeout: int = 5
     ):
         """Get a list of incidents.
 
@@ -195,10 +197,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.job_definition_id_in = job_definition_id_in
         self.sort_by = sort_by
         self.ascending = ascending
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Incident]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Incident.load(incident_json) for incident_json in response.json())
 
@@ -207,7 +210,7 @@ class Resolve(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Resolve an incident.
 
         :param url: Camunda Rest engine URL.
@@ -215,7 +218,8 @@ class Resolve(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)

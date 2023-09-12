@@ -79,7 +79,7 @@ class GetGroups(pycamunda.base.CamundaRequest):
 
     user_id = QueryParameter('userId')
 
-    def __init__(self, url: str, user_id: str):
+    def __init__(self, url: str, user_id: str, timeout: int = 5):
         """Get the groups of an user and all of their members.
 
         :param url: Camunda Rest engine URL.
@@ -87,10 +87,11 @@ class GetGroups(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/groups')
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> UsersGroups:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return UsersGroups.load(response.json())
 
@@ -100,7 +101,7 @@ class VerifyUser(pycamunda.base.CamundaRequest):
     username = BodyParameter('username')
     password = BodyParameter('password')
 
-    def __init__(self, url: str, username: str, password: str):
+    def __init__(self, url: str, username: str, password: str, timeout: int = 5):
         """Verify the credentials of an user.
 
         :param url: Camunda Rest engine URL.
@@ -110,26 +111,28 @@ class VerifyUser(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/verify')
         self.username = username
         self.password = password
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> AuthStatus:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return AuthStatus.load(response.json())
 
 
 class GetPasswordPolicy(pycamunda.base.CamundaRequest):
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, timeout: int = 5):
         """Get the list of password policy rules.
 
         :param url: Camunda Rest engine URL.
         """
         super().__init__(url=url + URL_SUFFIX + '/password-policy')
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[PasswordPolicy]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(PasswordPolicy.load(policy_json) for policy_json in response.json()['rules'])
 
@@ -138,7 +141,7 @@ class ValidatePassword(pycamunda.base.CamundaRequest):
 
     password = BodyParameter('password')
 
-    def __init__(self, url: str, password: str):
+    def __init__(self, url: str, password: str, timeout: int = 5):
         """Validate a password against the password policy rules.
 
         :param url: Camunda Rest engine URL.
@@ -146,10 +149,11 @@ class ValidatePassword(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/password-policy')
         self.password = password
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[PasswordPolicyCompliance]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return tuple(
             PasswordPolicyCompliance.load(policy_comp_json)
