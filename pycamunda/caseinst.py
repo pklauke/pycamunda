@@ -104,7 +104,8 @@ class GetList(pycamunda.base.CamundaRequest):
             sort_by: str = None,
             ascending: bool = True,
             first_result: int = None,
-            max_results: int = None
+            max_results: int = None,
+            timeout: int = 5
     ):
         """Get a list of case instances.
 
@@ -151,6 +152,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.max_results = max_results
 
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
@@ -166,7 +168,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[CaseInstance]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(CaseInstance.load(batch_json) for batch_json in response.json())
 
@@ -211,7 +213,8 @@ class Count(pycamunda.base.CamundaRequest):
             tenant_id_in: typing.Iterable[str] = None,
             without_tenant_id: bool = False,
             variable_names_ignore_case: bool = False,
-            variable_values_ignore_case: bool = False
+            variable_values_ignore_case: bool = False,
+            timeout: int = 5
     ):
         """Count a list of case instances.
 
@@ -250,6 +253,7 @@ class Count(pycamunda.base.CamundaRequest):
         self.variable_values_ignore_case = variable_values_ignore_case
 
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
@@ -265,7 +269,7 @@ class Count(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']
 
@@ -287,7 +291,8 @@ class Get(pycamunda.base.CamundaRequest):
             business_key: str = None,
             active: bool = False,
             completed: bool = False,
-            tenant_id: typing.Iterable[str] = None
+            tenant_id: typing.Iterable[str] = None,
+            timeout: int = 5
     ):
         """Get a case instance.
 
@@ -306,10 +311,11 @@ class Get(pycamunda.base.CamundaRequest):
         self.active = active
         self.completed = completed
         self.tenant_id = tenant_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> CaseInstance:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return CaseInstance.load(response.json())
 
@@ -355,7 +361,7 @@ class Complete(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
     variables = BodyParameter('variables')
     deletions = BodyParameter('deletions')
 
-    def __init__(self, url: str, id_: str, deletions: typing.Iterable[str] = None):
+    def __init__(self, url: str, id_: str, deletions: typing.Iterable[str] = None, timeout: int = 5):
         """Performs a transition from ACTIVE state to COMPLETED state. In addition to that,
         case instance variables can be updated and deleted.
 
@@ -368,10 +374,11 @@ class Complete(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
         self.deletions = deletions
 
         self.variables = {}
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Close(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
@@ -380,7 +387,7 @@ class Close(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
     variables = BodyParameter('variables')
     deletions = BodyParameter('deletions')
 
-    def __init__(self, url: str, id_: str, deletions: typing.Iterable[str] = None):
+    def __init__(self, url: str, id_: str, deletions: typing.Iterable[str] = None, timeout: int = 5):
         """Performs a transition from COMPLETED state to CLOSED state. In addition to that,
         case instance variables can be updated and deleted.
 
@@ -393,10 +400,11 @@ class Close(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
         self.deletions = deletions
 
         self.variables = {}
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Terminate(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
@@ -405,7 +413,7 @@ class Terminate(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
     variables = BodyParameter('variables')
     deletions = BodyParameter('deletions')
 
-    def __init__(self, url: str, id_: str, deletions: typing.Iterable[str] = None):
+    def __init__(self, url: str, id_: str, deletions: typing.Iterable[str] = None, timeout: int = 5):
         """Performs a transition from ACTIVE state to TERMINATED state. In addition to that,
         case instance variables can be updated and deleted.
 
@@ -418,7 +426,8 @@ class Terminate(_VariableDeletionMixin, pycamunda.base.CamundaRequest):
         self.deletions = deletions
 
         self.variables = {}
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)

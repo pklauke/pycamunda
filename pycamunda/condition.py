@@ -29,7 +29,8 @@ class Evaluate(pycamunda.base.CamundaRequest):
         business_key: str = None,
         tenant_id: str = None,
         without_tenant_id: bool = False,
-        process_definition_id: str = None
+        process_definition_id: str = None,
+        timeout: int = 5
     ):
         """Trigger the evaluation of conditional start events.
 
@@ -46,6 +47,7 @@ class Evaluate(pycamunda.base.CamundaRequest):
         self.process_definition_id = process_definition_id
 
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self,
@@ -65,7 +67,7 @@ class Evaluate(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[pycamunda.processinst.ProcessInstance]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return tuple(
             pycamunda.processinst.ProcessInstance.load(data=result_json)

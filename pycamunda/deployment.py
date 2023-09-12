@@ -171,6 +171,7 @@ class GetList(pycamunda.base.CamundaRequest):
         ascending: bool = True,
         first_result: int = None,
         max_results: int = None,
+        timeout: int = 5
     ):
         """Get a list of deployments.
         
@@ -206,10 +207,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Deployment]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Deployment.load(deployment_json) for deployment_json in response.json())
 
@@ -218,7 +220,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a deployment.
 
         :param url: Camunda Rest engine url.
@@ -226,10 +228,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Deployment:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Deployment.load(response.json())
 
@@ -249,7 +252,8 @@ class Create(pycamunda.base.CamundaRequest):
         source: str = None,
         enable_duplicate_filtering: bool = False,
         deploy_changed_only: bool = False,
-        tenant_id: str = None
+        tenant_id: str = None,
+        timeout: int = 5
     ):
         """Create a deployment with one or multiple resources (e.g. bpmn diagrams).
 
@@ -271,6 +275,7 @@ class Create(pycamunda.base.CamundaRequest):
         self.tenant_id = tenant_id
 
         self._files = []
+        self.timeout = timeout
 
     def add_resource(self, file) -> None:
         """Add a resource to the deployment.
@@ -293,7 +298,8 @@ class Create(pycamunda.base.CamundaRequest):
                 params=self.query_parameters(),
                 data=self.body_parameters(),
                 auth=self.auth,
-                files=self.files
+                files=self.files,
+                timeout=self.timeout
             )
         except requests.exceptions.RequestException as exc:
             raise pycamunda.PyCamundaException(exc)
@@ -307,7 +313,7 @@ class GetResources(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get the resources of a deployment.
 
         :param url: Camunda Rest engine URL.
@@ -315,10 +321,11 @@ class GetResources(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/resources')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Resource]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Resource.load(resource_json) for resource_json in response.json())
 
@@ -328,7 +335,7 @@ class GetResource(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     resource_id = PathParameter('resourceId')
 
-    def __init__(self, url: str, id_: str, resource_id: str, binary: bool = False):
+    def __init__(self, url: str, id_: str, resource_id: str, binary: bool = False, timeout: int = 5):
         """Get a resource of a deployment.
 
         :param url: Camunda Rest engine URL.
@@ -340,6 +347,7 @@ class GetResource(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.resource_id = resource_id
         self.binary = binary
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -347,7 +355,7 @@ class GetResource(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Union[Resource, typing.ByteString]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         if self.binary:
             return response.content
@@ -367,7 +375,8 @@ class Delete(pycamunda.base.CamundaRequest):
         id_: str,
         cascade: bool = False,
         skip_custom_listeners: bool = False,
-        skip_io_mappings: bool = False
+        skip_io_mappings: bool = False,
+        timeout: int = 5
     ):
         """Delete a deployment.
 
@@ -382,7 +391,8 @@ class Delete(pycamunda.base.CamundaRequest):
         self.cascade = cascade
         self.skip_custom_listeners = skip_custom_listeners
         self.skip_io_mappings = skip_io_mappings
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)

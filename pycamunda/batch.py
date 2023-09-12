@@ -116,7 +116,8 @@ class GetList(pycamunda.base.CamundaRequest):
             sort_by: str = None,
             ascending: bool = True,
             first_result: int = None,
-            max_results: int = None
+            max_results: int = None,
+            timeout: int = 5
     ):
         """Get a list of batches.
 
@@ -141,10 +142,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Batch]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Batch.load(batch_json) for batch_json in response.json())
 
@@ -165,6 +167,7 @@ class Count(pycamunda.base.CamundaRequest):
             tenant_id_in: typing.Iterable[str] = None,
             without_tenant_id: bool = False,
             suspended: bool = False,
+            timeout: int = 5
     ):
         """Count batches.
 
@@ -181,10 +184,11 @@ class Count(pycamunda.base.CamundaRequest):
         self.tenant_id_in = tenant_id_in
         self.without_tenant_id = without_tenant_id
         self.suspended = suspended
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']
 
@@ -193,7 +197,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str = None):
+    def __init__(self, url: str, id_: str = None, timeout: int = 5):
         """Get a batch.
 
         :param url: Camunda Rest engine URL.
@@ -201,10 +205,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Batch:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Batch.load(response.json())
 
@@ -214,7 +219,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     suspended = BodyParameter('suspended')
 
-    def __init__(self, url: str, id_: str, suspended: bool):
+    def __init__(self, url: str, id_: str, suspended: bool, timeout: int = 5):
         """Activate or Suspend a batch.
 
         :param url: Camunda Rest engine URL.
@@ -224,15 +229,16 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/suspended')
         self.id_ = id_
         self.suspended = suspended
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Activate(_ActivateSuspend):
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Activate a batch.
 
         :param url: Camunda Rest engine URL.
@@ -243,7 +249,7 @@ class Activate(_ActivateSuspend):
 
 class Suspend(_ActivateSuspend):
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Suspend a batch.
 
         :param url: Camunda Rest engine URL.
@@ -257,7 +263,7 @@ class Delete(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     cascade = QueryParameter('cascade', provide=pycamunda.base.value_is_true)
 
-    def __init__(self, url: str, id_: str, cascade: bool = False):
+    def __init__(self, url: str, id_: str, cascade: bool = False, timeout: int = 5):
         """Delete a batch.
 
         :param url: Camunda Rest engine URL.
@@ -267,10 +273,11 @@ class Delete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
         self.cascade = cascade
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class GetStats(pycamunda.base.CamundaRequest):
@@ -300,7 +307,8 @@ class GetStats(pycamunda.base.CamundaRequest):
             sort_by: str = None,
             ascending: bool = True,
             first_result: int = None,
-            max_results: int = None
+            max_results: int = None,
+            timeout: int = 5
     ):
         """Get batch statistics.
 
@@ -325,10 +333,11 @@ class GetStats(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[BatchStats]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(BatchStats.load(stats_json) for stats_json in response.json())
 
@@ -348,7 +357,8 @@ class CountStats(pycamunda.base.CamundaRequest):
             type_: str = None,
             tenant_id_in: typing.Iterable[str] = None,
             without_tenant_id: bool = False,
-            suspended: bool = False
+            suspended: bool = False,
+            timeout: int = 5
     ):
         """Count batch statistics.
 
@@ -365,9 +375,10 @@ class CountStats(pycamunda.base.CamundaRequest):
         self.tenant_id_in = tenant_id_in
         self.without_tenant_id = without_tenant_id
         self.suspended = suspended
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[BatchStats]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']

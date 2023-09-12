@@ -122,7 +122,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Query for a list of authorizations using a list of parameters. The size of the result set
         can be retrieved by using the Get Count request.
@@ -155,10 +156,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Authorization]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Authorization.load(auth_json) for auth_json in response.json())
 
@@ -181,6 +183,7 @@ class Count(pycamunda.base.CamundaRequest):
         group_id_in: typing.Iterable[str] = None,
         resource_type: typing.Union[str, pycamunda.resource.ResourceType] = None,
         resource_id: int = None,
+        timeout: int = 5
     ):
         """Get the size of the result returned by the Get List request.
 
@@ -203,10 +206,11 @@ class Count(pycamunda.base.CamundaRequest):
         if type_ is not None:
             self.resource_type = pycamunda.resource.ResourceType(resource_type)
         self.resource_id = resource_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return int(response.json()['count'])
 
@@ -215,7 +219,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get an auth.
 
         :param url: Camunda Rest engine URL.
@@ -223,10 +227,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Authorization:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Authorization.load(data=response.json())
 
@@ -246,7 +251,8 @@ class Check(pycamunda.base.CamundaRequest):
         permission_value: int,
         resource_name: str,
         resource_type: typing.Union[str, pycamunda.resource.ResourceType],
-        resource_id: str = None
+        resource_id: str = None,
+        timeout: int = 5
     ):
         """Check the authorization of the currently authenticated user.
 
@@ -263,10 +269,11 @@ class Check(pycamunda.base.CamundaRequest):
         self.resource_name = resource_name
         self.resource_type = resource_type
         self.resource_id = resource_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Permission:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Permission.load(data=response.json())
 
@@ -275,7 +282,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str = None):
+    def __init__(self, url: str, id_: str = None, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the authorization
         resource.
 
@@ -284,6 +291,7 @@ class Options(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '{path}')
         self.id_ = id_
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -291,7 +299,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(data=response.json())
 
@@ -313,7 +321,8 @@ class Create(pycamunda.base.CamundaRequest):
         resource_type: typing.Union[str, pycamunda.resource.ResourceType],
         resource_id: str,
         user_id: str = None,
-        group_id: str = None
+        group_id: str = None,
+        timeout: int = 5
     ):
         """Create an auth.
 
@@ -333,13 +342,14 @@ class Create(pycamunda.base.CamundaRequest):
         self.group_id = group_id
         self.resource_type = resource_type
         self.resource_id = resource_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Authorization:
         """Send the request."""
         assert (self.user_id is not None) != (self.group_id is not None), (
             'Either \'user_id\' or \'group_id\' has to be provided, not both.'
         )
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return Authorization.load(data=response.json())
 
@@ -361,7 +371,8 @@ class Update(pycamunda.base.CamundaRequest):
         resource_type: typing.Union[str, pycamunda.resource.ResourceType],
         resource_id: str,
         user_id: str = None,
-        group_id: str = None
+        group_id: str = None,
+        timeout: int = 5
     ):
         """Update an auth.
 
@@ -381,20 +392,21 @@ class Update(pycamunda.base.CamundaRequest):
         self.group_id = group_id
         self.resource_type = resource_type
         self.resource_id = resource_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         assert (self.user_id is not None) != (self.group_id is not None), (
             'Either \'user_id\' or \'group_id\' has to be provided, not both.'
         )
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Delete an auth.
 
         :param url: Camunda Rest engine URL.
@@ -402,7 +414,8 @@ class Delete(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
