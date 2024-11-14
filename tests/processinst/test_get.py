@@ -25,6 +25,15 @@ def test_get_calls_requests(mock, engine_url):
     assert mock.called
     assert mock.call_args[1]['method'].upper() == 'GET'
 
+@unittest.mock.patch('requests.Session.request')
+@unittest.mock.patch('pycamunda.processinst.ProcessInstance', unittest.mock.MagicMock())
+def test_get_calls_requests_with_timeout(mock, engine_url):
+    get_instance = pycamunda.processinst.Get(url=engine_url, id_='anProcessInstanceId', timeout=13)
+    get_instance()
+
+    assert mock.called
+    assert mock.call_args[1]['method'].upper() == 'GET'
+    assert mock.call_args[1]['timeout'] ==13 
 
 @unittest.mock.patch('requests.Session.request', raise_requests_exception_mock)
 def test_get_raises_pycamunda_exception(engine_url):

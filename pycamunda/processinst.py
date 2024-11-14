@@ -73,7 +73,8 @@ class Delete(pycamunda.base.CamundaRequest):
             skip_custom_listeners: bool = False,
             skip_io_mappings: bool = False,
             skip_subprocesses: bool = False,
-            fail_if_not_exists: bool = True
+            fail_if_not_exists: bool = True,
+            timeout: int = 10
     ):
         """Delete a process instance.
 
@@ -90,17 +91,18 @@ class Delete(pycamunda.base.CamundaRequest):
         self.skip_io_mappings = skip_io_mappings
         self.skip_subprocesses = skip_subprocesses
         self.fail_if_not_exists = fail_if_not_exists
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs):
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class GetActivityInstance(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get an activity instance tree for a specific process instance.
 
         :param url: Camunda Rest engine URL.
@@ -108,10 +110,11 @@ class GetActivityInstance(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/activity-instances')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> pycamunda.activityinst.ActivityInstance:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.activityinst.ActivityInstance.load(response.json())
 
@@ -200,7 +203,8 @@ class GetList(pycamunda.base.CamundaRequest):
             sort_by: str = None,
             ascending: bool = True,
             first_result: int = None,
-            max_results: int = None
+            max_results: int = None,
+            timeout: int = 10
     ):
         """Get a list of process instances.
 
@@ -284,10 +288,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ProcessInstance]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(ProcessInstance.load(instance_json) for instance_json in response.json())
 
@@ -296,7 +301,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a process instance.
 
         :param url: Camunda Rest engine URL.
@@ -304,10 +309,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> ProcessInstance:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return ProcessInstance.load(response.json())
 
@@ -327,7 +333,8 @@ class Modify(pycamunda.base.CamundaRequest):
         async_: bool = False,
         skip_custom_listeners: bool = False,
         skip_io_mappings: bool = False,
-        annotation: str = None
+        annotation: str = None,
+        timeout: int = 5
     ):
         """Modify a running process instance. This is done by adding instructions that are executed
         on a process instance.
@@ -347,6 +354,7 @@ class Modify(pycamunda.base.CamundaRequest):
         self.annotation = annotation
 
         self.instructions = []
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -521,7 +529,7 @@ class Modify(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Optional[pycamunda.batch.Batch]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         if self.async_:
             return pycamunda.batch.Batch.load(response.json())
@@ -532,7 +540,7 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     suspended = BodyParameter('suspended')
 
-    def __init__(self, url: str, id_: str, suspended: bool):
+    def __init__(self, url: str, id_: str, suspended: bool, timeout: int = 5):
         """Activate or Suspend a process definition.
 
         :param url: Camunda Rest engine URL.
@@ -542,15 +550,16 @@ class _ActivateSuspend(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/suspended')
         self.id_ = id_
         self.suspended = suspended
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Activate(_ActivateSuspend):
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Activate a process definition.
 
         :param url: Camunda Rest engine URL.
@@ -559,13 +568,14 @@ class Activate(_ActivateSuspend):
         super().__init__(
             url=url,
             id_=id_,
-            suspended=False
+            suspended=False,
+            timeout=timeout
         )
 
 
 class Suspend(_ActivateSuspend):
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Suspend a process definition.
 
         :param url: Camunda Rest engine URL.
@@ -574,7 +584,8 @@ class Suspend(_ActivateSuspend):
         super().__init__(
             url=url,
             id_=id_,
-            suspended=True
+            suspended=True,
+            timeout=timeout
         )
 
 
@@ -583,7 +594,7 @@ class VariablesDelete(pycamunda.base.CamundaRequest):
     process_instance_id = PathParameter('id')
     var_name = PathParameter('varName')
 
-    def __init__(self, url: str, process_instance_id: str, var_name: str):
+    def __init__(self, url: str, process_instance_id: str, var_name: str, timeout: int = 5):
         """Delete a process instance variable.
 
         :param url: Camunda Rest engine URL.
@@ -593,10 +604,11 @@ class VariablesDelete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/variables/{varName}')
         self.process_instance_id = process_instance_id
         self.var_name = var_name
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class VariablesGet(pycamunda.base.CamundaRequest):
@@ -611,7 +623,8 @@ class VariablesGet(pycamunda.base.CamundaRequest):
         process_instance_id: str,
         var_name: str,
         deserialize_value: bool = False,
-        binary: bool = False
+        binary: bool = False,
+        timeout: int = 5
     ):
         """Get a variable of a process instance.
 
@@ -627,6 +640,7 @@ class VariablesGet(pycamunda.base.CamundaRequest):
         self.var_name = var_name
         self.deserialize_value = deserialize_value
         self.binary = binary
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -634,7 +648,7 @@ class VariablesGet(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Union[pycamunda.variable.Variable, bytes]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         if self.binary:
             return response.content
@@ -650,7 +664,8 @@ class VariablesGetList(pycamunda.base.CamundaRequest):
         self,
         url: str,
         process_instance_id: str,
-        deserialize_values: bool = False
+        deserialize_values: bool = False,
+        timeout: int = 5
     ):
         """Get variables of a process instance.
 
@@ -662,10 +677,11 @@ class VariablesGetList(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/variables')
         self.process_instance_id = process_instance_id
         self.deserialize_values = deserialize_values
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Dict[str, pycamunda.variable.Variable]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return {
             name: pycamunda.variable.Variable.load(data=var_json)
@@ -679,7 +695,7 @@ class VariablesModify(pycamunda.base.CamundaRequest):
     modifications = BodyParameter('modifications')
     deletions = BodyParameter('deletions')
 
-    def __init__(self, url: str, process_instance_id: str, deletions: typing.Iterable[str] = None):
+    def __init__(self, url: str, process_instance_id: str, deletions: typing.Iterable[str] = None, timeout: int = 5):
         """Modify variables of a process instance. This can be either updating or deleting
         variables.
 
@@ -692,6 +708,7 @@ class VariablesModify(pycamunda.base.CamundaRequest):
         self.deletions = deletions
 
         self.modifications = {}
+        self.timeout = timeout
 
     def add_variable(
             self, name: str, value: typing.Any, type_: str = None, value_info: typing.Any = None
@@ -716,7 +733,7 @@ class VariablesModify(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class VariablesUpdate(pycamunda.base.CamundaRequest):
@@ -733,7 +750,8 @@ class VariablesUpdate(pycamunda.base.CamundaRequest):
         process_instance_id: str,
         var_name: str,
         value: typing.Any, type_: str = None,
-        value_info: typing.Any = None
+        value_info: typing.Any = None,
+        timeout: int = 5
     ):
         """Update a process instance variable. May be used with binary and file variables.
 
@@ -753,6 +771,7 @@ class VariablesUpdate(pycamunda.base.CamundaRequest):
         self.value = value
         self.type_ = type_
         self.value_info = value_info
+        self.timeout = timeout
 
     def _is_binary(self):
         return self.type_ in ('File', 'Bytes')
@@ -775,9 +794,9 @@ class VariablesUpdate(pycamunda.base.CamundaRequest):
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
         if self._is_binary():
-            response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+            response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
         else:
-            response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+            response = super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
         if not response:
             pycamunda.base._raise_for_status(response)

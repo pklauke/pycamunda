@@ -118,7 +118,8 @@ class GetList(pycamunda.base.CamundaRequest):
         ascending: bool = True,
         first_result: int = None,
         max_results: int = None,
-        deserialize_values: bool = False
+        deserialize_values: bool = False,
+        timeout: int = 5
     ):
         """Get a list of variable instances.
 
@@ -156,6 +157,7 @@ class GetList(pycamunda.base.CamundaRequest):
         self.deserialize_values = deserialize_values
 
         self.variable_values = []
+        self.timeout = timeout
 
     def _add_value_filter(self, name: str, criteria: str, value: str) -> None:
         """Add a filter to include only variables with certain values.
@@ -237,7 +239,7 @@ class GetList(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[VariableInstance]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(VariableInstance.load(variable_json) for variable_json in response.json())
 
@@ -247,7 +249,7 @@ class Get(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     deserialize_value = QueryParameter('deserializeValue')
 
-    def __init__(self, url: str, id_: str, deserialize_value: bool = False):
+    def __init__(self, url: str, id_: str, deserialize_value: bool = False, timeout: int = 5):
         """Get a variable instance.
 
         :param url: Camunda Rest engine URL.
@@ -258,9 +260,10 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
         self.deserialize_value = deserialize_value
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> VariableInstance:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return VariableInstance.load(response.json())

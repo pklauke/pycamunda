@@ -53,7 +53,7 @@ class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Deletes a user by id.
 
         :param url: Camunda Rest engine URL.
@@ -61,10 +61,11 @@ class Delete(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class Count(pycamunda.base.CamundaRequest):
@@ -90,7 +91,8 @@ class Count(pycamunda.base.CamundaRequest):
         email: str = None,
         email_like: str = None,
         member_of_group: str = None,
-        member_of_tenant: str = None
+        member_of_tenant: str = None,
+        timeout: int = 5
     ):
         """Count users.
 
@@ -115,10 +117,11 @@ class Count(pycamunda.base.CamundaRequest):
         self.email_like = email_like
         self.member_of_group = member_of_group
         self.member_of_tenant = member_of_tenant
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> int:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return response.json()['count']
 
@@ -166,7 +169,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Query for a list of users using a list of parameters. The size of the result set can be
         retrieved by using the Get User Count method.
@@ -200,10 +204,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[User]:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(User.load(user_json) for user_json in response.json())
 
@@ -212,7 +217,7 @@ class GetProfile(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get the profile of an user.
 
         :param url: Camunda Rest engine URL.
@@ -220,10 +225,11 @@ class GetProfile(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/profile')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> User:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return User.load(response.json())
 
@@ -232,7 +238,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str = None):
+    def __init__(self, url: str, id_: str = None, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the user resource.
 
         :param url: Camunda Rest engine URL.
@@ -240,6 +246,7 @@ class Options(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -247,7 +254,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -270,7 +277,8 @@ class Create(pycamunda.base.CamundaRequest):
         first_name: str = None,
         last_name: str = None,
         email: str = None,
-        password: str = None
+        password: str = None,
+        timeout: int = 5
     ):
         """Create a new user.
 
@@ -287,10 +295,11 @@ class Create(pycamunda.base.CamundaRequest):
         self.last_name = last_name
         self.email = email
         self.password = password
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class UpdateCredentials(pycamunda.base.CamundaRequest):
@@ -299,7 +308,7 @@ class UpdateCredentials(pycamunda.base.CamundaRequest):
     password = BodyParameter('password')
     authenticated_user_password = BodyParameter('authenticatedUserPassword')
 
-    def __init__(self, url: str, id_: str, password: str, authenticated_user_password: str):
+    def __init__(self, url: str, id_: str, password: str, authenticated_user_password: str, timeout: int = 5):
         """Update a user's credentials (password).
 
         :param url: Camunda Rest engine URL.
@@ -312,10 +321,11 @@ class UpdateCredentials(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.password = password
         self.authenticated_user_password = authenticated_user_password
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class UpdateProfile(pycamunda.base.CamundaRequest):
@@ -333,7 +343,8 @@ class UpdateProfile(pycamunda.base.CamundaRequest):
         new_user_id: str = None,
         first_name: str = None,
         last_name: str = None,
-        email: str = None
+        email: str = None,
+        timeout: int = 5
     ):
         """Update the profile information of an already existing user.
 
@@ -350,10 +361,11 @@ class UpdateProfile(pycamunda.base.CamundaRequest):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Unlock(pycamunda.base.CamundaRequest):
@@ -363,7 +375,8 @@ class Unlock(pycamunda.base.CamundaRequest):
     def __init__(
         self,
         url: str,
-        id_: str = None
+        id_: str = None,
+        timeout: int = 5
     ):
         """Unlock an user.
 
@@ -372,7 +385,8 @@ class Unlock(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/unlock')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)

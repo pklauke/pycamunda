@@ -47,7 +47,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a group.
 
         :param url: Camunda Rest engine URL.
@@ -55,10 +55,11 @@ class Get(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> Group:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return Group.load(response.json())
 
@@ -94,7 +95,8 @@ class GetList(pycamunda.base.CamundaRequest):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout: int = 5
     ):
         """Get a list of groups.
 
@@ -123,10 +125,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.ascending = ascending
         self.first_result = first_result
         self.max_results = max_results
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[Group]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
 
         return tuple(Group.load(group_json) for group_json in response.json())
 
@@ -137,7 +140,7 @@ class Create(pycamunda.base.CamundaRequest):
     name = BodyParameter('name')
     type_ = BodyParameter('type')
 
-    def __init__(self, url: str, id_: str, name: str, type_: str):
+    def __init__(self, url: str, id_: str, name: str, type_: str, timeout: int = 5):
         """Create a new group.
 
         :param url: Camunda Rest engine URL.
@@ -149,10 +152,11 @@ class Create(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.name = name
         self.type_ = type_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Update(pycamunda.base.CamundaRequest):
@@ -161,7 +165,7 @@ class Update(pycamunda.base.CamundaRequest):
     name = BodyParameter('name')
     type_ = BodyParameter('type')
 
-    def __init__(self, url: str, id_: str, name: str, type_: str):
+    def __init__(self, url: str, id_: str, name: str, type_: str, timeout: int = 5):
         """Update a group.
 
         :param url: Camunda Rest engine URL.
@@ -173,6 +177,7 @@ class Update(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.name = name
         self.type_ = type_
+        self.timeout = timeout
 
     def body_parameters(self, apply: typing.Callable = ...):
         params = super().body_parameters(apply=apply)
@@ -181,14 +186,14 @@ class Update(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class Options(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_=None):
+    def __init__(self, url: str, id_=None, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the group resource.
 
         :param url: Camunda Rest engine URL.
@@ -196,6 +201,7 @@ class Options(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX)
         self.id_ = id_
+        self.timeout = timeout
 
     @property
     def url(self):
@@ -203,7 +209,7 @@ class Options(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs):
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(response.json())
 
@@ -212,7 +218,7 @@ class Delete(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Delete a group.
 
         :param url: Camunda Rest engine URL.
@@ -220,10 +226,11 @@ class Delete(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class MemberCreate(pycamunda.base.CamundaRequest):
@@ -231,7 +238,7 @@ class MemberCreate(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = PathParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Add a member to a group.
 
         :param url: Camunda Rest engine URL.
@@ -241,10 +248,11 @@ class MemberCreate(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS + '/{userId}')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class MemberDelete(pycamunda.base.CamundaRequest):
@@ -252,7 +260,7 @@ class MemberDelete(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     user_id = PathParameter('userId')
 
-    def __init__(self, url: str, id_: str, user_id: str):
+    def __init__(self, url: str, id_: str, user_id: str, timeout: int = 5):
         """Delete a member from a group.
 
         :param url: Camunda Rest engine URL.
@@ -262,17 +270,18 @@ class MemberDelete(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS + '/{userId}')
         self.id_ = id_
         self.user_id = user_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request."""
-        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.DELETE, *args, **kwargs, timeout=self.timeout)
 
 
 class MemberOptions(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Get a list of options the currently authenticated user can perform on the group member
         resource.
 
@@ -281,9 +290,10 @@ class MemberOptions(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}' + URL_SUFFIX_MEMBERS)
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> pycamunda.resource.ResourceOptions:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.OPTIONS, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.resource.ResourceOptions.load(response.json())

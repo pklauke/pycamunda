@@ -97,7 +97,7 @@ class Get(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str, request_error_details: bool = True):
+    def __init__(self, url: str, id_: str, request_error_details: bool = True, timeout: int = 5):
         """Query for an external task.
 
         :param url: Camunda Rest engine URL.
@@ -108,10 +108,11 @@ class Get(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}')
         self.id_ = id_
         self.request_error_details = request_error_details
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> ExternalTask:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
         external_task = ExternalTask.load(response.json())
 
         if self.request_error_details:
@@ -193,7 +194,8 @@ class GetList(pycamunda.base.CamundaRequest):
         ascending: bool = True,
         first_result: int = None,
         max_results: int = None,
-        request_error_details: bool = True
+        request_error_details: bool = True,
+        timeout : int = 5
     ):
         """Query for a list of external tasks using a list of parameters. The size of the result set
         can be retrieved by using the Get Count request.
@@ -256,10 +258,11 @@ class GetList(pycamunda.base.CamundaRequest):
         self.first_result = first_result
         self.max_results = max_results
         self.request_error_details = request_error_details
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request."""
-        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.GET, *args, **kwargs, timeout=self.timeout)
         external_tasks = tuple(ExternalTask.load(task_json) for task_json in response.json())
 
         if self.request_error_details:
@@ -303,7 +306,8 @@ class Count(GetList):
         sort_by: str = None,
         ascending: bool = True,
         first_result: int = None,
-        max_results: int = None
+        max_results: int = None,
+        timeout : int = 5
     ):
         """Get the size of the result returned by the Get List request.
 
@@ -365,6 +369,7 @@ class Count(GetList):
             max_results=max_results
         )
         self._url += '/count'
+        self.timeout = timeout
 
     def query_parameters(self, apply: typing.Callable = ...):
         params = super().query_parameters(apply=apply)
@@ -403,7 +408,8 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
         worker_id: str,
         max_tasks: int,
         async_response_timeout: int = None,
-        use_priority: bool = False
+        use_priority: bool = False,
+        timeout : int = 5
     ):
         """Fetch and lock external tasks for a specific worker. Only external tasks with topics that
         are added to this request are fetched.
@@ -421,6 +427,7 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
         self.async_response_timeout = async_response_timeout
         self.use_priority = use_priority
         self.topics = []
+        self.timeout = timeout
 
     def add_topic(
         self,
@@ -449,7 +456,7 @@ class FetchAndLock(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> typing.Tuple[ExternalTask]:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return tuple(ExternalTask.load(task_json) for task_json in response.json())
 
@@ -461,7 +468,7 @@ class Complete(pycamunda.base.CamundaRequest):
     variables = BodyParameter('variables')
     local_variables = BodyParameter('localVariables')
 
-    def __init__(self, url: str, id_: str, worker_id: str):
+    def __init__(self, url: str, id_: str, worker_id: str, timeout: int = 5):
         """Complete an external task that is locked for a worker.
 
         :param url: Camunda Rest engine URL.
@@ -473,6 +480,7 @@ class Complete(pycamunda.base.CamundaRequest):
         self.worker_id = worker_id
         self.variables = {}
         self.local_variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
@@ -501,7 +509,7 @@ class Complete(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class HandleBPMNError(pycamunda.base.CamundaRequest):
@@ -518,7 +526,8 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
         id_: str,
         worker_id: str,
         error_code: str,
-        error_message: str = None
+        error_message: str = None,
+        timeout: int = 5
     ):
         """Report a business error for a running external task.
 
@@ -534,6 +543,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
         self.error_code = error_code
         self.error_message = error_message
         self.variables = {}
+        self.timeout = timeout
 
     def add_variable(
         self, name: str, value: str, type_: str = None, value_info: typing.Mapping = None
@@ -549,7 +559,7 @@ class HandleBPMNError(pycamunda.base.CamundaRequest):
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class HandleFailure(pycamunda.base.CamundaRequest):
@@ -569,7 +579,8 @@ class HandleFailure(pycamunda.base.CamundaRequest):
         error_message: str,
         error_details: str,
         retries: int,
-        retry_timeout: int
+        retry_timeout: int,
+        timeout: int = 5
     ):
         """Report a failure to execute a running external task.
 
@@ -593,17 +604,18 @@ class HandleFailure(pycamunda.base.CamundaRequest):
         self.error_details = error_details
         self.retries = retries
         self.retry_timeout = retry_timeout
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class Unlock(pycamunda.base.CamundaRequest):
 
     id_ = PathParameter('id')
 
-    def __init__(self, url: str, id_: str):
+    def __init__(self, url: str, id_: str, timeout: int = 5):
         """Unlock an external task.
 
         :param url: Camunda Rest engine URL.
@@ -611,10 +623,11 @@ class Unlock(pycamunda.base.CamundaRequest):
         """
         super().__init__(url=url + URL_SUFFIX + '/{id}/unlock')
         self.id_ = id_
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class ExtendLock(pycamunda.base.CamundaRequest):
@@ -623,7 +636,7 @@ class ExtendLock(pycamunda.base.CamundaRequest):
     new_duration = BodyParameter('newDuration')
     worker_id = BodyParameter('workerId')
 
-    def __init__(self, url: str, id_: str, new_duration: int, worker_id: str):
+    def __init__(self, url: str, id_: str, new_duration: int, worker_id: str, timeout: int = 5):
         """Unlock an external task.
 
         :param url: Camunda Rest engine URL.
@@ -636,10 +649,11 @@ class ExtendLock(pycamunda.base.CamundaRequest):
         self.id_ = id_
         self.new_duration = new_duration
         self.worker_id = worker_id
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
 
 class SetPriority(pycamunda.base.CamundaRequest):
@@ -647,7 +661,7 @@ class SetPriority(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     priority = BodyParameter('priority')
 
-    def __init__(self, url: str, id_: str, priority: int):
+    def __init__(self, url: str, id_: str, priority: int, timeout: int = 5):
         """Sets the priority of an external task.
 
         :param url: Camunda Rest engine URL.
@@ -657,10 +671,11 @@ class SetPriority(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/priority')
         self.id_ = id_
         self.priority = priority
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class SetRetries(pycamunda.base.CamundaRequest):
@@ -668,7 +683,7 @@ class SetRetries(pycamunda.base.CamundaRequest):
     id_ = PathParameter('id')
     retries = BodyParameter('retries', validate=lambda val: val >= 0)
 
-    def __init__(self, url: str, id_: str, retries: int):
+    def __init__(self, url: str, id_: str, retries: int, timeout: int = 5):
         """Sets the number of retries of an external task.
 
         :param url: Camunda Rest engine URL.
@@ -678,10 +693,11 @@ class SetRetries(pycamunda.base.CamundaRequest):
         super().__init__(url=url + URL_SUFFIX + '/{id}/retries')
         self.id_ = id_
         self.retries = retries
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
 
 
 class SetRetriesAsync(pycamunda.base.CamundaRequest):
@@ -693,7 +709,7 @@ class SetRetriesAsync(pycamunda.base.CamundaRequest):
     process_instance_query = BodyParameter('processInstanceQuery')
     historic_process_instance_query = BodyParameter('historicProcessInstanceQuery')
 
-    def __init__(self, url: str, retries: int, external_task_ids: typing.Iterable[str]):
+    def __init__(self, url: str, retries: int, external_task_ids: typing.Iterable[str], timeout: int = 5):
         """Sets the number of retries of external tasks asynchronously.
 
         :param url: Camunda Rest engine URL.
@@ -707,10 +723,11 @@ class SetRetriesAsync(pycamunda.base.CamundaRequest):
         self.external_task_query = None  # TODO
         self.process_instance_query = None  # TODO
         self.historic_process_instance_query = None  # TODO
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> pycamunda.batch.Batch:
         """Send the request"""
-        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs)
+        response = super().__call__(pycamunda.base.RequestMethod.POST, *args, **kwargs, timeout=self.timeout)
 
         return pycamunda.batch.Batch.load(response.json())
 
@@ -724,7 +741,7 @@ class SetRetriesSync(pycamunda.base.CamundaRequest):
     process_instance_query = BodyParameter('processInstanceQuery')
     historic_process_instance_query = BodyParameter('historicProcessInstanceQuery')
 
-    def __init__(self, url: str, retries: int, external_task_ids: typing.Iterable[str]):
+    def __init__(self, url: str, retries: int, external_task_ids: typing.Iterable[str], timeout: int = 5):
         """Sets the number of retries of external tasks synchronously.
 
         :param url: Camunda Rest engine URL.
@@ -738,7 +755,8 @@ class SetRetriesSync(pycamunda.base.CamundaRequest):
         self.external_task_query = None  # TODO
         self.process_instance_query = None  # TODO
         self.historic_process_instance_query = None  # TODO
+        self.timeout = timeout
 
     def __call__(self, *args, **kwargs) -> None:
         """Send the request"""
-        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs)
+        super().__call__(pycamunda.base.RequestMethod.PUT, *args, **kwargs, timeout=self.timeout)
